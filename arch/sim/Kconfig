@@ -48,6 +48,16 @@ config SIM_M32
 		beyond.  For those versions, you must add SIM_M32=y to the .config file in
 		order to enable building a 32-bit image on a 64-bit platform.
 
+config SIM_GLIBC_PLATFORM
+	bool "glibc platform"
+	default y
+	---help---
+		Configuration option to enable backtrace capability on platforms that
+		have execinfo.h. 
+
+		For platforms that do not have execinfo.h (Cygwin, Alpine and other),
+		you must add SIM_GLIBC_PLATFORM=n to the .config file to enable simulator build.
+
 config SIM_CYGWIN_DECORATED
 	bool "Decorated Cygwin names"
 	default n
@@ -116,7 +126,7 @@ config SIM_X8664_MICROSOFT
 		point return values are returned in XMM0. Parameters less than 64 bits
 		long are not zero extended; the high bits are not zeroed.
 
-endchoice
+endchoice # X64_64 ABI
 
 choice
 	prompt "Simulation at a fixed cadence in near real-time"
@@ -138,7 +148,7 @@ config SIM_WALLTIME_SIGNAL
 		will generate the timer 'tick' events from the host timer at a fixed rate.
 		The simulated 'tick' events from Idle task are no longer sent.
 
-endchoice
+endchoice # Simulation at a fixed cadence in near real-time
 
 config SIM_LOOPTASK_PRIORITY
 	int "looptask priority"
@@ -197,7 +207,7 @@ config SIM_NETUSRSOCK
 	---help---
 		Built-in support for a simulated network device using native stack via usrsock
 
-endchoice
+endchoice # Simulated Network Interface
 
 if SIM_NETDEV
 
@@ -217,7 +227,7 @@ config SIM_NETDEV_VPNKIT
 	---help---
 		Build in support for a simulated network device using VPNKit.
 
-endchoice
+endchoice # Simulated Network Device Type
 
 config SIM_NETDEV_NUMBER
 	int "Number of Simulated Network Device"
@@ -230,7 +240,7 @@ config SIM_NETDEV_NUMBER
 		Note that only one network device will be brought up by netinit automatically,
 		others will be kept in DOWN state by default.
 
-endif
+endif # SIM_NETDEV
 
 config SIM_NETDEV_VPNKIT_PATH
 	string "Unix domain socket to communicate with VPNKit"
@@ -258,8 +268,8 @@ config SIM_NET_BRIDGE
 		configure the bridge IP address (if any) and routes that point to the bridge.
 		See boards/sim/sim/sim/NETWORK-LINUX.txt for more information.
 
-endchoice
-endif
+endchoice # Simulation Network Type
+endif # HOST_LINUX
 
 if SIM_NET_BRIDGE
 config SIM_NET_BRIDGE_DEVICE
@@ -269,7 +279,7 @@ config SIM_NET_BRIDGE_DEVICE
 		The name of the bridge device (as passed to "brctl create") to which the simulation's
 		TAP interface should be added.
 
-endif
+endif # SIM_NET_BRIDGE
 
 config SIM_SOUND
 	bool "Simulated sound support"
@@ -286,9 +296,9 @@ config SIM_SOUND_ALSA
 	bool "alsa support on sim"
 	depends on HOST_LINUX
 
-endchoice
+endchoice # Simulated sound Type
 
-endif
+endif # SIM_SOUND
 
 config SIM_CAMERA
 	bool "Simulated video support"
@@ -305,7 +315,7 @@ config SIM_CAMERA_V4L2
 	bool "V4L2 camera support on sim"
 	depends on HOST_LINUX
 
-endchoice
+endchoice # Simulated video device type
 
 config HOST_VIDEO_DEV_PATH
 	string "Host video device path"
@@ -315,7 +325,7 @@ config SIM_CAMERA_DEV_PATH
 	string "NuttX video device path"
 	default "/dev/video"
 
-endif
+endif # SIM_CAMERA
 
 menu "Simulated Graphics/Input"
 
@@ -389,7 +399,7 @@ config SIM_VNCSERVER
 	---help---
 		Serve a VNC server
 
-endchoice
+endchoice # Graphics Device
 
 if INPUT
 choice
@@ -435,7 +445,7 @@ config SIM_KEYBOARD_BUFFSIZE
 	---help---
 		Emulator keyboard buffer size
 
-endif # if INPUT
+endif # INPUT
 
 endmenu
 
@@ -483,7 +493,7 @@ config SIM_I2CBUS_LINUX
 		by the user running the simulator.
 		https://www.kernel.org/doc/html/latest/i2c/dev-interface.html
 
-endchoice
+endchoice # Simulated I2C Bus Type
 
 config SIM_I2CBUS_ID
 	int "I2C host bus ID to attach to simulator"
@@ -493,7 +503,7 @@ config SIM_I2CBUS_ID
 		This is the bus identifier that should be used by the host implementation to
 		attach to the simulator driver.
 
-endif
+endif # SIM_I2CBUS
 
 config SIM_SPI
 	bool "Simulated SPI port"
@@ -516,7 +526,7 @@ config SIM_SPI_LINUX
 		interface. To achieve a SPI port on Linux host, it is
 		recommended to use a USB<>SPI device such as CH341A/B.
 
-endchoice
+endchoice # Simulated SPI Type
 
 config SIM_SPIDEV_NAME
 	string "the name of SPI host dev to attach to simulator"
@@ -526,7 +536,7 @@ config SIM_SPIDEV_NAME
 		This is the name of the SPI device on the host implementation to
 		attach to the simulator driver.
 
-endif
+endif # SIM_SPI
 
 menu "Simulated UART"
 
@@ -659,7 +669,7 @@ config SIM_USB_RAW_GADGET
 		Install Raw Gadget:
 		Run ./insmod.sh in the raw_gadget and dummy_hcd directory.
 
-endif
+endif # SIM_USB_DEV
 
 config SIM_USB_HOST
 	bool "Linux USB Host"
@@ -694,6 +704,6 @@ config SIM_USB_PRIO
 	int "Simulated USB waiter task priority"
 	default 100
 
-endif
+endif # SIM_USB_HOST
 
 endif # ARCH_SIM
