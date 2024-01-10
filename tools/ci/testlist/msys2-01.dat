@@ -1,0 +1,8 @@
+# Chose a minimalistic subset of board/configs due to MSYS2 builds
+# being extremely slow on GitHub
+
+# sim
+
+/sim/*/*/*/nsh
+
+# -Msys,sim:nsh

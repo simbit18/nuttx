@@ -49,6 +49,9 @@ case $(uname -s) in
   MINGW32*)
     HOST=MinGw
     ;;
+  MSYS*)
+    HOST=Msys
+    ;;
   *)
 
     # Assume linux as a fallback

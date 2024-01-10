@@ -242,6 +242,8 @@ function util-linux {
 }
 
 function gen-romfs {
+  add_path "${tools}"/genromfs/usr/bin
+
   if ! type genromfs &> /dev/null; then
     case ${os} in
       Darwin)
@@ -250,6 +252,15 @@ function gen-romfs {
         ;;
       Linux)
         apt-get install -y genromfs
+        ;;
+      MSYS*)
+        git clone https://bitbucket.org/nuttx/tools.git "${tools}"/nuttx-tools
+        cd "${tools}"/nuttx-tools
+        tar zxf genromfs-0.5.2.tar.gz
+        cd genromfs-0.5.2
+        make install PREFIX="${tools}"/genromfs
+        cd "${tools}"
+        rm -rf nuttx-tools
         ;;
     esac
   fi
@@ -609,7 +620,7 @@ case ${os} in
     install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
     ;;
   MSYS*)
-    install="arm-gcc-toolchain kconfig-frontends"
+    install="arm-gcc-toolchain gen-romfs kconfig-frontends"
     ;;
 esac
 
