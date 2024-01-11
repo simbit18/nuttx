@@ -1,0 +1,6 @@
+# Chose a minimalistic subset of board/configs due to MSYS2 builds
+# being extremely slow on GitHub
+
+# ARM
+
+/arm/stm32f7/stm32f746g-disco,CONFIG_ARM_TOOLCHAIN_GNU_EABI
