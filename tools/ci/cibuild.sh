@@ -256,7 +256,13 @@ function gen-romfs {
         ;;
       Linux)
         if [ "X$osname" == "Xalpine" ]; then
-          make; make install
+          git clone https://bitbucket.org/nuttx/tools.git "${tools}"/nuttx-tools
+          cd "${tools}"/nuttx-tools
+          tar zxf genromfs-0.5.2.tar.gz
+          cd genromfs-0.5.2
+          make install PREFIX="${tools}"/genromfs
+          cd "${tools}"
+          rm -rf nuttx-tools
         else
           apt-get install -y genromfs
         fi
