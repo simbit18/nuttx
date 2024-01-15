@@ -248,6 +248,10 @@ function util-linux {
 }
 
 function gen-romfs {
+  if [ "X$osname" == "Xalpine" ]; then
+    add_path "${tools}"/genromfs/usr/bin
+  fi
+
   if ! type genromfs &> /dev/null; then
     case ${os} in
       Darwin)
