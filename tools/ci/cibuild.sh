@@ -97,7 +97,11 @@ function arm-gcc-toolchain {
     fi
   fi
 
-  command arm-none-eabi-gcc --version
+  if [ "X$osname" == "Xalpine" ]; then
+    arm-none-eabi-gcc --version
+  else
+    command arm-none-eabi-gcc --version
+  fi
 }
 
 function arm64-gcc-toolchain {
