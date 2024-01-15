@@ -86,9 +86,7 @@ function arm-gcc-toolchain {
     if [ "$archivetool" == "tar" ]; then
       wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/${basefile}.tar.xz
       xz -d ${basefile}.tar.xz
-      tar xf ${basefile}.tar
-      mv ${basefile} gcc-arm-none-eabi
-      rm ${basefile}.tar
+      tar xf ${basefile}.tar; mv ${basefile} gcc-arm-none-eabi; rm ${basefile}.tar
     else
       wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/${basefile}.zip
       unzip -qo ${basefile}.zip
