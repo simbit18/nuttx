@@ -32,6 +32,8 @@ nuttx=${WORKSPACE}/nuttx
 apps=${WORKSPACE}/apps
 tools=${WORKSPACE}/tools
 os=$(uname -s)
+# osname=$(grep '^NAME=' /etc/os-release)
+osname=$(grep "^ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
 EXTRA_PATH=
 
 function add_path {
@@ -249,7 +251,11 @@ function gen-romfs {
         brew install genromfs
         ;;
       Linux)
-        apt-get install -y genromfs
+        if [ "X$osname" == "Xalpine" ]; then
+          make; make install
+        else
+          apt-get install -y genromfs
+        fi
         ;;
     esac
   fi
@@ -281,8 +287,13 @@ function kconfig-frontends {
       --disable-kconfig --disable-nconf --disable-qconf \
       --disable-gconf --disable-mconf --disable-static \
       --disable-shared --disable-L10n
-    # Avoid "aclocal/automake missing" errors
-    touch aclocal.m4 Makefile.in
+    if [ "X$osname" == "Xalpine" ]; then
+      ln -s /usr/bin/aclocal /usr/local/bin/aclocal-1.15
+      ln -s /usr/bin/automake /usr/local/bin/automake-1.15
+    else
+      # Avoid "aclocal/automake missing" errors
+      touch aclocal.m4 Makefile.in
+    fi
     make install
     cd "${tools}"
     rm -rf nuttx-tools
@@ -606,7 +617,11 @@ case ${os} in
     rm -f /usr/local/bin/openssl || :
     ;;
   Linux)
-    install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
+    if [ "X$osname" == "Xalpine" ]; then
+      install="arm-gcc-toolchain gen-romfs kconfig-frontends"
+    else
+      install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
+    fi
     ;;
   MSYS*)
     install="arm-gcc-toolchain kconfig-frontends"

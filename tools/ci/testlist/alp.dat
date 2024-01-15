@@ -1,0 +1,8 @@
+# Alpine linux builds
+
+# sim
+
+/sim/*/*/*/nsh
+
+
+CMake,sim:nsh
