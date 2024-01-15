@@ -75,7 +75,7 @@ function arm-gcc-toolchain {
         ;;
       Linux)
        archivetool=tar
-        basefile=arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi
+        basefile=arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi
         ;;
       MSYS*)
         archivetool=unzip
@@ -87,7 +87,6 @@ function arm-gcc-toolchain {
       wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/${basefile}.tar.xz
       xz -d ${basefile}.tar.xz
       tar xf ${basefile}.tar
-      ls -a
       mv ${basefile} gcc-arm-none-eabi
       rm ${basefile}.tar
     else
