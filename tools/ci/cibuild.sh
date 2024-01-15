@@ -293,14 +293,16 @@ function kconfig-frontends {
   if [ ! -f "${tools}/kconfig-frontends/bin/kconfig-conf" ]; then
     git clone https://bitbucket.org/nuttx/tools.git "${tools}"/nuttx-tools
     cd "${tools}"/nuttx-tools/kconfig-frontends
-    ./configure --prefix="${tools}"/kconfig-frontends \
-      --disable-kconfig --disable-nconf --disable-qconf \
-      --disable-gconf --disable-mconf --disable-static \
-      --disable-shared --disable-L10n
     if [ "X$osname" == "Xalpine" ]; then
+      ./configure --prefix="${tools}"/kconfig-frontends \
+        --enable-mconf --disable-nconf --disable-gconf --disable-qconf
       ln -s /usr/bin/aclocal /usr/local/bin/aclocal-1.15
       ln -s /usr/bin/automake /usr/local/bin/automake-1.15
     else
+      ./configure --prefix="${tools}"/kconfig-frontends \
+        --disable-kconfig --disable-nconf --disable-qconf \
+        --disable-gconf --disable-mconf --disable-static \
+        --disable-shared --disable-L10n
       # Avoid "aclocal/automake missing" errors
       touch aclocal.m4 Makefile.in
     fi
