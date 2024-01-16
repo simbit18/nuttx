@@ -2,6 +2,6 @@
 
 # sim
 
-/sim/*/*/*/nsh
-
 # CMake,sim:nsh
+
+/sim/*/*/*/nsh
