@@ -4,4 +4,4 @@
 
 /sim/*/*/*/nsh
 
-CMake,sim:nsh
+# CMake,sim:nsh
