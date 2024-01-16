@@ -634,7 +634,7 @@ case ${os} in
     ;;
   Linux)
     if [ "X$osname" == "Xalpine" ]; then
-      install="arm-gcc-toolchain gen-romfs kconfig-frontends"
+      install="gen-romfs kconfig-frontends"
     else
       install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
     fi
