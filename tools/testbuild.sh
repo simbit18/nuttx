@@ -117,7 +117,11 @@ while [ ! -z "$1" ]; do
     ;;
   -j )
     shift
-    JOPTION="-j $1"
+    if [ "X$HOST" == "XMsys" ]; then
+      JOPTION="--jobs=$1"
+    else
+      JOPTION="-j $1"
+    fi
     ;;
   -t )
     shift
