@@ -140,7 +140,7 @@ function riscv-gcc-toolchain {
     unzip -qo ${basefile}.zip
     mv xpack-riscv-none-elf-gcc-13.2.0-2 riscv-none-elf-gcc
     rm ${basefile}.zip
-
+  fi
   command riscv-none-elf-gcc --version
 }
 
@@ -157,7 +157,6 @@ function xtensa-esp32-gcc-toolchain {
     wget --quiet https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/${basefile}.zip
     unzip -qo ${basefile}.zip
     rm ${basefile}.zip
-
   fi
 
   command xtensa-esp32-elf-gcc --version
@@ -176,7 +175,6 @@ function xtensa-esp32s2-gcc-toolchain {
     wget --quiet https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/${basefile}.zip
     unzip -qo ${basefile}.zip
     rm ${basefile}.zip
-
   fi
 
   command xtensa-esp32s2-elf-gcc --version
@@ -195,7 +193,6 @@ function xtensa-esp32s3-gcc-toolchain {
     wget --quiet https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/${basefile}.zip
     unzip -qo ${basefile}.zip
     rm ${basefile}.zip
-
   fi
 
   command xtensa-esp32s3-elf-gcc --version

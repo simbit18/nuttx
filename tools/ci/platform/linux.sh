@@ -264,7 +264,7 @@ function riscv-gcc-toolchain {
     tar zxf ${basefile}.tar.gz
     mv xpack-riscv-none-elf-gcc-13.2.0-2 riscv-none-elf-gcc
     rm ${basefile}.tar.gz
-
+  fi
   command riscv-none-elf-gcc --version
 }
 
@@ -360,7 +360,6 @@ function xtensa-esp32-gcc-toolchain {
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
     rm ${basefile}.tar
-
   fi
 
   command xtensa-esp32-elf-gcc --version
@@ -379,7 +378,6 @@ function xtensa-esp32s2-gcc-toolchain {
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
     rm ${basefile}.tar
-
   fi
 
   command xtensa-esp32s2-elf-gcc --version
@@ -398,7 +396,6 @@ function xtensa-esp32s3-gcc-toolchain {
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
     rm ${basefile}.tar
-
   fi
 
   command xtensa-esp32s3-elf-gcc --version

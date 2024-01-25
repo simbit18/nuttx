@@ -243,7 +243,7 @@ function riscv-gcc-toolchain {
     tar zxf ${basefile}.tar.gz
     mv xpack-riscv-none-elf-gcc-13.2.0-2 riscv-none-elf-gcc
     rm ${basefile}.tar.gz
-
+  fi
   command riscv-none-elf-gcc --version
 }
 
