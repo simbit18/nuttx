@@ -277,7 +277,7 @@ function setup_links {
 function install_tools {
   mkdir -p "${tools}"
 
-  install="arm-clang-toolchain arm-gcc-toolchain gen-romfs kconfig-frontends riscv-gcc-toolchain xtensa-esp32-gcc-toolchain"
+  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain gen-romfs kconfig-frontends riscv-gcc-toolchain xtensa-esp32-gcc-toolchain"
 
   pushd .
   for func in ${install}; do
