@@ -105,10 +105,6 @@ function usage {
 if [ -z "$1" ]; then
   usage
 else
- #  while [ -n "$1" ]; do
- #    civars+="$1 "
- #    shift
- #  done
   ciarg="$@"
 fi
 

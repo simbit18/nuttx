@@ -27,9 +27,6 @@ WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
 nuttx=${WORKSPACE}/nuttx
 apps=${WORKSPACE}/apps
 tools=${WORKSPACE}/tools
-# os=$(uname -s)
-# osname=$(grep '^NAME=' /etc/os-release)
-# osname=$(grep "^ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
 EXTRA_PATH=
 
 function add_path {
@@ -61,7 +58,7 @@ function arm-gcc-toolchain {
 
   if [ ! -f "${tools}/gcc-arm-none-eabi/bin/arm-none-eabi-gcc" ]; then
     local basefile
-    basefile=arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi
+    basefile=arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi
     cd "${tools}"
     wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/${basefile}.zip
     unzip -qo ${basefile}.zip
@@ -70,6 +67,24 @@ function arm-gcc-toolchain {
   fi
 
   command arm-none-eabi-gcc --version
+}
+
+function arm64-gcc-toolchain {
+  add_path "${tools}"/gcc-aarch64-none-elf/bin
+
+  if [ ! -f "${tools}/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc" ]; then
+    local basefile
+    basefile=arm-gnu-toolchain-13.2.Rel1-mingw-x86_64-aarch64-none-elf
+
+    cd "${tools}"
+    # Download the latest ARM64 GCC toolchain prebuilt by ARM
+    wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.Rel1/binrel/${basefile}.zip
+    unzip -qo ${basefile}.zip
+    mv ${basefile} gcc-aarch64-none-elf
+    rm ${basefile}.zip
+  fi
+
+  command aarch64-none-elf-gcc --version
 }
 
 function c-cache {
@@ -82,7 +97,6 @@ function c-cache {
 
   command ccache --version
 }
-
 
 function gen-romfs {
   add_path "${tools}"/genromfs/usr/bin
