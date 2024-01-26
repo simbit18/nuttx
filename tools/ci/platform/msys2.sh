@@ -74,7 +74,7 @@ function arm64-gcc-toolchain {
 
   if [ ! -f "${tools}/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc" ]; then
     local basefile
-    basefile=arm-gnu-toolchain-13.2.Rel1-mingw-x86_64-aarch64-none-elf
+    basefile=arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-aarch64-none-elf
 
     cd "${tools}"
     # Download the latest ARM64 GCC toolchain prebuilt by ARM
