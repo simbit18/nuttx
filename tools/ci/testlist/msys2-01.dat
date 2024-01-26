@@ -6,5 +6,17 @@
 /arm64/qemu/qemu-armv8a/configs/nsh_smp
 
 # x86_64
+# no
+# /x86_64/intel64/qemu-intel64/configs/nsh
 
-/x86_64/intel64/qemu-intel64/configs/nsh
+# XTENSA
+
+/xtensa/esp32/esp32-devkitc/configs/nsh
+
+/xtensa/esp32s3/esp32s3-devkitc/configs/nsh
+
+# RISC-V
+
+/risc-v/bl602/bl602evb/configs/nsh
+
+/risc-v/qemu-rv/rv-virt/configs/nsh

@@ -158,6 +158,24 @@ function riscv-gcc-toolchain {
   command riscv-none-elf-gcc --version
 }
 
+function sparc-gcc-toolchain {
+  add_path "${tools}"/sparc-gaisler-elf-gcc/bin
+
+  if [ ! -f "${tools}/sparc-gaisler-elf-gcc/bin/sparc-gaisler-elf-gcc" ]; then
+    local basefile
+    basefile=bcc-2.1.0-gcc-mingw64
+    cd "${tools}"
+
+    # Download the SPARC GCC toolchain prebuilt by Gaisler
+    wget --quiet https://www.gaisler.com/anonftp/bcc2/bin/${basefile}.zip
+    unzip -qo ${basefile}.zip
+    mv bcc-2.1.0-gcc sparc-gaisler-elf-gcc
+    rm ${basefile}.zip
+  fi
+
+  command sparc-gaisler-elf-gcc --version
+}
+
 # NO TEST
 function xtensa-esp32-gcc-toolchain {
   add_path "${tools}"/xtensa-esp32-elf/bin
@@ -212,8 +230,6 @@ function xtensa-esp32s3-gcc-toolchain {
   command xtensa-esp32s3-elf-gcc --version
 }
 
-
-
 function usage {
   echo ""
   echo "USAGE: $0 [-i] [-s] [-c] [-*] <testlist>"
@@ -261,7 +277,7 @@ function setup_links {
 function install_tools {
   mkdir -p "${tools}"
 
-  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain gen-romfs kconfig-frontends riscv-gcc-toolchain xtensa-esp32-gcc-toolchain"
+  install="arm-clang-toolchain arm-gcc-toolchain gen-romfs kconfig-frontends riscv-gcc-toolchain xtensa-esp32-gcc-toolchain"
 
   pushd .
   for func in ${install}; do
