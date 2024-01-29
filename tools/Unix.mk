@@ -550,7 +550,7 @@ endif
 	$(Q) echo $(BIN) > nuttx.manifest
 	$(Q) printf "%s\n" *.map >> nuttx.manifest
 ifeq ($(CONFIG_INTELHEX_BINARY),y)
-	@echo "CP: nuttx.hex"
+	$(Q) echo "CP: nuttx.hex"
 	$(Q) $(OBJCOPY) $(OBJCOPYARGS) -O ihex $(BIN) nuttx.hex
 	$(Q) echo nuttx.hex >> nuttx.manifest
 endif
