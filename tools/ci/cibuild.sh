@@ -23,7 +23,7 @@ set -o xtrace
 
 CID=$(cd "$(dirname "$0")" && pwd)
 CIWORKSPACE=$(cd "${CID}"/../../../ && pwd -P)
-CIPLAT=${CIWORKSPACE}/nuttx/tools/ci/platform
+CIPLAT=${CIWORKSPACE}/nuttx/tools/ci/platforms
 
 os=$(uname -s)
 # osname=$(grep '^NAME=' /etc/os-release)
@@ -51,6 +51,9 @@ function find_platform {
       ;;
     arch)
       to_do "arch"
+      ;;
+    cygwin)
+      "${CIPLAT}"/cygwin.sh ${ciarg}
       ;;
     debian)
       to_do "debian"

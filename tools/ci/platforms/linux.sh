@@ -17,6 +17,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# LINUX
+
 set -e
 set -o xtrace
 

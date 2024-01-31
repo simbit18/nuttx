@@ -17,7 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# MSYS2
+# Cygwin
 
 set -e
 set -o xtrace
@@ -277,7 +277,7 @@ function setup_links {
 function install_tools {
   mkdir -p "${tools}"
 
-  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain gen-romfs kconfig-frontends riscv-gcc-toolchain xtensa-esp32-gcc-toolchain xtensa-esp32s3-gcc-toolchain"
+  install="arm-clang-toolchain gen-romfs kconfig-frontends"
 
   pushd .
   for func in ${install}; do
