@@ -27,10 +27,10 @@ CIPLAT=${CIWORKSPACE}/nuttx/tools/ci/platforms
 
 os=$(uname -s)
 # osname=$(grep '^NAME=' /etc/os-release)
-if [ "X$os" == "XDarwin" ]; then
-  osname="Darwin"
-else
+if [ -f /etc/os-release ]; then
   osname=$(grep "^ID=" /etc/os-release | cut -d'=' -f2 | tr -d '"')
+else
+  osname=${os}
 fi
 
 EXTRA_PATH=
@@ -52,7 +52,7 @@ function find_platform {
     arch)
       to_do "arch"
       ;;
-    cygwin)
+    CYGWIN*)
       "${CIPLAT}"/cygwin.sh ${ciarg}
       ;;
     debian)
