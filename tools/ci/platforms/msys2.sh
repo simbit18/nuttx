@@ -98,6 +98,21 @@ function c-cache {
   command ccache --version
 }
 
+function esp-tool {
+  add_path "${tools}"/esp-tool
+
+  if ! type esptool &> /dev/null; then
+    local basefile
+    basefile=esptool-v4.7.0-win64
+    cd "${tools}"
+    curl -O -L -s https://github.com/espressif/esptool/releases/download/v4.7.0/${basefile}.zip
+    unzip -qo ${basefile}.zip
+    mv esptool-win64 esp-tool
+    rm ${basefile}.zip
+  fi
+  command esptool version
+}
+
 function gen-romfs {
   add_path "${tools}"/genromfs/usr/bin
 
@@ -299,7 +314,7 @@ function setup_links {
 function install_tools {
   mkdir -p "${tools}"
 
-  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain gen-romfs kconfig-frontends riscv-gcc-toolchain rust xtensa-esp32-gcc-toolchain xtensa-esp32s3-gcc-toolchain"
+  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain esp-tool gen-romfs kconfig-frontends riscv-gcc-toolchain rust xtensa-esp32-gcc-toolchain xtensa-esp32s3-gcc-toolchain"
 
   pushd .
   for func in ${install}; do

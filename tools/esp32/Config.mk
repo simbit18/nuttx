@@ -22,6 +22,12 @@
 # and assemble source files and to insert the resulting object files into an
 # archive.  These replace the default definitions at tools/Config.mk
 
+ifeq ($(CONFIG_WINDOWS_MSYS),y)
+ESPTOOL_FILE=esptool.exe
+else
+ESPTOOL_FILE=esptool.py
+endif
+
 ifeq ($(CONFIG_ESP32_FLASH_2M),y)
 	FLASH_SIZE := 2MB
 else ifeq ($(CONFIG_ESP32_FLASH_4M),y)
@@ -153,7 +159,7 @@ define HELP_FLASH_BOOTLOADER
 	$(Q) echo ""
 	$(Q) echo "$(YELLOW)Security features enabled, so bootloader not flashed automatically.$(RST)"
 	$(Q) echo "Use the following command to flash the bootloader:"
-	$(Q) echo "    esptool.py $(ESPTOOL_OPTS) write_flash $(ESPTOOL_WRITEFLASH_OPTS) $(FLASH_BL)"
+	$(Q) echo "    $(ESPTOOL_FILE) $(ESPTOOL_OPTS) write_flash $(ESPTOOL_WRITEFLASH_OPTS) $(FLASH_BL)"
 	$(Q) echo ""
 endef
 
@@ -175,7 +181,7 @@ define MERGEBIN
 			$(ESPTOOL_FLASH_OPTS)                                                \
 		)                                                                        \
 	)
-	esptool.py -c esp32 merge_bin --output nuttx.merged.bin $(ESPTOOL_MERGEBIN_OPTS) $(ESPTOOL_BINS)
+	$(ESPTOOL_FILE) -c esp32 merge_bin --output nuttx.merged.bin $(ESPTOOL_MERGEBIN_OPTS) $(ESPTOOL_BINS)
 	$(Q) echo nuttx.merged.bin >> nuttx.manifest
 
 	$(Q) if [ "$(CONFIG_ESP32_QEMU_IMAGE)" = "y" ]; then \
@@ -227,9 +233,9 @@ else
 ifeq ($(CONFIG_ESP32_APP_FORMAT_LEGACY),y)
 define MKIMAGE
 	$(Q) echo "MKIMAGE: ESP32 binary"
-	$(Q) if ! esptool.py version 1>/dev/null 2>&1; then \
+	$(Q) if ! $(ESPTOOL_FILE) version 1>/dev/null 2>&1; then \
 		echo ""; \
-		echo "esptool.py not found.  Please run: \"pip install esptool\""; \
+		echo "$(ESPTOOL_FILE) not found.  Please run: \"pip install esptool\""; \
 		echo ""; \
 		echo "Run make again to create the nuttx.bin image."; \
 		exit 1; \
@@ -238,7 +244,7 @@ define MKIMAGE
 		echo "Missing Flash memory size configuration for the ESP32 chip."; \
 		exit 1; \
 	fi
-	esptool.py -c esp32 elf2image $(ESPTOOL_FLASH_OPTS) -o nuttx.bin nuttx
+	$(ESPTOOL_FILE) -c esp32 elf2image $(ESPTOOL_FLASH_OPTS) -o nuttx.bin nuttx
 	$(Q) echo nuttx.bin >> nuttx.manifest
 	$(Q) echo "Generated: nuttx.bin (ESP32 compatible)"
 endef
@@ -266,11 +272,11 @@ define POSTBUILD
 	$(if $(CONFIG_ESP32_MERGE_BINS),$(call MERGEBIN))
 endef
 
-# ESPTOOL_BAUD -- Serial port baud rate used when flashing/reading via esptool.py
+# ESPTOOL_BAUD -- Serial port baud rate used when flashing/reading via esptool.py or esptool.exe
 
 ESPTOOL_BAUD ?= 921600
 
-# FLASH -- Download a binary image via esptool.py
+# FLASH -- Download a binary image via esptool.py or esptool.exe
 
 define FLASH
 	$(Q) if [ -z $(ESPTOOL_PORT) ]; then \
@@ -280,7 +286,7 @@ define FLASH
 	fi
 
 	$(eval ESPTOOL_OPTS := -c esp32 -p $(ESPTOOL_PORT) -b $(ESPTOOL_BAUD) $(ESPTOOL_RESET_OPTS))
-	esptool.py $(ESPTOOL_OPTS) write_flash $(ESPTOOL_WRITEFLASH_OPTS) $(ESPTOOL_BINS)
+	$(ESPTOOL_FILE) $(ESPTOOL_OPTS) write_flash $(ESPTOOL_WRITEFLASH_OPTS) $(ESPTOOL_BINS)
 
 	$(if $(CONFIG_ESP32_SECURE_BOOT)$(CONFIG_ESP32_SECURE_FLASH_ENC_ENABLED),$(call HELP_FLASH_BOOTLOADER))
 endef
