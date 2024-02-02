@@ -51,7 +51,7 @@ function arm-clang-toolchain {
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
     mv ${basefile} clang-arm-none-eabi
-    cp /usr/bin/clang-extdef-mapping-10 clang-arm-none-eabi/bin/clang-extdef-mapping
+    # cp /usr/bin/clang-extdef-mapping-10 clang-arm-none-eabi/bin/clang-extdef-mapping
     rm ${basefile}.tar.xz
   fi
   which clang
