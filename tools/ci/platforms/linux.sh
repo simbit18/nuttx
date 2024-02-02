@@ -52,7 +52,7 @@ function arm-clang-toolchain {
     tar xf ${basefile}.tar
     mv ${basefile} clang-arm-none-eabi
     cp /usr/bin/clang-extdef-mapping-10 clang-arm-none-eabi/bin/clang-extdef-mapping
-    rm ${basefile}.tar.xz
+    rm ${basefile}.tar
   fi
 
   command clang --version
