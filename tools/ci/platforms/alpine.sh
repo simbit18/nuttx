@@ -492,7 +492,7 @@ function setup_repos {
 function install_tools {
   mkdir -p "${tools}"
 
-    install="arm-clang-toolchain arm-gcc-toolchain gen-romfs gperf kconfig-frontends"
+    install="arm-clang-toolchain arm-gcc-toolchain gen-romfs kconfig-frontends"
 
   pushd .
   for func in ${install}; do
