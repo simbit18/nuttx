@@ -55,7 +55,7 @@ function arm-clang-toolchain {
     rm ${basefile}.tar
   fi
   which clang
-  clang --version
+  # clang --version
 }
 
 function arm-gcc-toolchain {
@@ -74,7 +74,7 @@ function arm-gcc-toolchain {
     rm ${basefile}.tar
   fi
   which arm-none-eabi-gcc
-  arm-none-eabi-gcc --version
+  # arm-none-eabi-gcc --version
 }
 
 function arm64-gcc-toolchain {
