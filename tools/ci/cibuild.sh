@@ -47,7 +47,7 @@ function find_platform {
 
   case ${osname} in
     alpine)
-      to_do "alpine"
+      "${CIPLAT}"/alpine.sh ${ciarg}
       ;;
     arch)
       to_do "arch"
