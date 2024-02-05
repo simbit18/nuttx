@@ -60,38 +60,19 @@ function arm-gcc-toolchain {
 }
 
 function arm64-gcc-toolchain {
-  add_path "${tools}"/gcc-aarch64-none-elf/bin
-
-  if [ ! -f "${tools}/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc" ]; then
-    local basefile
-    basefile=arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf
-
-    cd "${tools}"
-    # Download the latest ARM64 GCC toolchain prebuilt by ARM
-    wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.Rel1/binrel/${basefile}.tar.xz
-    xz -d ${basefile}.tar.xz
-    tar xf ${basefile}.tar
-    mv ${basefile} gcc-aarch64-none-elf
-    rm ${basefile}.tar
+  if ! type aarch64-none-elf-gcc &> /dev/null; then
+    apk --no-cache --update add gcc-aarch64-none-elf
   fi
-
-  command aarch64-none-elf-gcc --version
+  
+  aarch64-none-elf-gcc --version
 }
 
 function avr-gcc-toolchain {
   if ! type avr-gcc &> /dev/null; then
-    apt-get install -y avr-libc gcc-avr
+    apk --no-cache --update add gcc-avr
   fi
 
-  command avr-gcc --version
-}
-
-function binutils {
-  if ! type objcopy &> /dev/null; then
-    apt-get install -y binutils-dev
-  fi
-
-  command objcopy --version
+  avr-gcc --version
 }
 
 function bloaty {
@@ -137,14 +118,6 @@ function clang-tidy {
   command clang-tidy --version
 }
 
-function util-linux {
-  if ! type flock &> /dev/null; then
-    apt-get install -y util-linux
-  fi
-
-  command flock --version
-}
-
 function gen-romfs {
   add_path "${tools}"/genromfs/usr/bin
 
@@ -186,134 +159,21 @@ function mips-gcc-toolchain {
   command p32-gcc --version
 }
 
-function python-tools {
-  # Python User Env
-  export PIP_USER=yes
-  export PYTHONUSERBASE=${tools}/pylocal
-  add_path "${PYTHONUSERBASE}"/bin
-
-  # workaround for Cython issue
-  # https://github.com/yaml/pyyaml/pull/702#issuecomment-1638930830
-  pip3 install "Cython<3.0"
-  git clone https://github.com/yaml/pyyaml.git && \
-  cd pyyaml && \
-  git checkout release/5.4.1 && \
-  sed -i.bak 's/Cython/Cython<3.0/g' pyproject.toml && \
-  python setup.py sdist && \
-  pip3 install --pre dist/PyYAML-5.4.1.tar.gz
-  cd ..
-
-  pip3 install \
-    cmake-format \
-    CodeChecker \
-    cvt2utf \
-    cxxfilt \
-    esptool==4.5.1 \
-    imgtool==1.9.0 \
-    kconfiglib \
-    pexpect==4.8.0 \
-    pyelftools \
-    pyserial==3.5 \
-    pytest==6.2.5 \
-    pytest-json==0.4.0 \
-    pytest-ordering==0.6 \
-    pytest-repeat==0.9.1
-}
-
 function riscv-gcc-toolchain {
-  add_path "${tools}"/riscv-none-elf-gcc/bin
-
-  if [ ! -f "${tools}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
-    local basefile
-    basefile=xpack-riscv-none-elf-gcc-13.2.0-2-linux-x64
-
-    cd "${tools}"
-    # Download the latest RISCV GCC toolchain prebuilt by xPack
-    wget --quiet https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-2/${basefile}.tar.gz
-    tar zxf ${basefile}.tar.gz
-    mv xpack-riscv-none-elf-gcc-13.2.0-2 riscv-none-elf-gcc
-    rm ${basefile}.tar.gz
+  if ! type riscv-none-elf-gcc &> /dev/null; then
+    apk --no-cache --update add gcc-riscv-none-elf
   fi
-  command riscv-none-elf-gcc --version
+  
+  riscv-none-elf-gcc --version
+  
 }
 
 function rust {
-  add_path "${tools}"/rust/bin
-
   if ! type rustc &> /dev/null; then
-    mkdir -p "${tools}"/rust/bin
-    # Currently Debian installed rustc doesn't support 2021 edition.
-    export CARGO_HOME=${tools}/rust
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    apk --no-cache --update add rust cargo
   fi
 
-  command rustc --version
-}
-
-function rx-gcc-toolchain {
-  add_path "${tools}"/renesas-toolchain/rx-elf-gcc/bin
-
-  if [ ! -f "${tools}/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc" ]; then
-        # Download toolchain source code
-        # RX toolchain is built from source code. Once prebuilt RX toolchain is made available, the below code snippet can be removed.
-        mkdir -p "${tools}"/renesas-tools/rx/source; cd "${tools}"/renesas-tools/rx/source
-        wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/binutils/4.8.4.201803-gnurx/rx_binutils2.24_2018Q3.tar.gz \
-          -O rx_binutils2.24_2018Q3.tar.gz
-        tar zxf rx_binutils2.24_2018Q3.tar.gz
-        wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/gcc/4.8.4.201803-gnurx/rx_gcc_4.8.4_2018Q3.tar.gz \
-          -O rx_gcc_4.8.4_2018Q3.tar.gz
-        tar zxf rx_gcc_4.8.4_2018Q3.tar.gz
-        wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/newlib/4.8.4.201803-gnurx/rx_newlib2.2.0_2018Q3.tar.gz \
-          -O rx_newlib2.2.0_2018Q3.tar.gz
-        tar zxf rx_newlib2.2.0_2018Q3.tar.gz
-
-        # Install binutils
-        cd "${tools}"/renesas-tools/rx/source/binutils; chmod +x ./configure ./mkinstalldirs
-        mkdir -p "${tools}"/renesas-tools/rx/build/binutils; cd "${tools}"/renesas-tools/rx/build/binutils
-        "${tools}"/renesas-tools/rx/source/binutils/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
-          --disable-werror
-        make; make install
-
-        # Install gcc
-        cd "${tools}"/renesas-tools/rx/source/gcc
-        chmod +x ./contrib/download_prerequisites ./configure ./move-if-change ./libgcc/mkheader.sh
-        ./contrib/download_prerequisites
-        sed -i '1s/^/@documentencoding ISO-8859-1\n/' ./gcc/doc/gcc.texi
-        sed -i 's/@tex/\n&/g' ./gcc/doc/gcc.texi && sed -i 's/@end tex/\n&/g' ./gcc/doc/gcc.texi
-        mkdir -p "${tools}"/renesas-tools/rx/build/gcc; cd "${tools}"/renesas-tools/rx/build/gcc
-        "${tools}"/renesas-tools/rx/source/gcc/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
-        --disable-shared --disable-multilib --disable-libssp --disable-libstdcxx-pch --disable-werror --enable-lto \
-        --enable-gold --with-pkgversion=GCC_Build_1.02 --with-newlib --enable-languages=c
-        make; make install
-
-        # Install newlib
-        cd "${tools}"/renesas-tools/rx/source/newlib; chmod +x ./configure
-        mkdir -p "${tools}"/renesas-tools/rx/build/newlib; cd "${tools}"/renesas-tools/rx/build/newlib
-        "${tools}"/renesas-tools/rx/source/newlib/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc
-        make; make install
-        rm -rf "${tools}"/renesas-tools/
-  fi
-
-  command rx-elf-gcc --version
-}
-
-function sparc-gcc-toolchain {
-  add_path "${tools}"/sparc-gaisler-elf-gcc/bin
-
-  if [ ! -f "${tools}/sparc-gaisler-elf-gcc/bin/sparc-gaisler-elf-gcc" ]; then
-    local basefile
-    basefile=bcc-2.1.0-gcc-linux64
-    cd "${tools}"
-
-    # Download the SPARC GCC toolchain prebuilt by Gaisler
-    wget --quiet https://www.gaisler.com/anonftp/bcc2/bin/${basefile}.tar.xz
-    xz -d ${basefile}.tar.xz
-    tar xf ${basefile}.tar
-    mv bcc-2.1.0-gcc sparc-gaisler-elf-gcc
-    rm ${basefile}.tar
-  fi
-
-  command sparc-gaisler-elf-gcc --version
+  rustc --version
 }
 
 function xtensa-esp32-gcc-toolchain {
