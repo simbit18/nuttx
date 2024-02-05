@@ -47,7 +47,7 @@ function find_platform {
 
   case ${osname} in
     alpine)
-      chmod 0755 "${CIPLAT}"/alpine.sh
+      # chmod 0755 "${CIPLAT}"/alpine.sh
       "${CIPLAT}"/alpine.sh ${ciarg}
       ;;
     arch)

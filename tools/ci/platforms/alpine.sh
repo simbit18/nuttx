@@ -39,42 +39,24 @@ echo ${PATH}
 }
 
 function arm-clang-toolchain {
-  add_path "${tools}"/clang-arm-none-eabi/bin
-
-  if [ ! -f "${tools}/clang-arm-none-eabi/bin/clang" ]; then
-    local basefile
-    basefile=LLVMEmbeddedToolchainForArm-17.0.1-Linux-x86_64
-
-    cd "${tools}"
-    # Download the latest ARM clang toolchain prebuilt by ARM
-    curl -O -L -s https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm/releases/download/release-17.0.1/${basefile}.tar.xz
-    xz -d ${basefile}.tar.xz
-    tar xf ${basefile}.tar
-    mv ${basefile} clang-arm-none-eabi
-    # cp /usr/bin/clang-extdef-mapping-10 clang-arm-none-eabi/bin/clang-extdef-mapping
-    rm ${basefile}.tar
+  if ! type clang &> /dev/null; then
+    apk --no-cache --update add clang
   fi
+  
   which clang
-  # clang --version
+  clang --version
 }
 
 function arm-gcc-toolchain {
-  add_path "${tools}"/gcc-arm-none-eabi/bin
-
-  if [ ! -f "${tools}/gcc-arm-none-eabi/bin/arm-none-eabi-gcc" ]; then
-    local basefile
-    basefile=arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi
-
-    cd "${tools}"
-    # Download the latest ARM GCC toolchain prebuilt by ARM
-    wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/${basefile}.tar.xz
-    xz -d ${basefile}.tar.xz
-    tar xf ${basefile}.tar
-    mv ${basefile} gcc-arm-none-eabi
-    rm ${basefile}.tar
+  if ! type arm-none-eabi-gcc &> /dev/null; then
+    apk --no-cache --update add clang \
+          gcc-arm-none-eabi \
+          newlib-arm-none-eabi \
+          g++-arm-none-eabi
   fi
+
   which arm-none-eabi-gcc
-  # arm-none-eabi-gcc --version
+  arm-none-eabi-gcc --version
 }
 
 function arm64-gcc-toolchain {
