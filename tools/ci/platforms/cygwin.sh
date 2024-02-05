@@ -277,7 +277,7 @@ function setup_links {
 function install_tools {
   mkdir -p "${tools}"
 
-  install="arm-clang-toolchain gen-romfs kconfig-frontends"
+  install="arm-clang-toolchain arm-gcc-toolchain gen-romfs kconfig-frontends"
 
   pushd .
   for func in ${install}; do
