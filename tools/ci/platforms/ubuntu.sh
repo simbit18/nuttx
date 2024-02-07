@@ -116,7 +116,7 @@ function bloaty {
     # cmake -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
     cmake -B build
     cmake --build build
-    cmake --build build --target install
+    cmake --build build --target install -DCMAKE_SYSTEM_PREFIX_PATH=/tools/bloaty
     mv "${tools}"/bloaty-src/build "${tools}"/bloaty
     cd "${tools}"
     rm -rf bloaty-src
