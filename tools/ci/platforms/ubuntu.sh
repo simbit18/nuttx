@@ -114,7 +114,7 @@ function bloaty {
     cd "${tools}"/bloaty-src
     mkdir -p "${tools}"/bloaty
     cmake -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
-    make install
+    cmake install
     cd "${tools}"
     rm -rf bloaty-src
   fi
