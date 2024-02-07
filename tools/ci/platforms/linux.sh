@@ -92,7 +92,7 @@ function arm64-gcc-toolchain {
 
 function avr-gcc-toolchain {
   if ! type avr-gcc &> /dev/null; then
-    sudo apt-get install -y avr-libc gcc-avr
+    sudo apt-get install -y binutils-avr gcc-avr avr-libc 
   fi
 
   command avr-gcc --version
@@ -110,13 +110,10 @@ function bloaty {
   add_path "${tools}"/bloaty/bin
 
   if [ ! -f "${tools}/bloaty/bin/bloaty" ]; then
-    git clone --branch main https://github.com/google/bloaty "${tools}"/bloaty-src
+    git clone --depth 1 --branch v1.1 https://github.com/google/bloaty "${tools}"/bloaty-src
     cd "${tools}"/bloaty-src
-    # Due to issues with latest MacOS versions use pinned commit.
-    # https://github.com/google/bloaty/pull/326
-    git checkout 52948c107c8f81045e7f9223ec02706b19cfa882
     mkdir -p "${tools}"/bloaty
-    cmake -D BLOATY_PREFER_SYSTEM_CAPSTONE=NO -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
+    cmake -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
     make install
     cd "${tools}"
     rm -rf bloaty-src
@@ -126,16 +123,8 @@ function bloaty {
 }
 
 function c-cache {
-  add_path "${tools}"/ccache/bin
-
   if ! type ccache &> /dev/null; then
-    local basefile
-    basefile=ccache-3.7.7
-    cd "${tools}";
-    wget https://github.com/ccache/ccache/releases/download/v3.7.7/${basefile}.tar.gz
-    tar zxf ${basefile}.tar.gz
-    cd ${basefile}; ./configure --prefix="${tools}"/ccache; make; make install
-    cd "${tools}"; rm -rf ${basefile}; rm ${basefile}.tar.gz
+    sudo apt-get install -y ccache
   fi
 
   command ccache --version
