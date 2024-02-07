@@ -111,10 +111,13 @@ function bloaty {
 
   if [ ! -f "${tools}/bloaty/bin/bloaty" ]; then
     git clone --depth 1 --branch v1.1 https://github.com/google/bloaty "${tools}"/bloaty-src
-    cd "${tools}"/bloaty-src
     mkdir -p "${tools}"/bloaty
-    cmake -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
-    cmake install
+    cd "${tools}"/bloaty-src
+    # cmake -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
+    cmake -B build -S .
+    cmake --build
+    cmake --build build --target install
+    mv "${tools}"/bloaty-src/build "${tools}"/bloaty
     cd "${tools}"
     rm -rf bloaty-src
   fi
