@@ -76,14 +76,11 @@ function find_platform {
     msys2)
       "${CIPLAT}"/msys2.sh ${ciarg}
       ;;
-    rocky)
-      to_do "rocky"
-      ;;
     ubuntu)
       "${CIPLAT}"/linux.sh ${ciarg}
       ;;
     *)
-       to_do "unknown"
+      to_do "unknown"
       ;;
   esac
 

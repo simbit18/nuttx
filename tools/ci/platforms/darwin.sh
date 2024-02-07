@@ -296,11 +296,11 @@ function wasi-sdk {
     wget --quiet https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-19/${wasibasefile}.tar.gz
     tar xzf ${wasibasefile}.tar.gz
     mv wasi-sdk-19.0 wasi-sdk
-    rm ${wasibasefile}.tar
+    rm ${wasibasefile}.tar.gz
     cd wamrc
     wget --quiet https://github.com/bytecodealliance/wasm-micro-runtime/releases/download/WAMR-1.1.2/${wasmbasefile}.tar.gz
     tar xzf ${wasmbasefile}.tar.gz
-    rm ${wasmbasefile}.tar
+    rm ${wasmbasefile}.tar.gz
   fi
 
   export WASI_SDK_PATH="${tools}/wasi-sdk"
