@@ -77,7 +77,7 @@ function find_platform {
       "${CIPLAT}"/msys2.sh ${ciarg}
       ;;
     ubuntu)
-      "${CIPLAT}"/linux.sh ${ciarg}
+      "${CIPLAT}"/ubuntu.sh ${ciarg}
       ;;
     *)
       to_do "unknown"
