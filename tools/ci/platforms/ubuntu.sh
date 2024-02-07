@@ -120,6 +120,7 @@ function bloaty {
     mv "${tools}"/bloaty-src/build "${tools}"/bloaty
     cd "${tools}"
     rm -rf bloaty-src
+    ls -a "${tools}"/bloaty
   fi
 
   command bloaty --version
