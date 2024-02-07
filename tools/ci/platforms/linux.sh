@@ -92,7 +92,7 @@ function arm64-gcc-toolchain {
 
 function avr-gcc-toolchain {
   if ! type avr-gcc &> /dev/null; then
-    apt-get install -y avr-libc gcc-avr
+    sudo apt-get install -y avr-libc gcc-avr
   fi
 
   command avr-gcc --version
@@ -100,7 +100,7 @@ function avr-gcc-toolchain {
 
 function binutils {
   if ! type objcopy &> /dev/null; then
-    apt-get install -y binutils-dev
+    sudo apt-get install -y binutils-dev
   fi
 
   command objcopy --version
@@ -143,7 +143,7 @@ function c-cache {
 
 function clang-tidy {
   if ! type clang-tidy &> /dev/null; then
-    apt-get install -y clang clang-tidy
+    sudo apt-get install -y clang clang-tidy
   fi
 
   command clang-tidy --version
@@ -151,7 +151,7 @@ function clang-tidy {
 
 function util-linux {
   if ! type flock &> /dev/null; then
-    apt-get install -y util-linux
+    sudo apt-get install -y util-linux
   fi
 
   command flock --version
@@ -161,7 +161,7 @@ function gen-romfs {
   add_path "${tools}"/genromfs/usr/bin
 
   if ! type genromfs &> /dev/null; then
-    apt-get install -y genromfs
+    sudo apt-get install -y genromfs
   fi
 }
 
@@ -394,7 +394,7 @@ function xtensa-esp32s3-gcc-toolchain {
 
 function u-boot-tools {
   if ! type mkimage &> /dev/null; then
-    apt-get install -y u-boot-tools
+    sudo apt-get install -y u-boot-tools
   fi
 }
 
