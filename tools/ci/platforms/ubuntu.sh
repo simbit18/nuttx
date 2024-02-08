@@ -161,7 +161,7 @@ function gperf {
     sudo apt-get install -y gperf
   fi
 
-  command gperf --version
+  ## command gperf --version
 }
 
 function kconfig-frontends {
