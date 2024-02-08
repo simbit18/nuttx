@@ -68,7 +68,7 @@ function find_platform {
       "${CIPLAT}"/darwin.sh ${ciarg}
       ;;
     Linux)
-      "${CIPLAT}"/linux.sh ${ciarg}
+      "${CIPLAT}"/ubuntu.sh ${ciarg}
       ;;
     manjaro)
       to_do "manjaro"
