@@ -249,13 +249,13 @@ function rx-gcc-toolchain {
   if [ ! -f "${tools}/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc" ]; then
         # Download toolchain source code
         # RX toolchain is built from source code. Once prebuilt RX toolchain is made available, the below code snippet can be removed.
-        mkdir -p /tools/renesas-tools/source/binutils
+        mkdir -p "${tools}"/renesas-tools/source/binutils
         curl -s -L "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/binutils/8.3.0.202305-gnurx/binutils-2.36.1.tar.gz"
         tar -C renesas-tools/source/binutils --strip-components=1 -xz
-        mkdir -p /tools/renesas-tools/source/gcc
+        mkdir -p "${tools}"/renesas-tools/source/gcc
         curl -s -L "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/gcc/8.3.0.202305-gnurx/gcc-8.3.0.tar.gz"
         tar -C renesas-tools/source/gcc --strip-components=1 -xz
-        mkdir -p /tools/renesas-tools/source/newlib
+        mkdir -p "${tools}"/renesas-tools/source/newlib
         curl -s -L "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/newlib/8.3.0.202305-gnurx/newlib-4.1.0.tar.gz"
         tar -C renesas-tools/source/newlib --strip-components=1 -xz
 
