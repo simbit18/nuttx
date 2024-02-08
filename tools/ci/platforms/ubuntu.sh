@@ -192,7 +192,7 @@ function mips-gcc-toolchain {
     # Download the latest pinguino toolchain prebuilt by 32bit
     curl -O -L -s  https://github.com/PinguinoIDE/pinguino-compilers/releases/download/v20.10/${basefile}.zip
     unzip -qo ${basefile}.zip
-    mv ${basefile} pinguino-compilers
+    mv p32 pinguino-compilers
     rm ${basefile}.zip
   fi
 
@@ -200,29 +200,14 @@ function mips-gcc-toolchain {
 }
 
 function python-tools {
-  # Python User Env
-  export PIP_USER=yes
-  export PYTHONUSERBASE=${tools}/pylocal
-  add_path "${PYTHONUSERBASE}"/bin
-
-  # workaround for Cython issue
-  # https://github.com/yaml/pyyaml/pull/702#issuecomment-1638930830
-  pip3 install "Cython<3.0"
-  git clone https://github.com/yaml/pyyaml.git && \
-  cd pyyaml && \
-  git checkout release/5.4.1 && \
-  sed -i.bak 's/Cython/Cython<3.0/g' pyproject.toml && \
-  python setup.py sdist && \
-  pip3 install --pre dist/PyYAML-5.4.1.tar.gz
-  cd ..
 
   pip3 install \
     cmake-format \
     CodeChecker \
     cvt2utf \
     cxxfilt \
-    esptool==4.5.1 \
-    imgtool==1.9.0 \
+    esptool \
+    imgtool \
     kconfiglib \
     pexpect==4.8.0 \
     pyelftools \
