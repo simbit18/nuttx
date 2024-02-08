@@ -249,15 +249,28 @@ function rx-gcc-toolchain {
   if [ ! -f "${tools}/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc" ]; then
         # Download toolchain source code
         # RX toolchain is built from source code. Once prebuilt RX toolchain is made available, the below code snippet can be removed.
-        mkdir -p "${tools}"/renesas-tools/source/binutils
-        curl -s -L "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/binutils/8.3.0.202305-gnurx/binutils-2.36.1.tar.gz"
-        tar -C renesas-tools/source/binutils --strip-components=1 -xz
-        mkdir -p "${tools}"/renesas-tools/source/gcc
-        curl -s -L "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/gcc/8.3.0.202305-gnurx/gcc-8.3.0.tar.gz"
-        tar -C renesas-tools/source/gcc --strip-components=1 -xz
-        mkdir -p "${tools}"/renesas-tools/source/newlib
-        curl -s -L "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/newlib/8.3.0.202305-gnurx/newlib-4.1.0.tar.gz"
-        tar -C renesas-tools/source/newlib --strip-components=1 -xz
+        local basefilebinutils
+        local basefilegcc
+        local basefilenewlib
+        basefilebinutils=binutils-2.36.1
+        basefilegcc=gcc-8.3.0
+        basefilenewlib=newlib-4.1.0
+
+        mkdir -p "${tools}"/renesas-tools/source
+        curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/binutils/8.3.0.202305-gnurx/binutils-2.36.1.tar.gz" -o ${basefilebinutils}.tar.gz
+        tar zxf ${basefilebinutils}.tar.gz
+        mv ${basefilebinutils} "${tools}"/renesas-tools/source/binutils
+        rm ${basefilebinutils}.tar.gz
+
+        curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/gcc/8.3.0.202305-gnurx/gcc-8.3.0.tar.gz" -o ${basefilegcc}.tar.gz
+        tar zxf ${basefilegcc}.tar.gz
+        mv ${basefilegcc} "${tools}"/renesas-tools/source/gcc
+        rm ${basefilegcc}.tar.gz
+
+        curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/newlib/8.3.0.202305-gnurx/newlib-4.1.0.tar.gz" -o ${basefilenewlib}.tar.gz
+        tar zxf ${basefilenewlib}.tar.gz
+        mv ${basefilenewlib} "${tools}"/renesas-tools/source/newlib
+        rm ${basefilenewlib}.tar.gz
 
         # Install binutils
         cd "${tools}"/renesas-tools/source/binutils; chmod +x ./configure ./mkinstalldirs
