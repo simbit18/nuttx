@@ -188,11 +188,12 @@ function mips-gcc-toolchain {
   if [ ! -d "${tools}/pinguino-compilers/p32/bin/p32-gcc" ]; then
     local basefile
     basefile=pinguino-linux64-p32
+    mkdir -p "${tools}"/pinguino-compilers
     cd "${tools}"
     # Download the latest pinguino toolchain prebuilt by 32bit
     curl -O -L -s  https://github.com/PinguinoIDE/pinguino-compilers/releases/download/v20.10/${basefile}.zip
     unzip -qo ${basefile}.zip
-    mv p32 pinguino-compilers
+    mv p32 "${tools}"/pinguino-compilers/p32
     rm ${basefile}.zip
   fi
 
