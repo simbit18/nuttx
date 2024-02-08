@@ -236,17 +236,8 @@ function riscv-gcc-toolchain {
 }
 
 function rust {
-  add_path "${tools}"/rust/bin
-  # Configuring the PATH environment variable
-  export CARGO_HOME=${tools}/rust/cargo
-  export RUSTUP_HOME=${tools}/rust/rustup
   if ! type rustc &> /dev/null; then
-    mkdir -p "${tools}"/rust
-    cd "${tools}"
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    # Install targets supported from NuttX
-    $CARGO_HOME/bin/rustup target add thumbv6m-none-eabi
-    $CARGO_HOME/bin/rustup target add thumbv7m-none-eabi
+    sudo sudo apt-get install rustc
   fi
 
   command rustc --version
