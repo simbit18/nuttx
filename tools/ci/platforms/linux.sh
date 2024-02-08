@@ -46,7 +46,6 @@ function arm-clang-toolchain {
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
     mv ${basefile} clang-arm-none-eabi
-    cp /usr/bin/clang-extdef-mapping-10 clang-arm-none-eabi/bin/clang-extdef-mapping
     rm ${basefile}.tar
   fi
 
@@ -91,7 +90,7 @@ function arm64-gcc-toolchain {
 
 function avr-gcc-toolchain {
   if ! type avr-gcc &> /dev/null; then
-    apt-get install -y avr-libc gcc-avr
+    sudo apt-get install -y binutils-avr gcc-avr avr-libc 
   fi
 
   command avr-gcc --version
@@ -99,7 +98,7 @@ function avr-gcc-toolchain {
 
 function binutils {
   if ! type objcopy &> /dev/null; then
-    apt-get install -y binutils-dev
+    sudo apt-get install -y binutils-dev
   fi
 
   command objcopy --version
@@ -109,32 +108,25 @@ function bloaty {
   add_path "${tools}"/bloaty/bin
 
   if [ ! -f "${tools}/bloaty/bin/bloaty" ]; then
-    git clone --branch main https://github.com/google/bloaty "${tools}"/bloaty-src
-    cd "${tools}"/bloaty-src
-    # Due to issues with latest MacOS versions use pinned commit.
-    # https://github.com/google/bloaty/pull/326
-    git checkout 52948c107c8f81045e7f9223ec02706b19cfa882
+    git clone --depth 1 --branch v1.1 https://github.com/google/bloaty "${tools}"/bloaty-src
     mkdir -p "${tools}"/bloaty
-    cmake -D BLOATY_PREFER_SYSTEM_CAPSTONE=NO -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
-    make install
+    cd "${tools}"/bloaty-src
+    # cmake -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
+    cmake -B build -DCMAKE_INSTALL_PREFIX="${tools}"/bloaty
+    cmake --build build
+    cmake --build build --target install
+    # mv "${tools}"/bloaty-src/build "${tools}"/bloaty
     cd "${tools}"
     rm -rf bloaty-src
+    ls -a "${tools}"/bloaty
   fi
 
   command bloaty --version
 }
 
 function c-cache {
-  add_path "${tools}"/ccache/bin
-
   if ! type ccache &> /dev/null; then
-    local basefile
-    basefile=ccache-3.7.7
-    cd "${tools}";
-    wget https://github.com/ccache/ccache/releases/download/v3.7.7/${basefile}.tar.gz
-    tar zxf ${basefile}.tar.gz
-    cd ${basefile}; ./configure --prefix="${tools}"/ccache; make; make install
-    cd "${tools}"; rm -rf ${basefile}; rm ${basefile}.tar.gz
+    sudo apt-get install -y ccache
   fi
 
   command ccache --version
@@ -142,7 +134,7 @@ function c-cache {
 
 function clang-tidy {
   if ! type clang-tidy &> /dev/null; then
-    apt-get install -y clang clang-tidy
+    sudo apt-get install -y clang clang-tidy
   fi
 
   command clang-tidy --version
@@ -150,37 +142,24 @@ function clang-tidy {
 
 function util-linux {
   if ! type flock &> /dev/null; then
-    apt-get install -y util-linux
+    sudo apt-get install -y util-linux
   fi
 
   command flock --version
 }
 
 function gen-romfs {
-  add_path "${tools}"/genromfs/usr/bin
-
   if ! type genromfs &> /dev/null; then
-    apt-get install -y genromfs
+    sudo apt-get install -y genromfs
   fi
 }
 
 function gperf {
-  add_path "${tools}"/gperf/bin
-
-  if [ ! -f "${tools}/gperf/bin/gperf" ]; then
-    local basefile
-    basefile=gperf-3.1
-
-    cd "${tools}"
-    wget --quiet http://ftp.gnu.org/pub/gnu/gperf/${basefile}.tar.gz
-    tar zxf ${basefile}.tar.gz
-    cd "${tools}"/${basefile}
-    ./configure --prefix="${tools}"/gperf; make; make install
-    cd "${tools}"
-    rm -rf ${basefile}; rm ${basefile}.tar.gz
+ if ! type gperf &> /dev/null; then
+    sudo apt-get install -y gperf
   fi
 
-  command gperf --version
+  ## command gperf --version
 }
 
 function kconfig-frontends {
@@ -202,40 +181,32 @@ function kconfig-frontends {
 }
 
 function mips-gcc-toolchain {
-  add_path "${tools}"/pinguino-compilers/linux64/p32/bin
+  add_path "${tools}"/pinguino-compilers/p32/bin
 
-  if [ ! -d "${tools}/pinguino-compilers" ]; then
+  if [ ! -d "${tools}/pinguino-compilers/p32/bin/p32-gcc" ]; then
+    local basefile
+    basefile=pinguino-linux64-p32
+    mkdir -p "${tools}"/pinguino-compilers
     cd "${tools}"
-    git clone https://github.com/PinguinoIDE/pinguino-compilers
+    # Download the latest pinguino toolchain prebuilt by 32bit
+    curl -O -L -s  https://github.com/PinguinoIDE/pinguino-compilers/releases/download/v20.10/${basefile}.zip
+    unzip -qo ${basefile}.zip
+    mv p32 "${tools}"/pinguino-compilers/p32
+    rm ${basefile}.zip
   fi
 
   command p32-gcc --version
 }
 
 function python-tools {
-  # Python User Env
-  export PIP_USER=yes
-  export PYTHONUSERBASE=${tools}/pylocal
-  add_path "${PYTHONUSERBASE}"/bin
-
-  # workaround for Cython issue
-  # https://github.com/yaml/pyyaml/pull/702#issuecomment-1638930830
-  pip3 install "Cython<3.0"
-  git clone https://github.com/yaml/pyyaml.git && \
-  cd pyyaml && \
-  git checkout release/5.4.1 && \
-  sed -i.bak 's/Cython/Cython<3.0/g' pyproject.toml && \
-  python setup.py sdist && \
-  pip3 install --pre dist/PyYAML-5.4.1.tar.gz
-  cd ..
 
   pip3 install \
     cmake-format \
     CodeChecker \
     cvt2utf \
     cxxfilt \
-    esptool==4.5.1 \
-    imgtool==1.9.0 \
+    esptool \
+    imgtool \
     kconfiglib \
     pexpect==4.8.0 \
     pyelftools \
@@ -252,7 +223,6 @@ function riscv-gcc-toolchain {
   if [ ! -f "${tools}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
     local basefile
     basefile=xpack-riscv-none-elf-gcc-13.2.0-2-linux-x64
-
     cd "${tools}"
     # Download the latest RISCV GCC toolchain prebuilt by xPack
     wget --quiet https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-2/${basefile}.tar.gz
@@ -264,13 +234,8 @@ function riscv-gcc-toolchain {
 }
 
 function rust {
-  add_path "${tools}"/rust/bin
-
   if ! type rustc &> /dev/null; then
-    mkdir -p "${tools}"/rust/bin
-    # Currently Debian installed rustc doesn't support 2021 edition.
-    export CARGO_HOME=${tools}/rust
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    sudo sudo apt-get install rustc
   fi
 
   command rustc --version
@@ -282,40 +247,52 @@ function rx-gcc-toolchain {
   if [ ! -f "${tools}/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc" ]; then
         # Download toolchain source code
         # RX toolchain is built from source code. Once prebuilt RX toolchain is made available, the below code snippet can be removed.
-        mkdir -p "${tools}"/renesas-tools/rx/source; cd "${tools}"/renesas-tools/rx/source
-        wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/binutils/4.8.4.201803-gnurx/rx_binutils2.24_2018Q3.tar.gz \
-          -O rx_binutils2.24_2018Q3.tar.gz
-        tar zxf rx_binutils2.24_2018Q3.tar.gz
-        wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/gcc/4.8.4.201803-gnurx/rx_gcc_4.8.4_2018Q3.tar.gz \
-          -O rx_gcc_4.8.4_2018Q3.tar.gz
-        tar zxf rx_gcc_4.8.4_2018Q3.tar.gz
-        wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/newlib/4.8.4.201803-gnurx/rx_newlib2.2.0_2018Q3.tar.gz \
-          -O rx_newlib2.2.0_2018Q3.tar.gz
-        tar zxf rx_newlib2.2.0_2018Q3.tar.gz
+        local basefilebinutils
+        local basefilegcc
+        local basefilenewlib
+        basefilebinutils=binutils-2.36.1
+        basefilegcc=gcc-8.3.0
+        basefilenewlib=newlib-4.1.0
+
+        mkdir -p "${tools}"/renesas-tools/source
+        curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/binutils/8.3.0.202305-gnurx/binutils-2.36.1.tar.gz" -o ${basefilebinutils}.tar.gz
+        tar zxf ${basefilebinutils}.tar.gz
+        mv ${basefilebinutils} "${tools}"/renesas-tools/source/binutils
+        rm ${basefilebinutils}.tar.gz
+
+        curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/gcc/8.3.0.202305-gnurx/gcc-8.3.0.tar.gz" -o ${basefilegcc}.tar.gz
+        tar zxf ${basefilegcc}.tar.gz
+        mv ${basefilegcc} "${tools}"/renesas-tools/source/gcc
+        rm ${basefilegcc}.tar.gz
+
+        curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/newlib/8.3.0.202305-gnurx/newlib-4.1.0.tar.gz" -o ${basefilenewlib}.tar.gz
+        tar zxf ${basefilenewlib}.tar.gz
+        mv ${basefilenewlib} "${tools}"/renesas-tools/source/newlib
+        rm ${basefilenewlib}.tar.gz
 
         # Install binutils
-        cd "${tools}"/renesas-tools/rx/source/binutils; chmod +x ./configure ./mkinstalldirs
-        mkdir -p "${tools}"/renesas-tools/rx/build/binutils; cd "${tools}"/renesas-tools/rx/build/binutils
-        "${tools}"/renesas-tools/rx/source/binutils/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
+        cd "${tools}"/renesas-tools/source/binutils; chmod +x ./configure ./mkinstalldirs
+        mkdir -p "${tools}"/renesas-tools/build/binutils; cd "${tools}"/renesas-tools/build/binutils
+        "${tools}"/renesas-tools/source/binutils/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
           --disable-werror
         make; make install
 
         # Install gcc
-        cd "${tools}"/renesas-tools/rx/source/gcc
+        cd "${tools}"/renesas-tools/source/gcc
         chmod +x ./contrib/download_prerequisites ./configure ./move-if-change ./libgcc/mkheader.sh
         ./contrib/download_prerequisites
         sed -i '1s/^/@documentencoding ISO-8859-1\n/' ./gcc/doc/gcc.texi
         sed -i 's/@tex/\n&/g' ./gcc/doc/gcc.texi && sed -i 's/@end tex/\n&/g' ./gcc/doc/gcc.texi
-        mkdir -p "${tools}"/renesas-tools/rx/build/gcc; cd "${tools}"/renesas-tools/rx/build/gcc
-        "${tools}"/renesas-tools/rx/source/gcc/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
+        mkdir -p "${tools}"/renesas-tools/build/gcc; cd "${tools}"/renesas-tools/build/gcc
+        "${tools}"/renesas-tools/source/gcc/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
         --disable-shared --disable-multilib --disable-libssp --disable-libstdcxx-pch --disable-werror --enable-lto \
         --enable-gold --with-pkgversion=GCC_Build_1.02 --with-newlib --enable-languages=c
         make; make install
 
         # Install newlib
-        cd "${tools}"/renesas-tools/rx/source/newlib; chmod +x ./configure
-        mkdir -p "${tools}"/renesas-tools/rx/build/newlib; cd "${tools}"/renesas-tools/rx/build/newlib
-        "${tools}"/renesas-tools/rx/source/newlib/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc
+        cd "${tools}"/renesas-tools/source/newlib; chmod +x ./configure
+        mkdir -p "${tools}"/renesas-tools/build/newlib; cd "${tools}"/renesas-tools/build/newlib
+        "${tools}"/renesas-tools/source/newlib/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc
         make; make install
         rm -rf "${tools}"/renesas-tools/
   fi
@@ -394,7 +371,7 @@ function xtensa-esp32s3-gcc-toolchain {
 
 function u-boot-tools {
   if ! type mkimage &> /dev/null; then
-    apt-get install -y u-boot-tools
+    sudo apt-get install -y u-boot-tools
   fi
 }
 
@@ -464,13 +441,19 @@ function setup_links {
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/gcc
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/g++
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/p32-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv64-unknown-elf-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv64-unknown-elf-g++
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/rx-elf-gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv-none-elf-gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv-none-elf-g++
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-gcc
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-g++
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-gcc
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-g++
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-g++
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s2-elf-gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s2-elf-g++
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-g++
 }
 
 function setup_repos {
@@ -496,7 +479,7 @@ function setup_repos {
 function install_tools {
   mkdir -p "${tools}"
 
-    install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
+  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
 
   pushd .
   for func in ${install}; do
