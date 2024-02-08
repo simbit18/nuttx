@@ -114,10 +114,10 @@ function bloaty {
     mkdir -p "${tools}"/bloaty
     cd "${tools}"/bloaty-src
     # cmake -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
-    cmake -B build -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
+    cmake -B build -DCMAKE_INSTALL_PREFIX="${tools}"/bloaty
     cmake --build build
     cmake --build build --target install
-    mv "${tools}"/bloaty-src/build "${tools}"/bloaty
+    # mv "${tools}"/bloaty-src/build "${tools}"/bloaty
     cd "${tools}"
     rm -rf bloaty-src
     ls -a "${tools}"/bloaty
