@@ -35,8 +35,6 @@ else
   osname=${os}
 fi
 
-# EXTRA_PATH=
-
 function to_do {
   echo ""
   echo "NuttX TODO: $1"
@@ -104,13 +102,6 @@ function usage {
   exit 1
 }
 
-# if [ -z "$1" ]; then
-#   usage
-# else
-#  ciarg="$@"
-# fi
-
-# find_platform
 function enable_ccache {
   export CCACHE_DIR="${CIWORKSPACE}"/tools/ccache
 }

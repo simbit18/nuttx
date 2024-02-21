@@ -26,8 +26,6 @@ set -o xtrace
 
 WD=$(cd "$(dirname "$0")" && pwd)
 WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
-nuttx=${WORKSPACE}/nuttx
-apps=${WORKSPACE}/apps
 tools=${WORKSPACE}/tools
 EXTRA_PATH=
 
@@ -113,11 +111,9 @@ function bloaty {
     git clone --depth 1 --branch v1.1 https://github.com/google/bloaty "${tools}"/bloaty-src
     mkdir -p "${tools}"/bloaty
     cd "${tools}"/bloaty-src
-    # cmake -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
     cmake -B build -DCMAKE_INSTALL_PREFIX="${tools}"/bloaty
     cmake --build build
     cmake --build build --target install
-    # mv "${tools}"/bloaty-src/build "${tools}"/bloaty
     cd "${tools}"
     rm -rf bloaty-src
     ls -a "${tools}"/bloaty
@@ -161,7 +157,6 @@ function gperf {
     sudo apt-get install -y gperf
   fi
 
-  ## command gperf --version
 }
 
 function kconfig-frontends {
@@ -407,26 +402,6 @@ function wasi-sdk {
   command wamrc --version
 }
 
-function usage {
-  echo ""
-  echo "USAGE: $0 [-i] [-s] [-c] [-*] <testlist>"
-  echo "       $0 -h"
-  echo ""
-  echo "Where:"
-  echo "  -i install tools"
-  echo "  -s setup repos"
-  echo "  -c enable ccache"
-  echo "  -* support all options in testbuild.sh"
-  echo "  -h will show this help test and terminate"
-  echo "  <testlist> select testlist file"
-  echo ""
-  exit 1
-}
-
-function enable_ccache {
-  export CCACHE_DIR="${tools}"/ccache
-}
-
 function setup_links {
   # Configure ccache
   mkdir -p "${tools}"/ccache/bin/
@@ -458,27 +433,7 @@ function setup_links {
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-g++
 }
 
-function setup_repos {
-  pushd .
-  if [ -d "${nuttx}" ]; then
-    cd "${nuttx}"; git pull
-  else
-    git clone https://github.com/apache/nuttx.git "${nuttx}"
-    cd "${nuttx}"
-  fi
-  git log -1
-
-  if [ -d "${apps}" ]; then
-    cd "${apps}"; git pull
-  else
-    git clone https://github.com/apache/nuttx-apps.git "${apps}"
-    cd "${apps}"
-  fi
-  git log -1
-  popd
-}
-
-function install_tools {
+function install_build_tools {
   mkdir -p "${tools}"
 
   install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
@@ -492,52 +447,10 @@ function install_tools {
   if [ -d "${CCACHE_DIR}" ]; then
     setup_links
   fi
-  echo PATH="${EXTRA_PATH}"/"${PATH}" > "${tools}"/env.sh
+
+  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
+  echo "PATH=${EXTRA_PATH}:"'${PATH}' >> "${tools}"/env.sh
+  echo "export PATH" >> "${tools}"/env.sh
 }
 
-function run_builds {
-  local ncpus
-  ncpus=$(grep -c ^processor /proc/cpuinfo)
-
-  options+="-j ${ncpus}"
-
-  for build in "${builds[@]}"; do
-    "${nuttx}"/tools/testbuild.sh ${options} -e "-Wno-cpp -Werror" "${build}"
-  done
-
-  if [ -d "${CCACHE_DIR}" ]; then
-    # Print a summary of configuration and statistics counters
-    ccache -s
-  fi
-}
-
-if [ -z "$1" ]; then
-   usage
-fi
-
-while [ -n "$1" ]; do
-  case "$1" in
-  -h )
-    usage
-    ;;
-  -i )
-    install_tools
-    ;;
-  -c )
-    enable_ccache
-    ;;
-  -s )
-    setup_repos
-    ;;
-  -* )
-    options+="$1 "
-    ;;
-  * )
-    builds=( "$@" )
-    break
-    ;;
-  esac
-  shift
-done
-
-run_builds
+install_build_tools

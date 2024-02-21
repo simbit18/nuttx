@@ -246,6 +246,7 @@ function xtensa-esp32s3-gcc-toolchain {
 }
 
 function setup_links {
+  # Configure ccache
   mkdir -p "${tools}"/ccache/bin/
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-g++
@@ -269,7 +270,7 @@ function setup_links {
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-gcc
 }
 
-function install_tools {
+function install_build_tools {
   mkdir -p "${tools}"
 
   install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain kconfig-frontends riscv-gcc-toolchain rust"
@@ -287,7 +288,6 @@ function install_tools {
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${EXTRA_PATH}:"'${PATH}' >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
-  # echo PATH="${EXTRA_PATH}"/"${PATH}" > "${tools}"/env.sh
 }
 
-install_tools
+install_build_tools
