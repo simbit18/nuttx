@@ -26,8 +26,6 @@ set -o xtrace
 
 WD=$(cd "$(dirname "$0")" && pwd)
 WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
-# nuttx=${WORKSPACE}/nuttx
-# apps=${WORKSPACE}/apps
 tools=${WORKSPACE}/tools
 EXTRA_PATH=
 
@@ -288,3 +286,4 @@ function install_tools {
   echo PATH="${EXTRA_PATH}"/"${PATH}" > "${tools}"/env.sh
 }
 
+install_tools

@@ -67,20 +67,19 @@ function install_tools {
       to_do "freebsd"
       ;;
     Darwin)
-      "${CIPLAT}"/darwin.sh ${ciarg}
+      "${CIPLAT}"/darwin.sh
       ;;
     Linux)
-      "${CIPLAT}"/linux.sh ${ciarg}
+      "${CIPLAT}"/linux.sh
       ;;
     manjaro)
       to_do "manjaro"
       ;;
     msys2)
       "${CIPLAT}"/msys2.sh
-# "${CIPLAT}"/msys2.sh ${ciarg}
       ;;
     ubuntu)
-      "${CIPLAT}"/ubuntu.sh ${ciarg}
+      "${CIPLAT}"/ubuntu.sh
       ;;
     *)
       to_do "unknown"
@@ -113,7 +112,7 @@ function usage {
 
 # find_platform
 function enable_ccache {
-  export CCACHE_DIR="${tools}"/ccache
+  export CCACHE_DIR="${CIWORKSPACE}"/tools/ccache
 }
 
 function setup_repos {
@@ -138,7 +137,7 @@ function setup_repos {
 
 function run_builds {
   local ncpus
-  if ${osname} == Darwin; then
+  if [ "X$osname" == "XDarwin" ]; then
     ncpus=$(sysctl -n hw.ncpu)
   else
     ncpus=$(grep -c ^processor /proc/cpuinfo)
@@ -186,4 +185,3 @@ while [ -n "$1" ]; do
 done
 
 run_builds
-
