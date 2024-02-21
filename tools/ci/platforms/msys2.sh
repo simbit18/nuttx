@@ -285,7 +285,7 @@ function install_tools {
   fi
 
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
-  echo PATH="${EXTRA_PATH}"/"${PATH}" >> "${tools}"/env.sh
+  echo "PATH=${EXTRA_PATH}:"'${PATH}' >> ${_setup}
   echo "export PATH" >> "${tools}"/env.sh
   # echo PATH="${EXTRA_PATH}"/"${PATH}" > "${tools}"/env.sh
 }
