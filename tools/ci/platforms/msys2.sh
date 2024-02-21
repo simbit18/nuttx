@@ -30,7 +30,7 @@ tools=${WORKSPACE}/tools
 EXTRA_PATH=
 
 function add_path {
-  PATH=$1:${PATH}
+  export PATH=$1:${PATH}
   EXTRA_PATH=$1:${EXTRA_PATH}
 }
 
