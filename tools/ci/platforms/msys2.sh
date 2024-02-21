@@ -30,7 +30,7 @@ tools=${WORKSPACE}/tools
 EXTRA_PATH=
 
 function add_path {
-  export PATH=$1:${PATH}
+  PATH=$1:${PATH}
   EXTRA_PATH=$1:${EXTRA_PATH}
 }
 
@@ -283,7 +283,11 @@ function install_tools {
   if [ -d "${CCACHE_DIR}" ]; then
     setup_links
   fi
-  echo PATH="${EXTRA_PATH}"/"${PATH}" > "${tools}"/env.sh
+
+  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
+  echo PATH="${EXTRA_PATH}"/"${PATH}" >> "${tools}"/env.sh
+  echo "export PATH" >> "${tools}"/env.sh
+  # echo PATH="${EXTRA_PATH}"/"${PATH}" > "${tools}"/env.sh
 }
 
 install_tools

@@ -137,6 +137,9 @@ function setup_repos {
 
 function run_builds {
   local ncpus
+  
+  source "${CIWORKSPACE}"/tools/env.sh
+  
   if [ "X$osname" == "XDarwin" ]; then
     ncpus=$(sysctl -n hw.ncpu)
   else
