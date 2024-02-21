@@ -26,8 +26,8 @@ set -o xtrace
 
 WD=$(cd "$(dirname "$0")" && pwd)
 WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
-nuttx=${WORKSPACE}/nuttx
-apps=${WORKSPACE}/apps
+# nuttx=${WORKSPACE}/nuttx
+# apps=${WORKSPACE}/apps
 tools=${WORKSPACE}/tools
 EXTRA_PATH=
 
@@ -247,26 +247,6 @@ function xtensa-esp32s3-gcc-toolchain {
   command xtensa-esp32s3-elf-gcc --version
 }
 
-function usage {
-  echo ""
-  echo "USAGE: $0 [-i] [-s] [-c] [-*] <testlist>"
-  echo "       $0 -h"
-  echo ""
-  echo "Where:"
-  echo "  -i install tools"
-  echo "  -s setup repos"
-  echo "  -c enable ccache"
-  echo "  -* support all options in testbuild.sh"
-  echo "  -h will show this help test and terminate"
-  echo "  <testlist> select testlist file"
-  echo ""
-  exit 1
-}
-
-function enable_ccache {
-  export CCACHE_DIR="${tools}"/ccache
-}
-
 function setup_links {
   mkdir -p "${tools}"/ccache/bin/
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
@@ -308,69 +288,3 @@ function install_tools {
   echo PATH="${EXTRA_PATH}"/"${PATH}" > "${tools}"/env.sh
 }
 
-function setup_repos {
-  pushd .
-  if [ -d "${nuttx}" ]; then
-    cd "${nuttx}"; git pull
-  else
-    git clone https://github.com/apache/nuttx.git "${nuttx}"
-    cd "${nuttx}"
-  fi
-  git log -1
-
-  if [ -d "${apps}" ]; then
-    cd "${apps}"; git pull
-  else
-    git clone https://github.com/apache/nuttx-apps.git "${apps}"
-    cd "${apps}"
-  fi
-  git log -1
-  popd
-}
-
-function run_builds {
-  local ncpus
-  ncpus=$(grep -c ^processor /proc/cpuinfo)
-
-  options+="-j ${ncpus}"
-
-  for build in "${builds[@]}"; do
-    "${nuttx}"/tools/testbuild.sh ${options} -e "-Wno-cpp -Werror" "${build}"
-  done
-
-  if [ -d "${CCACHE_DIR}" ]; then
-    # Print a summary of configuration and statistics counters
-    ccache -s
-  fi
-}
-
-if [ -z "$1" ]; then
-   usage
-fi
-
-while [ -n "$1" ]; do
-  case "$1" in
-  -h )
-    usage
-    ;;
-  -i )
-    install_tools
-    ;;
-  -c )
-    enable_ccache
-    ;;
-  -s )
-    setup_repos
-    ;;
-  -* )
-    options+="$1 "
-    ;;
-  * )
-    builds=( "$@" )
-    break
-    ;;
-  esac
-  shift
-done
-
-run_builds

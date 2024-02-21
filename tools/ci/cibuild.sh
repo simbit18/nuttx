@@ -25,6 +25,8 @@ set -o xtrace
 CID=$(cd "$(dirname "$0")" && pwd)
 CIWORKSPACE=$(cd "${CID}"/../../../ && pwd -P)
 CIPLAT=${CIWORKSPACE}/nuttx/tools/ci/platforms
+nuttx=${CIWORKSPACE}/nuttx
+apps=${CIWORKSPACE}/apps
 
 os=$(uname -s)
 if [ -f /etc/os-release ]; then
@@ -33,7 +35,7 @@ else
   osname=${os}
 fi
 
-EXTRA_PATH=
+# EXTRA_PATH=
 
 function to_do {
   echo ""
@@ -43,7 +45,7 @@ function to_do {
   exit 1
 }
 
-function find_platform {
+function install_tools {
 
   case ${osname} in
     alpine)
@@ -74,7 +76,8 @@ function find_platform {
       to_do "manjaro"
       ;;
     msys2)
-      "${CIPLAT}"/msys2.sh ${ciarg}
+      "${CIPLAT}"/msys2.sh
+# "${CIPLAT}"/msys2.sh ${ciarg}
       ;;
     ubuntu)
       "${CIPLAT}"/ubuntu.sh ${ciarg}
@@ -102,10 +105,85 @@ function usage {
   exit 1
 }
 
+# if [ -z "$1" ]; then
+#   usage
+# else
+#  ciarg="$@"
+# fi
+
+# find_platform
+function enable_ccache {
+  export CCACHE_DIR="${tools}"/ccache
+}
+
+function setup_repos {
+  pushd .
+  if [ -d "${nuttx}" ]; then
+    cd "${nuttx}"; git pull
+  else
+    git clone https://github.com/apache/nuttx.git "${nuttx}"
+    cd "${nuttx}"
+  fi
+  git log -1
+
+  if [ -d "${apps}" ]; then
+    cd "${apps}"; git pull
+  else
+    git clone https://github.com/apache/nuttx-apps.git "${apps}"
+    cd "${apps}"
+  fi
+  git log -1
+  popd
+}
+
+function run_builds {
+  local ncpus
+  if ${osname} == Darwin; then
+    ncpus=$(sysctl -n hw.ncpu)
+  else
+    ncpus=$(grep -c ^processor /proc/cpuinfo)
+  fi
+
+  options+="-j ${ncpus}"
+
+  for build in "${builds[@]}"; do
+    "${nuttx}"/tools/testbuild.sh ${options} -e "-Wno-cpp -Werror" "${build}"
+  done
+
+  if [ -d "${CCACHE_DIR}" ]; then
+    # Print a summary of configuration and statistics counters
+    ccache -s
+  fi
+}
+
 if [ -z "$1" ]; then
-  usage
-else
-  ciarg="$@"
+   usage
 fi
 
-find_platform
+while [ -n "$1" ]; do
+  case "$1" in
+  -h )
+    usage
+    ;;
+  -i )
+    install_tools
+    ;;
+  -c )
+    enable_ccache
+    ;;
+  -s )
+    setup_repos
+    ;;
+  -* )
+    options+="$1 "
+    ;;
+  * )
+    builds=( "$@" )
+    break
+    ;;
+  esac
+  shift
+done
+
+run_builds
+
