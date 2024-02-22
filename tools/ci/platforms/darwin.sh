@@ -335,8 +335,8 @@ function setup_links {
 function install_build_tools {
   mkdir -p "${tools}"
 
-  install="arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty elf-toolchain gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
-
+  # install="arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty elf-toolchain gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
+  install="arm-gcc-toolchain binutils elf-toolchain gen-romfs gperf kconfig-frontends python-tools u-boot-tools util-linux c-cache"
   mkdir -p "${tools}"/homebrew
   export HOMEBREW_CACHE=${tools}/homebrew
   # https://github.com/apache/arrow/issues/15025
