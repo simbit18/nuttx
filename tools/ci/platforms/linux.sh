@@ -377,10 +377,6 @@ function install_build_tools {
   done
   popd
 
-  if [ -d "${CCACHE_DIR}" ]; then
-    setup_links
-  fi
-
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh

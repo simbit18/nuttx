@@ -123,7 +123,7 @@ function c-cache {
   if ! type ccache &> /dev/null; then
     brew install ccache
   fi
-
+  setup_links
   command ccache --version
 }
 
@@ -353,10 +353,6 @@ function install_build_tools {
     ${func}
   done
   popd
-
-  if [ -d "${CCACHE_DIR}" ]; then
-    setup_links
-  fi
 
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
