@@ -96,7 +96,7 @@ function usage {
   echo "  -s setup repos"
   echo "  -c enable ccache"
   echo "  -* support all options in testbuild.sh"
-  echo "  -h will show this help test and terminate"
+  echo "  -h will show this help text and terminate"
   echo "  <testlist> select testlist file"
   echo ""
   exit 1

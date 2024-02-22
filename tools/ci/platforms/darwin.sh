@@ -303,7 +303,7 @@ function wasi-sdk {
 
   export WASI_SDK_PATH="${tools}/wasi-sdk"
 
-  command ${WASI_SDK_PATH}/bin/clang --version
+  command "${WASI_SDK_PATH}"/bin/clang --version
   command wamrc --version
 }
 
@@ -359,7 +359,7 @@ function install_build_tools {
   fi
 
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
-  echo "PATH=${EXTRA_PATH}:"'${PATH}' >> "${tools}"/env.sh
+  echo "PATH=${EXTRA_PATH}:${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
 }
 

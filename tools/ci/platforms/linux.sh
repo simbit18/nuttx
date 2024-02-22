@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ############################################################################
-# tools/ci/platforms/linux.sh
+# tools/ci/platforms/ubuntu.sh
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -19,7 +19,7 @@
 #
 ############################################################################
 
-# LINUX
+# Ubuntu
 
 set -e
 set -o xtrace
@@ -88,22 +88,6 @@ function arm64-gcc-toolchain {
   command aarch64-none-elf-gcc --version
 }
 
-function avr-gcc-toolchain {
-  if ! type avr-gcc &> /dev/null; then
-    sudo apt-get install -y binutils-avr gcc-avr avr-libc 
-  fi
-
-  command avr-gcc --version
-}
-
-function binutils {
-  if ! type objcopy &> /dev/null; then
-    sudo apt-get install -y binutils-dev
-  fi
-
-  command objcopy --version
-}
-
 function bloaty {
   add_path "${tools}"/bloaty/bin
 
@@ -120,42 +104,6 @@ function bloaty {
   fi
 
   command bloaty --version
-}
-
-function c-cache {
-  if ! type ccache &> /dev/null; then
-    sudo apt-get install -y ccache
-  fi
-
-  command ccache --version
-}
-
-function clang-tidy {
-  if ! type clang-tidy &> /dev/null; then
-    sudo apt-get install -y clang clang-tidy
-  fi
-
-  command clang-tidy --version
-}
-
-function util-linux {
-  if ! type flock &> /dev/null; then
-    sudo apt-get install -y util-linux
-  fi
-
-  command flock --version
-}
-
-function gen-romfs {
-  if ! type genromfs &> /dev/null; then
-    sudo apt-get install -y genromfs
-  fi
-}
-
-function gperf {
- if ! type gperf &> /dev/null; then
-    sudo apt-get install -y gperf
-  fi
 }
 
 function kconfig-frontends {
@@ -227,14 +175,6 @@ function riscv-gcc-toolchain {
     rm ${basefile}.tar.gz
   fi
   command riscv-none-elf-gcc --version
-}
-
-function rust {
-  if ! type rustc &> /dev/null; then
-    sudo sudo apt-get install rustc
-  fi
-
-  command rustc --version
 }
 
 function rx-gcc-toolchain {
@@ -365,12 +305,6 @@ function xtensa-esp32s3-gcc-toolchain {
   command xtensa-esp32s3-elf-gcc --version
 }
 
-function u-boot-tools {
-  if ! type mkimage &> /dev/null; then
-    sudo apt-get install -y u-boot-tools
-  fi
-}
-
 function wasi-sdk {
   add_path "${tools}"/wamrc
 
@@ -397,7 +331,7 @@ function wasi-sdk {
 
   export WASI_SDK_PATH="${tools}/wasi-sdk"
 
-  command ${WASI_SDK_PATH}/bin/clang --version
+  command "${WASI_SDK_PATH}"/bin/clang --version
   command wamrc --version
 }
 
@@ -435,7 +369,7 @@ function setup_links {
 function install_build_tools {
   mkdir -p "${tools}"
 
-  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
+  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain bloaty kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain util-linux wasi-sdk"
 
   pushd .
   for func in ${install}; do
@@ -448,7 +382,7 @@ function install_build_tools {
   fi
 
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
-  echo "PATH=${EXTRA_PATH}:"'${PATH}' >> "${tools}"/env.sh
+  echo "PATH=${EXTRA_PATH}:${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
 }
 
