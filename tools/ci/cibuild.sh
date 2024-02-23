@@ -71,7 +71,10 @@ function install_tools {
     Darwin)
       "${CIPLAT}"/darwin.sh
       # source "${CIWORKSPACE}"/tools/env.sh
+      echo "$PATH"
+      cat "${CIWORKSPACE}"/tools/env.sh
       modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
+      echo "$PATH"
       ;;
     Linux)
       "${CIPLAT}"/linux.sh
