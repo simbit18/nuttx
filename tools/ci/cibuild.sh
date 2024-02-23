@@ -36,8 +36,7 @@ else
 fi
 
 function modify_path {
-  PATH=$1${PATH}
-  export PATH
+  export PATH=$1${PATH}
 }
 
 function to_do {
@@ -88,10 +87,10 @@ function install_tools {
       to_do "unknown"
       ;;
   esac
-  echo "$PATH"
+  # echo "$PATH"
   cat "${CIWORKSPACE}"/tools/env.sh
   modify_path "$(cat "${CIWORKSPACE}"/tools/env.sh)"
-  echo "$PATH"
+  # echo "$PATH"
 }
 
 function usage {
