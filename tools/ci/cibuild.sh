@@ -88,8 +88,8 @@ function install_tools {
       ;;
   esac
   # echo "$PATH"
-  cat "${CIWORKSPACE}"/tools/env.sh
-  modify_path "$(cat "${CIWORKSPACE}"/tools/env.sh)"
+  # cat "${CIWORKSPACE}"/tools/env.sh
+  modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
   # echo "$PATH"
 }
 
@@ -144,7 +144,7 @@ function run_builds {
   options+="-j ${ncpus}"
 
   for build in "${builds[@]}"; do
-    "${nuttx}"/tools/testbuild.sh "${options}" -e "-Wno-cpp -Werror" "${build}"
+    "${nuttx}"/tools/testbuild.sh ${options} -e "-Wno-cpp -Werror" "${build}"
   done
 
   if [ -d "${CCACHE_DIR}" ]; then
