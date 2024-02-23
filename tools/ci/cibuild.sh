@@ -141,7 +141,8 @@ function run_builds {
     ncpus=$(grep -c ^processor /proc/cpuinfo)
   fi
 
-  options+="-j ${ncpus}"
+  # options+="-j ${ncpus}"
+  options+="-j 1"
 
   for build in "${builds[@]}"; do
     "${nuttx}"/tools/testbuild.sh ${options} -e "-Wno-cpp -Werror" "${build}"
