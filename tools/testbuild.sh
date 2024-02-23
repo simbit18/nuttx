@@ -17,18 +17,18 @@
 # under the License.
 #
 
-WD=$(cd $(dirname $0) && cd .. && pwd)
+WD=$(cd "$(dirname "$0")" && cd .. && pwd)
 nuttx=$WD/../nuttx
 
 progname=$0
 fail=0
 APPSDIR=$WD/../apps
-if [ -z $ARTIFACTDIR ]; then
+if [ -z "$ARTIFACTDIR" ]; then
   ARTIFACTDIR=$WD/../buildartifacts
 fi
 MAKE_FLAGS=-k
 EXTRA_FLAGS="EXTRAFLAGS="
-MAKE=make
+MAKE=$(make)
 unset testfile
 unset HOPTION
 unset JOPTION
@@ -170,21 +170,21 @@ if [ ! -d "$nuttx" ]; then
   showusage
 fi
 
-if [ ! -d $APPSDIR ]; then
+if [ ! -d "$APPSDIR" ]; then
   echo "ERROR: No directory found at $APPSDIR"
   exit 1
 fi
 
 export APPSDIR
 
-testlist=`grep -v -E "^(-|#)|^[C|c][M|m][A|a][K|k][E|e]" $testfile || true`
-blacklist=`grep "^-" $testfile || true`
+testlist=$(grep -v -E "^(-|#)|^[C|c][M|m][A|a][K|k][E|e]" "$testfile" || true)
+blacklist=$(grep "^-" "$testfile" || true)
 
 if [ "X$HOST" == "XLinux" ]; then
-  cmakelist=`grep "^[C|c][M|m][A|a][K|k][E|e]" $testfile | cut -d',' -f2 || true`
+  cmakelist=$(grep "^[C|c][M|m][A|a][K|k][E|e]" "$testfile" | cut -d',' -f2 || true)
 fi
 
-cd $nuttx || { echo "ERROR: failed to CD to $nuttx"; exit 1; }
+cd "$nuttx" || { echo "ERROR: failed to CD to $nuttx"; exit 1; }
 
 function exportandimport {
   # Do nothing until we finish to build the nuttx
@@ -197,7 +197,7 @@ function exportandimport {
     return $fail
   fi
 
-  if ! ${MAKE} export ${JOPTION} 1>/dev/null; then
+  if ! ${MAKE} export "${JOPTION}" 1>/dev/null; then
     fail=1
     return $fail
   fi
@@ -210,7 +210,7 @@ function exportandimport {
     return $fail
   fi
 
-  if ! ${MAKE} import ${JOPTION} 1>/dev/null; then
+  if ! ${MAKE} import "${JOPTION}" 1>/dev/null; then
     fail=1
   fi
   popd
@@ -221,16 +221,16 @@ function compressartifacts {
   local target_path=$1
   local target_name=$2
 
-  pushd $target_path >/dev/null
+  pushd "$target_path" >/dev/null
 
-  tar zcf ${target_name}.tar.gz ${target_name}
-  rm -rf ${target_name}
+  tar zcf "${target_name}".tar.gz "${target_name}"
+  rm -rf "${target_name}"
 
   popd >/dev/null
 }
 
 function makefunc {
-  if ! ${MAKE} ${MAKE_FLAGS} "${EXTRA_FLAGS}" ${JOPTION} $@ 1>/dev/null; then
+  if ! ${MAKE} "${MAKE_FLAGS}" "${EXTRA_FLAGS}" "${JOPTION}" "$@" 1>/dev/null; then
     fail=1
   else
     exportandimport
@@ -240,17 +240,17 @@ function makefunc {
 }
 
 function checkfunc {
-  build_cmd="${MAKE} ${MAKE_FLAGS} \"${EXTRA_FLAGS}\" ${JOPTION} 1>/dev/null"
+  build_cmd="${MAKE} "${MAKE_FLAGS}" \"${EXTRA_FLAGS}\" ${JOPTION} 1>/dev/null"
 
   local config_sub_path=$(echo "$config" | sed "s/:/\//")
-  local sub_target_name=${config_sub_path#$(dirname "${config_sub_path}")/}
+  local sub_target_name=${config_sub_path#"$(dirname "${config_sub_path}")"/}
   local codechecker_dir=${ARTIFACTDIR}/codechecker_logs/${config_sub_path}
 
   mkdir -p "${codechecker_dir}"
 
   echo "    Checking NuttX by Codechecker..."
   CodeChecker check -b "${build_cmd}" -o "${codechecker_dir}/logs" -e sensitive --ctu
-  codecheck_ret=$?
+#  codecheck_ret=$?
   echo "    Storing analysis result to CodeChecker..."
   echo "      Generating HTML report..."
   CodeChecker parse --export html --output "${codechecker_dir}/html" "${codechecker_dir}/logs" 1>/dev/null
@@ -271,8 +271,8 @@ function distclean {
   echo "  Cleaning..."
   if [ -f .config ] || [ -f build/.config ]; then
     if [ ${GITCLEAN} -eq 1 ] || [ ! -z ${cmake} ]; then
-      git -C $nuttx clean -xfdq
-      git -C $APPSDIR clean -xfdq
+      git -C "$nuttx" clean -xfdq
+      git -C "$APPSDIR" clean -xfdq
     else
       makefunc distclean
 
@@ -284,13 +284,13 @@ function distclean {
       # Ensure nuttx and apps directory in clean state even with --ignored
 
       if [ ${CHECKCLEAN} -ne 0 ]; then
-        if [ -d $nuttx/.git ] || [ -d $APPSDIR/.git ]; then
-          if [[ -n $(git -C $nuttx status --ignored -s) ]]; then
-            git -C $nuttx status --ignored
+        if [ -d "$nuttx"/.git ] || [ -d "$APPSDIR"/.git ]; then
+          if [[ -n $(git -C "$nuttx" status --ignored -s) ]]; then
+            git -C "$nuttx" status --ignored
             fail=1
           fi
-          if [[ -n $(git -C $APPSDIR status --ignored -s) ]]; then
-            git -C $APPSDIR status --ignored
+          if [[ -n $(git -C "$APPSDIR" status --ignored -s) ]]; then
+            git -C "$APPSDIR" status --ignored
             fail=1
           fi
         fi
@@ -304,13 +304,13 @@ function distclean {
 # Configure for the next build
 
 function configure_default {
-  if ! ./tools/configure.sh ${HOPTION} $config ${JOPTION} 1>/dev/null; then
+  if ! ./tools/configure.sh "${HOPTION}" "$config" "${JOPTION}" 1>/dev/null; then
     fail=1
   fi
 
   if [ "X$toolchain" != "X" ]; then
-    setting=`grep _TOOLCHAIN_ $nuttx/.config | grep -v CONFIG_ARCH_TOOLCHAIN_* | grep =y`
-    original_toolchain=`echo $setting | cut -d'=' -f1`
+    setting=$(grep _TOOLCHAIN_ "$nuttx"/.config | grep -v CONFIG_ARCH_TOOLCHAIN_* | grep =y)
+    original_toolchain=$(echo "$setting" | cut -d'=' -f1)
     if [ ! -z "$original_toolchain" ]; then
       echo "  Disabling $original_toolchain"
       kconfig-tweak --file $nuttx/.config -d $original_toolchain
