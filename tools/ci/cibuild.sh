@@ -35,6 +35,10 @@ else
   osname=${os}
 fi
 
+function modify_path {
+  PATH=$1${PATH}
+}
+
 function to_do {
   echo ""
   echo "NuttX TODO: $1"
@@ -66,7 +70,8 @@ function install_tools {
       ;;
     Darwin)
       "${CIPLAT}"/darwin.sh
-      source "${CIWORKSPACE}"/tools/env.sh
+      # source "${CIWORKSPACE}"/tools/env.sh
+      modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
       ;;
     Linux)
       "${CIPLAT}"/linux.sh
@@ -77,7 +82,8 @@ function install_tools {
       ;;
     msys2)
       "${CIPLAT}"/msys2.sh
-      source "${CIWORKSPACE}"/tools/env.sh
+      # source "${CIWORKSPACE}"/tools/env.sh
+      modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
       ;;
     ubuntu)
       "${CIPLAT}"/ubuntu.sh

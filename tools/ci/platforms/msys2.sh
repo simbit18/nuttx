@@ -281,9 +281,10 @@ function install_build_tools {
   done
   popd
 
-  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
-  echo "PATH=${PATH}" >> "${tools}"/env.sh
-  echo "export PATH" >> "${tools}"/env.sh
+  # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
+  # echo "PATH=${PATH}" >> "${tools}"/env.sh
+  # echo "export PATH" >> "${tools}"/env.sh
+  echo "${EXTRA_PATH}" > "${tools}"/env.sh
 }
 
 install_build_tools
