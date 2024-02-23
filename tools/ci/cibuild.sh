@@ -37,6 +37,7 @@ fi
 
 function modify_path {
   PATH=$1${PATH}
+  export PATH
 }
 
 function to_do {
@@ -70,33 +71,27 @@ function install_tools {
       ;;
     Darwin)
       "${CIPLAT}"/darwin.sh
-      # source "${CIWORKSPACE}"/tools/env.sh
-      echo "$PATH"
-      cat "${CIWORKSPACE}"/tools/env.sh
-      modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
-      echo "$PATH"
       ;;
     Linux)
       "${CIPLAT}"/linux.sh
-      source "${CIWORKSPACE}"/tools/env.sh
       ;;
     manjaro)
       to_do "manjaro"
       ;;
     msys2)
       "${CIPLAT}"/msys2.sh
-      # source "${CIWORKSPACE}"/tools/env.sh
-      modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
       ;;
     ubuntu)
       "${CIPLAT}"/ubuntu.sh
-      source "${CIWORKSPACE}"/tools/env.sh
       ;;
     *)
       to_do "unknown"
       ;;
   esac
-
+  echo "$PATH"
+  cat "${CIWORKSPACE}"/tools/env.sh
+  modify_path "$(cat "${CIWORKSPACE}"/tools/env.sh)"
+  echo "$PATH"
 }
 
 function usage {
@@ -150,7 +145,7 @@ function run_builds {
   options+="-j ${ncpus}"
 
   for build in "${builds[@]}"; do
-    "${nuttx}"/tools/testbuild.sh ${options} -e "-Wno-cpp -Werror" "${build}"
+    "${nuttx}"/tools/testbuild.sh "${options}" -e "-Wno-cpp -Werror" "${build}"
   done
 
   if [ -d "${CCACHE_DIR}" ]; then
