@@ -357,7 +357,6 @@ function install_build_tools {
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
-  source "${tools}"/env.sh
 }
 
 install_build_tools

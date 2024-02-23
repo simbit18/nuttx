@@ -66,18 +66,22 @@ function install_tools {
       ;;
     Darwin)
       "${CIPLAT}"/darwin.sh
+      source "${CIWORKSPACE}"/tools/env.sh
       ;;
     Linux)
       "${CIPLAT}"/linux.sh
+      source "${CIWORKSPACE}"/tools/env.sh
       ;;
     manjaro)
       to_do "manjaro"
       ;;
     msys2)
       "${CIPLAT}"/msys2.sh
+      source "${CIWORKSPACE}"/tools/env.sh
       ;;
     ubuntu)
       "${CIPLAT}"/ubuntu.sh
+      source "${CIWORKSPACE}"/tools/env.sh
       ;;
     *)
       to_do "unknown"
