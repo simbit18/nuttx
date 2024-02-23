@@ -230,7 +230,7 @@ function compressartifacts {
 }
 
 function makefunc {
-  if ! ${MAKE} "${MAKE_FLAGS}" "${EXTRA_FLAGS}" "${JOPTION}" "$@" 1>/dev/null; then
+  if ! ${MAKE} "${MAKE_FLAGS} ${EXTRA_FLAGS} ${JOPTION}" "$@" 1>/dev/null; then
     fail=1
   else
     exportandimport
@@ -240,7 +240,7 @@ function makefunc {
 }
 
 function checkfunc {
-  build_cmd="${MAKE} "${MAKE_FLAGS}" \"${EXTRA_FLAGS}\" ${JOPTION} 1>/dev/null"
+  build_cmd="${MAKE} ${MAKE_FLAGS} \"${EXTRA_FLAGS}\" ${JOPTION} 1>/dev/null"
 
   local config_sub_path=$(echo "$config" | sed "s/:/\//")
   local sub_target_name=${config_sub_path#"$(dirname "${config_sub_path}")"/}
@@ -309,15 +309,15 @@ function configure_default {
   fi
 
   if [ "X$toolchain" != "X" ]; then
-    setting=$(grep _TOOLCHAIN_ "$nuttx"/.config | grep -v CONFIG_ARCH_TOOLCHAIN_* | grep =y)
+    setting=$(grep _TOOLCHAIN_ "$nuttx"/.config | grep -v CONFIG_ARCH_TOOLCHAIN_* | grep '=y')
     original_toolchain=$(echo "$setting" | cut -d'=' -f1)
     if [ ! -z "$original_toolchain" ]; then
       echo "  Disabling $original_toolchain"
-      kconfig-tweak --file $nuttx/.config -d $original_toolchain
+      kconfig-tweak --file "$nuttx"/.config -d $original_toolchain
     fi
 
     echo "  Enabling $toolchain"
-    kconfig-tweak --file $nuttx/.config -e $toolchain
+    kconfig-tweak --file "$nuttx"/.config -e $toolchain
 
     makefunc olddefconfig
   fi
@@ -332,11 +332,11 @@ function configure_cmake {
   fi
 
   if [ "X$toolchain" != "X" ]; then
-    setting=`grep _TOOLCHAIN_ $nuttx/build/.config | grep -v CONFIG_ARCH_TOOLCHAIN_* | grep =y`
-    original_toolchain=`echo $setting | cut -d'=' -f1`
+    setting=$(grep _TOOLCHAIN_ "$nuttx"/build/.config | grep -v "CONFIG_ARCH_TOOLCHAIN_*" | grep '=y')
+    original_toolchain=$(echo "$setting" | cut -d'=' -f1)
     if [ ! -z "$original_toolchain" ]; then
       echo "  Disabling $original_toolchain"
-      kconfig-tweak --file $nuttx/build/.config -d $original_toolchain
+      kconfig-tweak --file "$nuttx"/build/.config -d "$original_toolchain"
     fi
 
     echo "  Enabling $toolchain"
@@ -421,7 +421,7 @@ function refresh_cmake {
 
   if [ "X$toolchain" != "X" ]; then
     if [ ! -z "$original_toolchain" ]; then
-      kconfig-tweak --file $nuttx/build/.config -e $original_toolchain
+      kconfig-tweak --file "$nuttx"/build/.config -e "$original_toolchain"
     fi
 
     kconfig-tweak --file $nuttx/build/.config -d $toolchain
@@ -483,7 +483,7 @@ function run {
 
 function dotest {
   echo "===================================================================================="
-  config=`echo $1 | cut -d',' -f1`
+  config=$(echo "$1" | cut -d',' -f1)
   check=${HOST},${config/\//:}
 
   skip=0
@@ -509,9 +509,9 @@ function dotest {
 
   # Parse the next line
 
-  configdir=`echo $config | cut -s -d':' -f2`
+  configdir=$(echo "$config" | cut -s -d':' -f2)
   if [ -z "${configdir}" ]; then
-    configdir=`echo $config | cut -s -d'/' -f2`
+    configdir=$(echo "$config" | cut -s -d'/' -f2)
     if [ -z "${configdir}" ]; then
       echo "ERROR: Malformed configuration: ${config}"
       showusage
@@ -557,10 +557,10 @@ for line in $testlist; do
     dir=`echo $line | cut -d',' -f1`
     list=`find boards$dir -name defconfig | cut -d'/' -f4,6`
     for i in ${list}; do
-      dotest $i${line/"$dir"/}
+      dotest "$i""${line/"$dir"/}"
     done
   else
-    dotest $line
+    dotest "$line"
   fi
 done
 
