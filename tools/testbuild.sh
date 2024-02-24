@@ -19,8 +19,6 @@
 
 WD=$(cd $(dirname $0) && cd .. && pwd)
 nuttx=$WD/../nuttx
-#new
-tools=$WD/../tools
 
 progname=$0
 fail=0
@@ -41,16 +39,9 @@ CHECKCLEAN=1
 CODECHECKER=0
 RUN=0
 
-# new
-function modify_path {
-  export PATH=$1${PATH}
-}
-
 case $(uname -s) in
   Darwin*)
     HOST=Darwin
-    # new
-    modify_path $(cat "${tools}"/env.sh)
     ;;
   CYGWIN*)
     HOST=Cygwin
