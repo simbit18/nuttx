@@ -41,6 +41,11 @@ CHECKCLEAN=1
 CODECHECKER=0
 RUN=0
 
+# new
+function modify_path {
+  export PATH=$1${PATH}
+}
+
 case $(uname -s) in
   Darwin*)
     HOST=Darwin
@@ -59,10 +64,6 @@ case $(uname -s) in
     HOST=Linux
     ;;
 esac
-# new
-function modify_path {
-  export PATH=$1${PATH}
-}
 
 function showusage {
   echo ""
