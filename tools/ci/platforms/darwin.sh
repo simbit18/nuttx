@@ -84,11 +84,11 @@ function avr-gcc-toolchain {
 }
 
 function binutils {
+  mkdir -p "${tools}"/bintools/bin
   add_path "${tools}"/bintools/bin
 
   if ! type objcopy &> /dev/null; then
     brew install binutils
-    mkdir -p "${tools}"/bintools/bin
     # It is possible we cached prebuilt but did brew install so recreate
     # symlink if it exists
     rm -f "${tools}"/bintools/bin/objcopy
@@ -136,7 +136,7 @@ function elf-toolchain {
 }
 
 function gen-romfs {
-  add_path "${tools}"/genromfs/usr/bin
+#  add_path "${tools}"/genromfs/usr/bin
 
   if ! type genromfs &> /dev/null; then
     brew tap PX4/px4
