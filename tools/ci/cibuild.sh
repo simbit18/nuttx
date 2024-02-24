@@ -79,6 +79,7 @@ function install_tools {
       ;;
     msys2)
       "${CIPLAT}"/msys2.sh
+      modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
       ;;
     ubuntu)
       "${CIPLAT}"/ubuntu.sh
@@ -89,7 +90,7 @@ function install_tools {
   esac
   # echo "$PATH"
   # cat "${CIWORKSPACE}"/tools/env.sh
-  modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
+#  modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
   # echo "$PATH"
 }
 

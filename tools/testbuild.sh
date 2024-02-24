@@ -19,6 +19,8 @@
 
 WD=$(cd $(dirname $0) && cd .. && pwd)
 nuttx=$WD/../nuttx
+#new
+tools=$WD/../tools
 
 progname=$0
 fail=0
@@ -42,6 +44,8 @@ RUN=0
 case $(uname -s) in
   Darwin*)
     HOST=Darwin
+    # new
+    modify_path $(cat "${tools}"/env.sh)
     ;;
   CYGWIN*)
     HOST=Cygwin
@@ -55,6 +59,10 @@ case $(uname -s) in
     HOST=Linux
     ;;
 esac
+# new
+function modify_path {
+  export PATH=$1${PATH}
+}
 
 function showusage {
   echo ""
