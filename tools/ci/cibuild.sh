@@ -70,6 +70,10 @@ function install_tools {
       ;;
     Darwin)
       "${CIPLAT}"/darwin.sh
+      # Python User Env
+      export PIP_USER=yes
+      export PYTHONUSERBASE=${CIWORKSPACE}/tools/pylocal
+      export HOMEBREW_CACHE=${CIWORKSPACE}/tools/homebrew
       ;;
     Linux)
       "${CIPLAT}"/linux.sh
