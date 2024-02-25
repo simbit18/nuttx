@@ -163,6 +163,8 @@ function rust {
   # Configuring the PATH environment variable
   export CARGO_HOME=${tools}/rust/cargo
   export RUSTUP_HOME=${tools}/rust/rustup
+  echo "export CARGO_HOME=${tools}/rust/cargo" >> "${tools}"/env.sh
+  echo "export RUSTUP_HOME=${tools}/rust/rustup" >> "${tools}"/env.sh
   if ! type rustc &> /dev/null; then
     local basefile
     basefile=x86_64-pc-windows-gnu
@@ -272,7 +274,7 @@ function setup_links {
 
 function install_build_tools {
   mkdir -p "${tools}"
-
+  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain kconfig-frontends riscv-gcc-toolchain rust"
 
   pushd .
@@ -284,7 +286,9 @@ function install_build_tools {
   # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   # echo "PATH=${PATH}" >> "${tools}"/env.sh
   # echo "export PATH" >> "${tools}"/env.sh
-  echo "${EXTRA_PATH}" > "${tools}"/env.sh
+  # echo "${EXTRA_PATH}" > "${tools}"/env.sh
+  echo "PATH=${PATH}" >> "${tools}"/env.sh
+  echo "export PATH" >> "${tools}"/env.sh
 }
 
 install_build_tools
