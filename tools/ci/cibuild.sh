@@ -70,10 +70,6 @@ function install_tools {
       ;;
     Darwin)
       "${CIPLAT}"/darwin.sh
-      # Python User Env
-      export PIP_USER=yes
-      export PYTHONUSERBASE=${CIWORKSPACE}/tools/pylocal
-      export HOMEBREW_CACHE=${CIWORKSPACE}/tools/homebrew
       ;;
     Linux)
       "${CIPLAT}"/linux.sh
@@ -93,8 +89,9 @@ function install_tools {
   esac
   # echo "$PATH"
   # cat "${CIWORKSPACE}"/tools/env.sh
-  modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
+  # modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
   # echo "$PATH"
+  source "${CIWORKSPACE}"/tools/env.sh
 }
 
 function usage {
@@ -145,11 +142,10 @@ function run_builds {
     ncpus=$(grep -c ^processor /proc/cpuinfo)
   fi
 
-  # options+="-j ${ncpus}"
-  options+="-j 1"
+  options+="-j ${ncpus}"
 
   for build in "${builds[@]}"; do
-    "${nuttx}"/tools/testbuild.sh ${options} -e "-Wno-cpp -Werror" "${build}"
+    "${nuttx}/tools/testbuild.sh ${options}" -e "-Wno-cpp -Werror" "${build}"
   done
 
   if [ -d "${CCACHE_DIR}" ]; then

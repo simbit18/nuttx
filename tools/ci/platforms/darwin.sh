@@ -196,6 +196,8 @@ function python-tools {
   # Python User Env
   export PIP_USER=yes
   export PYTHONUSERBASE=${tools}/pylocal
+  echo "export PIP_USER=yes" >> "${tools}"/env.sh
+  echo "export PYTHONUSERBASE=${tools}/pylocal" >> "${tools}"/env.sh
   add_path "${PYTHONUSERBASE}"/bin
 
   # workaround for Cython issue
@@ -302,6 +304,7 @@ function wasi-sdk {
   fi
 
   export WASI_SDK_PATH="${tools}/wasi-sdk"
+  echo "export WASI_SDK_PATH=${tools}/wasi-sdk" >> "${tools}"/env.sh
 
   command "${WASI_SDK_PATH}"/bin/clang --version
   command wamrc --version
@@ -334,11 +337,12 @@ function setup_links {
 
 function install_build_tools {
   mkdir -p "${tools}"
-
+  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   # install="arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty elf-toolchain gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
   install="arm-gcc-toolchain binutils elf-toolchain gen-romfs gperf kconfig-frontends python-tools u-boot-tools util-linux c-cache"
   mkdir -p "${tools}"/homebrew
   export HOMEBREW_CACHE=${tools}/homebrew
+  echo "export HOMEBREW_CACHE=${tools}/homebrew" >> "${tools}"/env.sh
   # https://github.com/apache/arrow/issues/15025
   rm -f /usr/local/bin/2to3* || :
   rm -f /usr/local/bin/idle3* || :
@@ -355,9 +359,9 @@ function install_build_tools {
   popd
 
   # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
-  # echo "PATH=${PATH}" >> "${tools}"/env.sh
-  # echo "export PATH" >> "${tools}"/env.sh
-  echo "${EXTRA_PATH}" > "${tools}"/env.sh
+  echo "PATH=${PATH}" >> "${tools}"/env.sh
+  echo "export PATH" >> "${tools}"/env.sh
+  #echo "${EXTRA_PATH}" > "${tools}"/env.sh
 }
 
 install_build_tools
