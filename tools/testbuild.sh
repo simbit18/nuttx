@@ -26,7 +26,7 @@ APPSDIR=$WD/../apps
 if [ -z $ARTIFACTDIR ]; then
   ARTIFACTDIR=$WD/../buildartifacts
 fi
-MAKE_FLAGS='-k'
+MAKE_FLAGS=-k
 EXTRA_FLAGS="EXTRAFLAGS="
 MAKE=$(MAKE)
 unset testfile

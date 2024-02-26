@@ -22,7 +22,7 @@ set -e
 progname=$0
 host=
 wenv=
-MAKECMD="make"
+MAKECMD=$(MAKE)
 
 function showusage {
   echo ""
