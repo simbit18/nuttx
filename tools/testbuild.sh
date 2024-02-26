@@ -304,7 +304,7 @@ function distclean {
 # Configure for the next build
 
 function configure_default {
-  if ! ./tools/configure.sh ${HOPTION} $config ${JOPTION} 1>/dev/null; then
+  if ! ./tools/configure.sh ${HOPTION} $config 1>/dev/null; then
     fail=1
   fi
 
