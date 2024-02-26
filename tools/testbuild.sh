@@ -28,7 +28,7 @@ if [ -z $ARTIFACTDIR ]; then
 fi
 MAKE_FLAGS=-k
 EXTRA_FLAGS="EXTRAFLAGS="
-MAKE=make
+MAKE=$(MAKE)
 unset testfile
 unset HOPTION
 unset JOPTION
