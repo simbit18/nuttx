@@ -175,8 +175,8 @@ function rust {
     # Install Rust target x86_64-pc-windows-gnu
     ./rustup-init.exe -y --default-host ${basefile} --no-modify-path
     # Install targets supported from NuttX
-    $CARGO_HOME/bin/rustup target add thumbv6m-none-eabi
-    $CARGO_HOME/bin/rustup target add thumbv7m-none-eabi
+    "$CARGO_HOME"/bin/rustup target add thumbv6m-none-eabi
+    "$CARGO_HOME"/bin/rustup target add thumbv7m-none-eabi
     rm rustup-init.exe
   fi
   command rustc --version

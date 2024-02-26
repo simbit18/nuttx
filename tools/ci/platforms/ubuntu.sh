@@ -242,56 +242,56 @@ function rx-gcc-toolchain {
   add_path "${tools}"/renesas-toolchain/rx-elf-gcc/bin
 
   if [ ! -f "${tools}/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc" ]; then
-        # Download toolchain source code
-        # RX toolchain is built from source code. Once prebuilt RX toolchain is made available, the below code snippet can be removed.
-        local basefilebinutils
-        local basefilegcc
-        local basefilenewlib
-        basefilebinutils=binutils-2.36.1
-        basefilegcc=gcc-8.3.0
-        basefilenewlib=newlib-4.1.0
+    # Download toolchain source code
+    # RX toolchain is built from source code. Once prebuilt RX toolchain is made available, the below code snippet can be removed.
+    local basefilebinutils
+    local basefilegcc
+    local basefilenewlib
+    basefilebinutils=binutils-2.36.1
+    basefilegcc=gcc-8.3.0
+    basefilenewlib=newlib-4.1.0
 
-        mkdir -p "${tools}"/renesas-tools/source
-        curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/binutils/8.3.0.202305-gnurx/binutils-2.36.1.tar.gz" -o ${basefilebinutils}.tar.gz
-        tar zxf ${basefilebinutils}.tar.gz
-        mv ${basefilebinutils} "${tools}"/renesas-tools/source/binutils
-        rm ${basefilebinutils}.tar.gz
+    mkdir -p "${tools}"/renesas-tools/source
+    curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/binutils/8.3.0.202305-gnurx/binutils-2.36.1.tar.gz" -o ${basefilebinutils}.tar.gz
+    tar zxf ${basefilebinutils}.tar.gz
+    mv ${basefilebinutils} "${tools}"/renesas-tools/source/binutils
+    rm ${basefilebinutils}.tar.gz
 
-        curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/gcc/8.3.0.202305-gnurx/gcc-8.3.0.tar.gz" -o ${basefilegcc}.tar.gz
-        tar zxf ${basefilegcc}.tar.gz
-        mv ${basefilegcc} "${tools}"/renesas-tools/source/gcc
-        rm ${basefilegcc}.tar.gz
+    curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/gcc/8.3.0.202305-gnurx/gcc-8.3.0.tar.gz" -o ${basefilegcc}.tar.gz
+    tar zxf ${basefilegcc}.tar.gz
+    mv ${basefilegcc} "${tools}"/renesas-tools/source/gcc
+    rm ${basefilegcc}.tar.gz
 
-        curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/newlib/8.3.0.202305-gnurx/newlib-4.1.0.tar.gz" -o ${basefilenewlib}.tar.gz
-        tar zxf ${basefilenewlib}.tar.gz
-        mv ${basefilenewlib} "${tools}"/renesas-tools/source/newlib
-        rm ${basefilenewlib}.tar.gz
+    curl -L -s "https://llvm-gcc-renesas.com/downloads/d.php?f=rx/newlib/8.3.0.202305-gnurx/newlib-4.1.0.tar.gz" -o ${basefilenewlib}.tar.gz
+    tar zxf ${basefilenewlib}.tar.gz
+    mv ${basefilenewlib} "${tools}"/renesas-tools/source/newlib
+    rm ${basefilenewlib}.tar.gz
 
-        # Install binutils
-        cd "${tools}"/renesas-tools/source/binutils; chmod +x ./configure ./mkinstalldirs
-        mkdir -p "${tools}"/renesas-tools/build/binutils; cd "${tools}"/renesas-tools/build/binutils
-        "${tools}"/renesas-tools/source/binutils/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
-          --disable-werror
-        make; make install
+    # Install binutils
+    cd "${tools}"/renesas-tools/source/binutils; chmod +x ./configure ./mkinstalldirs
+    mkdir -p "${tools}"/renesas-tools/build/binutils; cd "${tools}"/renesas-tools/build/binutils
+    "${tools}"/renesas-tools/source/binutils/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
+      --disable-werror
+    make; make install
 
-        # Install gcc
-        cd "${tools}"/renesas-tools/source/gcc
-        chmod +x ./contrib/download_prerequisites ./configure ./move-if-change ./libgcc/mkheader.sh
-        ./contrib/download_prerequisites
-        sed -i '1s/^/@documentencoding ISO-8859-1\n/' ./gcc/doc/gcc.texi
-        sed -i 's/@tex/\n&/g' ./gcc/doc/gcc.texi && sed -i 's/@end tex/\n&/g' ./gcc/doc/gcc.texi
-        mkdir -p "${tools}"/renesas-tools/build/gcc; cd "${tools}"/renesas-tools/build/gcc
-        "${tools}"/renesas-tools/source/gcc/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
-        --disable-shared --disable-multilib --disable-libssp --disable-libstdcxx-pch --disable-werror --enable-lto \
-        --enable-gold --with-pkgversion=GCC_Build_1.02 --with-newlib --enable-languages=c
-        make; make install
+    # Install gcc
+    cd "${tools}"/renesas-tools/source/gcc
+    chmod +x ./contrib/download_prerequisites ./configure ./move-if-change ./libgcc/mkheader.sh
+    ./contrib/download_prerequisites
+    sed -i '1s/^/@documentencoding ISO-8859-1\n/' ./gcc/doc/gcc.texi
+    sed -i 's/@tex/\n&/g' ./gcc/doc/gcc.texi && sed -i 's/@end tex/\n&/g' ./gcc/doc/gcc.texi
+    mkdir -p "${tools}"/renesas-tools/build/gcc; cd "${tools}"/renesas-tools/build/gcc
+    "${tools}"/renesas-tools/source/gcc/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc \
+      --disable-shared --disable-multilib --disable-libssp --disable-libstdcxx-pch --disable-werror --enable-lto \
+      --enable-gold --with-pkgversion=GCC_Build_1.02 --with-newlib --enable-languages=c
+    make; make install
 
-        # Install newlib
-        cd "${tools}"/renesas-tools/source/newlib; chmod +x ./configure
-        mkdir -p "${tools}"/renesas-tools/build/newlib; cd "${tools}"/renesas-tools/build/newlib
-        "${tools}"/renesas-tools/source/newlib/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc
-        make; make install
-        rm -rf "${tools}"/renesas-tools/
+    # Install newlib
+    cd "${tools}"/renesas-tools/source/newlib; chmod +x ./configure
+    mkdir -p "${tools}"/renesas-tools/build/newlib; cd "${tools}"/renesas-tools/build/newlib
+    "${tools}"/renesas-tools/source/newlib/configure --target=rx-elf --prefix="${tools}"/renesas-toolchain/rx-elf-gcc
+    make; make install
+    rm -rf "${tools}"/renesas-tools/
   fi
 
   command rx-elf-gcc --version
@@ -397,6 +397,7 @@ function wasi-sdk {
   fi
 
   export WASI_SDK_PATH="${tools}/wasi-sdk"
+  echo "export WASI_SDK_PATH=${tools}/wasi-sdk" >> "${tools}"/env.sh
 
   command "${WASI_SDK_PATH}"/bin/clang --version
   command wamrc --version
@@ -435,6 +436,7 @@ function setup_links {
 
 function install_build_tools {
   mkdir -p "${tools}"
+  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
 
   install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
 
@@ -444,7 +446,7 @@ function install_build_tools {
   done
   popd
 
-  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
+  # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
 }

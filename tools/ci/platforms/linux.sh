@@ -330,6 +330,7 @@ function wasi-sdk {
   fi
 
   export WASI_SDK_PATH="${tools}/wasi-sdk"
+  echo "export WASI_SDK_PATH=${tools}/wasi-sdk" >> "${tools}"/env.sh
 
   command "${WASI_SDK_PATH}"/bin/clang --version
   command wamrc --version
@@ -368,6 +369,7 @@ function setup_links {
 
 function install_build_tools {
   mkdir -p "${tools}"
+  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
 
   install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain bloaty kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain util-linux wasi-sdk"
 
@@ -377,7 +379,7 @@ function install_build_tools {
   done
   popd
 
-  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
+  # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
 }
