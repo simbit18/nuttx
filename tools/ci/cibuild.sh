@@ -51,7 +51,7 @@ function install_tools {
 
   case ${osname} in
     alpine)
-      to_do "alpine"
+      "${CIPLAT}"/alpine.sh
       ;;
     arch)
       to_do "arch"
