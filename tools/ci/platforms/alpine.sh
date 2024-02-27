@@ -362,7 +362,7 @@ function install_build_tools {
   mkdir -p "${tools}"
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
 
-  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain gen-romfs kconfig-frontends rust"
+  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain gen-romfs kconfig-frontends"
 
   pushd .
   for func in ${install}; do
