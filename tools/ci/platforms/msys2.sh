@@ -24,14 +24,8 @@
 set -e
 set -o xtrace
 
-#WD=$(cd "$(dirname "$0")" && pwd)
-#WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
-# tools=${WORKSPACE}/tools
-# EXTRA_PATH=
-
 add_path() {
   PATH=$1:${PATH}
-  #EXTRA_PATH=$1:${EXTRA_PATH}
 }
 
 arm_clang_toolchain() {
@@ -283,7 +277,7 @@ setup_links() {
 }
 
 install_build_tools() {
-  # mkdir -p "${NUTTXTOOLS}"
+  mkdir -p "${NUTTXTOOLS}"
   echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
   install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain kconfig_frontends riscv_gcc_toolchain rust"
 

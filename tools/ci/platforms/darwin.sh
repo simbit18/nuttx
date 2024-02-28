@@ -29,23 +29,17 @@
 set -e
 set -o xtrace
 
-WD=$(cd "$(dirname "$0")" && pwd)
-WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
-tools=${WORKSPACE}/tools
-EXTRA_PATH=
-
 add_path() {
   PATH=$1:${PATH}
-  EXTRA_PATH=$1:${EXTRA_PATH}
 }
 
 arm_gcc_toolchain() {
-  add_path "${tools}"/gcc-arm-none-eabi/bin
+  add_path "${NUTTXTOOLS}"/gcc-arm-none-eabi/bin
 
-  if [ ! -f "${tools}/gcc-arm-none-eabi/bin/arm-none-eabi-gcc" ]; then
+  if [ ! -f "${NUTTXTOOLS}/gcc-arm-none-eabi/bin/arm-none-eabi-gcc" ]; then
     local basefile
     basefile=arm-gnu-toolchain-13.2.rel1-darwin-x86_64-arm-none-eabi
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/${basefile}.tar.xz
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
@@ -57,12 +51,12 @@ arm_gcc_toolchain() {
 }
 
 arm64_gcc_toolchain() {
-  add_path "${tools}"/gcc-aarch64-none-elf/bin
+  add_path "${NUTTXTOOLS}"/gcc-aarch64-none-elf/bin
 
-  if [ ! -f "${tools}/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc" ]; then
+  if [ ! -f "${NUTTXTOOLS}/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc" ]; then
     local basefile
     basefile=arm-gnu-toolchain-13.2.Rel1-darwin-x86_64-aarch64-none-elf
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     # Download the latest ARM64 GCC toolchain prebuilt by ARM
     wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.Rel1/binrel/${basefile}.tar.xz
     xz -d ${basefile}.tar.xz
@@ -84,34 +78,34 @@ avr_gcc_toolchain() {
 }
 
 binutils() {
-  mkdir -p "${tools}"/bintools/bin
-  add_path "${tools}"/bintools/bin
+  mkdir -p "${NUTTXTOOLS}"/bintools/bin
+  add_path "${NUTTXTOOLS}"/bintools/bin
 
   if ! type objcopy > /dev/null 2>&1; then
     brew install binutils
     # It is possible we cached prebuilt but did brew install so recreate
     # symlink if it exists
-    rm -f "${tools}"/bintools/bin/objcopy
-    ln -s /usr/local/opt/binutils/bin/objcopy "${tools}"/bintools/bin/objcopy
+    rm -f "${NUTTXTOOLS}"/bintools/bin/objcopy
+    ln -s /usr/local/opt/binutils/bin/objcopy "${NUTTXTOOLS}"/bintools/bin/objcopy
   fi
 
   command objcopy --version
 }
 
 bloaty() {
-  add_path "${tools}"/bloaty/bin
+  add_path "${NUTTXTOOLS}"/bloaty/bin
 
-  if [ ! -f "${tools}/bloaty/bin/bloaty" ]; then
-    git clone --branch main https://github.com/google/bloaty "${tools}"/bloaty-src
-    cd "${tools}"/bloaty-src
+  if [ ! -f "${NUTTXTOOLS}/bloaty/bin/bloaty" ]; then
+    git clone --branch main https://github.com/google/bloaty "${NUTTXTOOLS}"/bloaty-src
+    cd "${NUTTXTOOLS}"/bloaty-src
     # Due to issues with latest MacOS versions use pinned commit.
     # https://github.com/google/bloaty/pull/326
     git checkout 52948c107c8f81045e7f9223ec02706b19cfa882
-    mkdir -p "${tools}"/bloaty
-    cmake -D BLOATY_PREFER_SYSTEM_CAPSTONE=NO -DCMAKE_INSTALL_PREFIX="${tools}"/bloaty
+    mkdir -p "${NUTTXTOOLS}"/bloaty
+    cmake -D BLOATY_PREFER_SYSTEM_CAPSTONE=NO -DCMAKE_INSTALL_PREFIX="${NUTTXTOOLS}"/bloaty
     cmake --build build
     cmake --build build --target install
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     rm -rf bloaty-src
   fi
 
@@ -119,7 +113,7 @@ bloaty() {
 }
 
 c_cache() {
-  add_path "${tools}"/ccache/bin
+  add_path "${NUTTXTOOLS}"/ccache/bin
 
   if ! type ccache > /dev/null 2>&1; then
     brew install ccache
@@ -144,18 +138,18 @@ gen_romfs() {
 }
 
 gperf() {
-  add_path "${tools}"/gperf/bin
+  add_path "${NUTTXTOOLS}"/gperf/bin
 
-  if [ ! -f "${tools}/gperf/bin/gperf" ]; then
+  if [ ! -f "${NUTTXTOOLS}/gperf/bin/gperf" ]; then
     local basefile
     basefile=gperf-3.1
 
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     wget --quiet http://ftp.gnu.org/pub/gnu/gperf/${basefile}.tar.gz
     tar zxf ${basefile}.tar.gz
-    cd "${tools}"/${basefile}
-    ./configure --prefix="${tools}"/gperf; make; make install
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"/${basefile}
+    ./configure --prefix="${NUTTXTOOLS}"/gperf; make; make install
+    cd "${NUTTXTOOLS}"
     rm -rf ${basefile}; rm ${basefile}.tar.gz
   fi
 
@@ -163,28 +157,28 @@ gperf() {
 }
 
 kconfig_frontends() {
-  add_path "${tools}"/kconfig-frontends/bin
+  add_path "${NUTTXTOOLS}"/kconfig-frontends/bin
 
-  if [ ! -f "${tools}/kconfig-frontends/bin/kconfig-conf" ]; then
-    git clone https://bitbucket.org/nuttx/tools.git "${tools}"/nuttx-tools
-    cd "${tools}"/nuttx-tools/kconfig-frontends
-    ./configure --prefix="${tools}"/kconfig-frontends \
+  if [ ! -f "${NUTTXTOOLS}/kconfig-frontends/bin/kconfig-conf" ]; then
+    git clone https://bitbucket.org/nuttx/tools.git "${NUTTXTOOLS}"/nuttx-tools
+    cd "${NUTTXTOOLS}"/nuttx-tools/kconfig-frontends
+    ./configure --prefix="${NUTTXTOOLS}"/kconfig-frontends \
       --disable-kconfig --disable-nconf --disable-qconf \
       --disable-gconf --disable-mconf --disable-static \
       --disable-shared --disable-L10n
     # Avoid "aclocal/automake missing" errors
     touch aclocal.m4 Makefile.in
     make install
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     rm -rf nuttx-tools
   fi
 }
 
 mips_gcc_toolchain() {
-  add_path "${tools}"/pinguino-compilers/macosx/p32/bin
+  add_path "${NUTTXTOOLS}"/pinguino-compilers/macosx/p32/bin
 
-  if [ ! -d "${tools}/pinguino-compilers" ]; then
-    cd "${tools}"
+  if [ ! -d "${NUTTXTOOLS}/pinguino-compilers" ]; then
+    cd "${NUTTXTOOLS}"
     git clone https://github.com/PinguinoIDE/pinguino-compilers
   fi
 
@@ -194,9 +188,9 @@ mips_gcc_toolchain() {
 python_tools() {
   # Python User Env
   export PIP_USER=yes
-  export PYTHONUSERBASE=${tools}/pylocal
-  echo "export PIP_USER=yes" >> "${tools}"/env.sh
-  echo "export PYTHONUSERBASE=${tools}/pylocal" >> "${tools}"/env.sh
+  export PYTHONUSERBASE=${NUTTXTOOLS}/pylocal
+  echo "export PIP_USER=yes" >> "${NUTTXTOOLS}"/env.sh
+  echo "export PYTHONUSERBASE=${NUTTXTOOLS}/pylocal" >> "${NUTTXTOOLS}"/env.sh
   add_path "${PYTHONUSERBASE}"/bin
 
   # workaround for Cython issue
@@ -228,12 +222,12 @@ python_tools() {
 }
 
 riscv_gcc_toolchain() {
-  add_path "${tools}"/riscv-none-elf-gcc/bin
+  add_path "${NUTTXTOOLS}"/riscv-none-elf-gcc/bin
 
-  if [ ! -f "${tools}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
+  if [ ! -f "${NUTTXTOOLS}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
     local basefile
     basefile=xpack-riscv-none-elf-gcc-13.2.0-2-darwin-x64
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     # Download the latest RISCV GCC toolchain prebuilt by xPack
     wget --quiet https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-2/${basefile}.tar.gz
     tar zxf ${basefile}.tar.gz
@@ -252,12 +246,12 @@ rust() {
 }
 
 xtensa_esp32_gcc_toolchain() {
-  add_path "${tools}"/xtensa-esp32-elf/bin
+  add_path "${NUTTXTOOLS}"/xtensa-esp32-elf/bin
 
-  if [ ! -f "${tools}/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc" ]; then
+  if [ ! -f "${NUTTXTOOLS}/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc" ]; then
     local basefile
     basefile=xtensa-esp32-elf-12.2.0_20230208-x86_64-apple-darwin
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     wget --quiet https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/${basefile}.tar.xz
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
@@ -283,14 +277,14 @@ util_linux() {
 }
 
 wasi_sdk() {
-  add_path "${tools}"/wamrc
+  add_path "${NUTTXTOOLS}"/wamrc
 
-  if [ ! -f "${tools}/wamrc/wasi-sdk/bin/clang" ]; then
+  if [ ! -f "${NUTTXTOOLS}/wamrc/wasi-sdk/bin/clang" ]; then
     local wasibasefile
     local wasmbasefile
     wasibasefile=wasi-sdk-19.0-macos
     wasmbasefile=wamrc-1.1.2-x86_64-macos-latest
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     mkdir wamrc
     wget --quiet https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-19/${wasibasefile}.tar.gz
     tar xzf ${wasibasefile}.tar.gz
@@ -302,8 +296,8 @@ wasi_sdk() {
     rm ${wasmbasefile}.tar.gz
   fi
 
-  export WASI_SDK_PATH="${tools}/wasi-sdk"
-  echo "export WASI_SDK_PATH=${tools}/wasi-sdk" >> "${tools}"/env.sh
+  export WASI_SDK_PATH="${NUTTXTOOLS}/wasi-sdk"
+  echo "export WASI_SDK_PATH=${NUTTXTOOLS}/wasi-sdk" >> "${NUTTXTOOLS}"/env.sh
 
   command "${WASI_SDK_PATH}"/bin/clang --version
   command wamrc --version
@@ -311,37 +305,37 @@ wasi_sdk() {
 
 setup_links() {
   # Configure ccache
-  mkdir -p "${tools}"/ccache/bin/
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/arm-none-eabi-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/arm-none-eabi-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/avr-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/avr-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/cc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/c++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/clang
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/clang++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/p32-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv64-unknown-elf-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv64-unknown-elf-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-gcc
+  mkdir -p "${NUTTXTOOLS}"/ccache/bin/
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/aarch64-none-elf-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/aarch64-none-elf-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/arm-none-eabi-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/arm-none-eabi-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/avr-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/avr-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/cc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/c++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/clang
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/clang++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/p32-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/riscv64-unknown-elf-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/riscv64-unknown-elf-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/sparc-gaisler-elf-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/sparc-gaisler-elf-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/x86_64-elf-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/x86_64-elf-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/xtensa-esp32-elf-gcc
 }
 
 install_build_tools() {
-  mkdir -p "${tools}"
-  echo "#!/usr/bin/env sh" > "${tools}"/env.sh
+  mkdir -p "${NUTTXTOOLS}"
+  echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
   # install="arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain binutils bloaty elf_toolchain gen_romfs gperf kconfig_frontends mips_gcc_toolchain python_tools riscv_gcc_toolchain rust xtensa_esp32_gcc_toolchain u_boot_tools util_linux wasi_sdk c_cache"
   install="arm_gcc_toolchain binutils elf_toolchain gen_romfs gperf kconfig_frontends python_tools u_boot_tools util_linux c_cache"
-  mkdir -p "${tools}"/homebrew
-  export HOMEBREW_CACHE=${tools}/homebrew
-  echo "export HOMEBREW_CACHE=${tools}/homebrew" >> "${tools}"/env.sh
+  mkdir -p "${NUTTXTOOLS}"/homebrew
+  export HOMEBREW_CACHE=${NUTTXTOOLS}/homebrew
+  echo "export HOMEBREW_CACHE=${NUTTXTOOLS}/homebrew" >> "${NUTTXTOOLS}"/env.sh
   # https://github.com/apache/arrow/issues/15025
   rm -f /usr/local/bin/2to3* || :
   rm -f /usr/local/bin/idle3* || :
@@ -357,8 +351,8 @@ install_build_tools() {
   done
   cd "${oldpath}"
 
-  echo "PATH=${PATH}" >> "${tools}"/env.sh
-  echo "export PATH" >> "${tools}"/env.sh
+  echo "PATH=${PATH}" >> "${NUTTXTOOLS}"/env.sh
+  echo "export PATH" >> "${NUTTXTOOLS}"/env.sh
 }
 
 install_build_tools
