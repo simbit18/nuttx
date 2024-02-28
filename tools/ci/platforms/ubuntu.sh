@@ -231,18 +231,16 @@ riscv_gcc_toolchain() {
 }
 
 rust() {
-  add_path "${tools}"/rust/cargo/bin
-  # Configuring the PATH environment variable
-  export CARGO_HOME=${tools}/rust/cargo
-  export RUSTUP_HOME=${tools}/rust/rustup
-  echo "export CARGO_HOME=${tools}/rust/cargo" >> "${tools}"/env.sh
-  echo "export RUSTUP_HOME=${tools}/rust/rustup" >> "${tools}"/env.sh
   if ! type rustc > /dev/null 2>&1; then
-    # Install Rust target x86_64-unknown-linux-musl
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --no-modify-path -y
+    sudo apt-get install rustc
     # Install targets supported from NuttX
-    "$CARGO_HOME"/bin/rustup target add thumbv6m-none-eabi
-    "$CARGO_HOME"/bin/rustup target add thumbv7m-none-eabi
+    command rustup target add thumbv6m-none-eabi
+    command rustup target add thumbv7m-none-eabi
+  fi
+
+  command rustc --version
+}
+
     
   fi
 
