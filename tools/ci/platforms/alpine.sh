@@ -208,10 +208,8 @@ function rust {
   echo "export CARGO_HOME=${tools}/rust/cargo" >> "${tools}"/env.sh
   echo "export RUSTUP_HOME=${tools}/rust/rustup" >> "${tools}"/env.sh
   if ! type rustc &> /dev/null; then
-    local basefile
-    basefile=x86_64-unknown-linux-musl
     # Install Rust target x86_64-unknown-linux-musl
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y --default-host ${basefile} --no-modify-path
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y -- --no-modify-path
     # Install targets supported from NuttX
     $CARGO_HOME/bin/rustup target add thumbv6m-none-eabi
     $CARGO_HOME/bin/rustup target add thumbv7m-none-eabi
@@ -327,42 +325,42 @@ function rust {
   # command wamrc --version
 # }
 
-# function setup_links {
-  # # Configure ccache
-  # mkdir -p "${tools}"/ccache/bin/
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-g++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/arm-none-eabi-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/arm-none-eabi-g++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/avr-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/avr-g++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/cc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/c++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/clang
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/clang++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/g++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/p32-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/rx-elf-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv-none-elf-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv-none-elf-g++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-g++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-g++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-g++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s2-elf-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s2-elf-g++
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-gcc
-  # ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-g++
-# }
+function setup_links {
+  # Configure ccache
+  mkdir -p "${tools}"/ccache/bin/
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-g++
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/arm-none-eabi-gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/arm-none-eabi-g++
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/avr-gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/avr-g++
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/cc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/c++
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/clang
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/clang++
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/g++
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/p32-gcc
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/rx-elf-gcc
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv-none-elf-gcc
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv-none-elf-g++
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-gcc
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-g++
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-gcc
+  ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-g++
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-gcc
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-g++
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s2-elf-gcc
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s2-elf-g++
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-gcc
+#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-g++
+}
 
 function install_build_tools {
   mkdir -p "${tools}"
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
 
-  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain gen-romfs kconfig-frontends"
+  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain gen-romfs kconfig-frontends rust"
 
   pushd .
   for func in ${install}; do
