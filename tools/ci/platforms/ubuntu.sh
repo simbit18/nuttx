@@ -234,14 +234,8 @@ rust() {
   if ! type rustc > /dev/null 2>&1; then
     sudo apt-get install rustc
     # Install targets supported from NuttX
-    command rustup target add thumbv6m-none-eabi
-    command rustup target add thumbv7m-none-eabi
-  fi
-
-  command rustc --version
-}
-
-    
+    rustup target add thumbv6m-none-eabi
+    rustup target add thumbv7m-none-eabi
   fi
 
   command rustc --version
