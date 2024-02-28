@@ -27,7 +27,6 @@ CIWORKSPACE=$(cd "${CID}"/../../../ && pwd -P)
 CIPLAT=${CIWORKSPACE}/nuttx/tools/ci/platforms
 nuttx=${CIWORKSPACE}/nuttx
 apps=${CIWORKSPACE}/apps
-NUTTXTOOLS=${CIWORKSPACE}/tools
 
 os=$(uname -s)
 if [ -f /etc/os-release ]; then
@@ -45,8 +44,8 @@ function to_do {
 }
 
 function install_tools {
+  export NUTTXTOOLS=${CIWORKSPACE}/tools
   mkdir -p "${NUTTXTOOLS}"
-  export "${NUTTXTOOLS}"
 
   case ${osname} in
     alpine)
