@@ -24,14 +24,8 @@
 set -e
 set -o xtrace
 
-WD=$(cd "$(dirname "$0")" && pwd)
-WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
-tools=${WORKSPACE}/tools
-EXTRA_PATH=
-
 add_path() {
   PATH=$1:${PATH}
-  EXTRA_PATH=$1:${EXTRA_PATH}
 }
 
 arm_clang_toolchain() {
@@ -79,18 +73,18 @@ avr_gcc_toolchain() {
 # }
 
 bloaty() {
-  add_path "${tools}"/bloaty/bin
+  add_path "${NUTTXTOOLS}"/bloaty/bin
 
-  if [ ! -f "${tools}/bloaty/bin/bloaty" ]; then
-    git clone --depth 1 --branch v1.1 https://github.com/google/bloaty "${tools}"/bloaty-src
-    mkdir -p "${tools}"/bloaty
-    cd "${tools}"/bloaty-src
-    cmake -B build -DCMAKE_INSTALL_PREFIX="${tools}"/bloaty
+  if [ ! -f "${NUTTXTOOLS}/bloaty/bin/bloaty" ]; then
+    git clone --depth 1 --branch v1.1 https://github.com/google/bloaty "${NUTTXTOOLS}"/bloaty-src
+    mkdir -p "${NUTTXTOOLS}"/bloaty
+    cd "${NUTTXTOOLS}"/bloaty-src
+    cmake -B build -DCMAKE_INSTALL_PREFIX="${NUTTXTOOLS}"/bloaty
     cmake --build build
     cmake --build build --target install
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     rm -rf bloaty-src
-    ls -a "${tools}"/bloaty
+    ls -a "${NUTTXTOOLS}"/bloaty
   fi
 
   command bloaty --version
@@ -124,15 +118,15 @@ c_cache() {
 # }
 
 gen_romfs() {
-  add_path "${tools}"/genromfs/usr/bin
+  add_path "${NUTTXTOOLS}"/genromfs/usr/bin
 
   if ! type genromfs > /dev/null 2>&1; then
-    git clone https://bitbucket.org/nuttx/tools.git "${tools}"/nuttx-tools
-    cd "${tools}"/nuttx-tools
+    git clone https://bitbucket.org/nuttx/tools.git "${NUTTXTOOLS}"/nuttx-tools
+    cd "${NUTTXTOOLS}"/nuttx-tools
     tar zxf genromfs-0.5.2.tar.gz
     cd genromfs-0.5.2
-    make install PREFIX="${tools}"/genromfs
-    cd "${tools}"
+    make install PREFIX="${NUTTXTOOLS}"/genromfs
+    cd "${NUTTXTOOLS}"
     rm -rf nuttx-tools
   fi
 }
@@ -145,33 +139,33 @@ gen_romfs() {
 # }
 
 kconfig_frontends() {
-  add_path "${tools}"/kconfig-frontends/bin
+  add_path "${NUTTXTOOLS}"/kconfig-frontends/bin
 
-  if [ ! -f "${tools}/kconfig-frontends/bin/kconfig-conf" ]; then
-    git clone https://bitbucket.org/nuttx/tools.git "${tools}"/nuttx-tools
-    cd "${tools}"/nuttx-tools/kconfig-frontends
-    ./configure --prefix="${tools}"/kconfig-frontends \
+  if [ ! -f "${NUTTXTOOLS}/kconfig-frontends/bin/kconfig-conf" ]; then
+    git clone https://bitbucket.org/nuttx/tools.git "${NUTTXTOOLS}"/nuttx-tools
+    cd "${NUTTXTOOLS}"/nuttx-tools/kconfig-frontends
+    ./configure --prefix="${NUTTXTOOLS}"/kconfig-frontends \
       --enable-mconf --disable-nconf --disable-gconf --disable-qconf
     ln -s /usr/bin/aclocal /usr/local/bin/aclocal-1.15
     ln -s /usr/bin/automake /usr/local/bin/automake-1.15
     make install
-    cd "${tools}"
+    cd "${NUTTXTOOLS}"
     rm -rf nuttx-tools
   fi
 }
 
 # function mips-gcc-toolchain {
-  # add_path "${tools}"/pinguino-compilers/p32/bin
+  # add_path "${NUTTXTOOLS}"/pinguino-compilers/p32/bin
 
-  # if [ ! -d "${tools}/pinguino-compilers/p32/bin/p32-gcc" ]; then
+  # if [ ! -d "${NUTTXTOOLS}/pinguino-compilers/p32/bin/p32-gcc" ]; then
     # local basefile
     # basefile=pinguino-linux64-p32
-    # mkdir -p "${tools}"/pinguino-compilers
-    # cd "${tools}"
+    # mkdir -p "${NUTTXTOOLS}"/pinguino-compilers
+    # cd "${NUTTXTOOLS}"
     # # Download the latest pinguino toolchain prebuilt by 32bit
     # curl -O -L -s  https://github.com/PinguinoIDE/pinguino-compilers/releases/download/v20.10/${basefile}.zip
     # unzip -qo ${basefile}.zip
-    # mv p32 "${tools}"/pinguino-compilers/p32
+    # mv p32 "${NUTTXTOOLS}"/pinguino-compilers/p32
     # rm ${basefile}.zip
   # fi
 
@@ -179,9 +173,9 @@ kconfig_frontends() {
 # }
 
 # function riscv-gcc-toolchain {
-  # add_path "${tools}"/riscv-none-elf-gcc/bin
+  # add_path "${NUTTXTOOLS}"/riscv-none-elf-gcc/bin
 
-  # if [ ! -f "${tools}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
+  # if [ ! -f "${NUTTXTOOLS}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
     # ## Add glibc-to-musl compatibility, because xPack GCC was compiled for glibc
     # ## From https://github.com/sgerrand/alpine-pkg-glibc
     # wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
@@ -190,7 +184,7 @@ kconfig_frontends() {
 
     # local basefile
     # basefile=xpack-riscv-none-elf-gcc-13.2.0-2-linux-x64
-    # cd "${tools}"
+    # cd "${NUTTXTOOLS}"
     # # Download the latest RISCV GCC toolchain prebuilt by xPack
     # wget --quiet https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-2/${basefile}.tar.gz
     # tar zxf ${basefile}.tar.gz
@@ -201,12 +195,12 @@ kconfig_frontends() {
 # }
 
 rust() {
-  add_path "${tools}"/rust/cargo/bin
+  add_path "${NUTTXTOOLS}"/rust/cargo/bin
   # Configuring the PATH environment variable
-  export CARGO_HOME=${tools}/rust/cargo
-  export RUSTUP_HOME=${tools}/rust/rustup
-  echo "export CARGO_HOME=${tools}/rust/cargo" >> "${tools}"/env.sh
-  echo "export RUSTUP_HOME=${tools}/rust/rustup" >> "${tools}"/env.sh
+  export CARGO_HOME=${NUTTXTOOLS}/rust/cargo
+  export RUSTUP_HOME=${NUTTXTOOLS}/rust/rustup
+  echo "export CARGO_HOME=${NUTTXTOOLS}/rust/cargo" >> "${NUTTXTOOLS}"/env.sh
+  echo "export RUSTUP_HOME=${NUTTXTOOLS}/rust/rustup" >> "${NUTTXTOOLS}"/env.sh
   if ! type rustc > /dev/null 2>&1; then
     # Install Rust target x86_64-unknown-linux-musl
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
@@ -220,12 +214,12 @@ rust() {
 }
 
 # function sparc-gcc-toolchain {
-  # add_path "${tools}"/sparc-gaisler-elf-gcc/bin
+  # add_path "${NUTTXTOOLS}"/sparc-gaisler-elf-gcc/bin
 
-  # if [ ! -f "${tools}/sparc-gaisler-elf-gcc/bin/sparc-gaisler-elf-gcc" ]; then
+  # if [ ! -f "${NUTTXTOOLS}/sparc-gaisler-elf-gcc/bin/sparc-gaisler-elf-gcc" ]; then
     # local basefile
     # basefile=bcc-2.1.0-gcc-linux64
-    # cd "${tools}"
+    # cd "${NUTTXTOOLS}"
     # # Download the SPARC GCC toolchain prebuilt by Gaisler
     # wget --quiet https://www.gaisler.com/anonftp/bcc2/bin/${basefile}.tar.xz
     # xz -d ${basefile}.tar.xz
@@ -238,12 +232,12 @@ rust() {
 # }
 
 # function xtensa-esp32-gcc-toolchain {
-  # add_path "${tools}"/xtensa-esp32-elf/bin
+  # add_path "${NUTTXTOOLS}"/xtensa-esp32-elf/bin
 
-  # if [ ! -f "${tools}/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc" ]; then
+  # if [ ! -f "${NUTTXTOOLS}/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc" ]; then
     # local basefile
     # basefile=xtensa-esp32-elf-12.2.0_20230208-x86_64-linux-gnu
-    # cd "${tools}"
+    # cd "${NUTTXTOOLS}"
     # # Download the latest ESP32 GCC toolchain prebuilt by Espressif
     # wget --quiet https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/${basefile}.tar.xz
     # xz -d ${basefile}.tar.xz
@@ -255,12 +249,12 @@ rust() {
 # }
 
 # function xtensa-esp32s2-gcc-toolchain {
-  # add_path "${tools}"/xtensa-esp32s2-elf/bin
+  # add_path "${NUTTXTOOLS}"/xtensa-esp32s2-elf/bin
 
-  # if [ ! -f "${tools}/xtensa-esp32s2-elf/bin/xtensa-esp32s2-elf-gcc" ]; then
+  # if [ ! -f "${NUTTXTOOLS}/xtensa-esp32s2-elf/bin/xtensa-esp32s2-elf-gcc" ]; then
     # local basefile
     # basefile=xtensa-esp32s2-elf-12.2.0_20230208-x86_64-linux-gnu
-    # cd "${tools}"
+    # cd "${NUTTXTOOLS}"
     # # Download the latest ESP32 S2 GCC toolchain prebuilt by Espressif
     # wget --quiet https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/${basefile}.tar.xz
     # xz -d ${basefile}.tar.xz
@@ -272,12 +266,12 @@ rust() {
 # }
 
 # function xtensa-esp32s3-gcc-toolchain {
-  # add_path "${tools}"/xtensa-esp32s3-elf/bin
+  # add_path "${NUTTXTOOLS}"/xtensa-esp32s3-elf/bin
 
-  # if [ ! -f "${tools}/xtensa-esp32s3-elf/bin/xtensa-esp32s3-elf-gcc" ]; then
+  # if [ ! -f "${NUTTXTOOLS}/xtensa-esp32s3-elf/bin/xtensa-esp32s3-elf-gcc" ]; then
     # local basefile
     # basefile=xtensa-esp32s3-elf-12.2.0_20230208-x86_64-linux-gnu
-    # cd "${tools}"
+    # cd "${NUTTXTOOLS}"
     # # Download the latest ESP32 S3 GCC toolchain prebuilt by Espressif
     # wget --quiet https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/${basefile}.tar.xz
     # xz -d ${basefile}.tar.xz
@@ -295,14 +289,14 @@ rust() {
 # }
 
 # function wasi-sdk {
-  # add_path "${tools}"/wamrc
+  # add_path "${NUTTXTOOLS}"/wamrc
 
-  # if [ ! -f "${tools}/wasi-sdk/bin/clang" ]; then
+  # if [ ! -f "${NUTTXTOOLS}/wasi-sdk/bin/clang" ]; then
     # local wasibasefile
     # local wasmbasefile
     # wasibasefile=wasi-sdk-19.0-linux
     # wasmbasefile=wamrc-1.1.2-x86_64-ubuntu-20.04
-    # cd "${tools}"
+    # cd "${NUTTXTOOLS}"
     # mkdir wamrc
 
     # # Download the latest WASI-enabled WebAssembly C/C++ toolchain prebuilt by WASM
@@ -318,8 +312,8 @@ rust() {
 
   # fi
 
-  # export WASI_SDK_PATH="${tools}/wasi-sdk"
-  # echo "export WASI_SDK_PATH=${tools}/wasi-sdk" >> "${tools}"/env.sh
+  # export WASI_SDK_PATH="${NUTTXTOOLS}/wasi-sdk"
+  # echo "export WASI_SDK_PATH=${NUTTXTOOLS}/wasi-sdk" >> "${NUTTXTOOLS}"/env.sh
 
   # command "${WASI_SDK_PATH}"/bin/clang --version
   # command wamrc --version
@@ -327,38 +321,38 @@ rust() {
 
 setup_links() {
   # Configure ccache
-  mkdir -p "${tools}"/ccache/bin/
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/arm-none-eabi-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/arm-none-eabi-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/avr-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/avr-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/cc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/c++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/clang
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/clang++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/g++
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/p32-gcc
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/rx-elf-gcc
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv-none-elf-gcc
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/riscv-none-elf-g++
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-gcc
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/sparc-gaisler-elf-g++
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-gcc
-  ln -sf "$(which ccache)" "${tools}"/ccache/bin/x86_64-elf-g++
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-gcc
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-g++
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s2-elf-gcc
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s2-elf-g++
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-gcc
-#  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-g++
+  mkdir -p "${NUTTXTOOLS}"/ccache/bin/
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/aarch64-none-elf-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/aarch64-none-elf-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/arm-none-eabi-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/arm-none-eabi-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/avr-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/avr-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/cc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/c++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/clang
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/clang++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/g++
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/p32-gcc
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/rx-elf-gcc
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/riscv-none-elf-gcc
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/riscv-none-elf-g++
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/sparc-gaisler-elf-gcc
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/sparc-gaisler-elf-g++
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/x86_64-elf-gcc
+  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/x86_64-elf-g++
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/xtensa-esp32-elf-gcc
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/xtensa-esp32-elf-g++
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/xtensa-esp32s2-elf-gcc
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/xtensa-esp32s2-elf-g++
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/xtensa-esp32s3-elf-gcc
+#  ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/xtensa-esp32s3-elf-g++
 }
 
 install_build_tools() {
-  mkdir -p "${tools}"
-  echo "#!/usr/bin/env sh" > "${tools}"/env.sh
+  mkdir -p "${NUTTXTOOLS}"
+  echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
 
   install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain gen_romfs kconfig_frontends rust"
 
@@ -370,8 +364,8 @@ install_build_tools() {
   echo "${oldpath}"
   cd "${oldpath}"
 
-  echo "PATH=${PATH}" >> "${tools}"/env.sh
-  echo "export PATH" >> "${tools}"/env.sh
+  echo "PATH=${PATH}" >> "${NUTTXTOOLS}"/env.sh
+  echo "export PATH" >> "${NUTTXTOOLS}"/env.sh
 }
 
 install_build_tools
