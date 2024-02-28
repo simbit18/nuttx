@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 ############################################################################
 # tools/ci/platforms/msys2.sh
 #
@@ -29,12 +29,12 @@ WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
 tools=${WORKSPACE}/tools
 EXTRA_PATH=
 
-function add_path {
+add_path() {
   PATH=$1:${PATH}
   EXTRA_PATH=$1:${EXTRA_PATH}
 }
 
-function arm-clang-toolchain {
+arm_clang_toolchain() {
   add_path "${tools}"/clang-arm-none-eabi/bin
 
   if [ ! -f "${tools}/clang-arm-none-eabi/bin/clang" ]; then
@@ -51,7 +51,7 @@ function arm-clang-toolchain {
   command clang --version
 }
 
-function arm-gcc-toolchain {
+arm_gcc_toolchain() {
   add_path "${tools}"/gcc-arm-none-eabi/bin
 
   if [ ! -f "${tools}/gcc-arm-none-eabi/bin/arm-none-eabi-gcc" ]; then
@@ -67,7 +67,7 @@ function arm-gcc-toolchain {
   command arm-none-eabi-gcc --version
 }
 
-function arm64-gcc-toolchain {
+arm64_gcc_toolchain() {
   add_path "${tools}"/gcc-aarch64-none-elf/bin
 
   if [ ! -f "${tools}/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc" ]; then
@@ -84,21 +84,20 @@ function arm64-gcc-toolchain {
   command aarch64-none-elf-gcc --version
 }
 
-function c-cache {
+c_cache() {
   add_path "${tools}"/ccache/bin
 
-  if ! type ccache &> /dev/null; then
+  if ! type ccache > /dev/null 2>&1; then
     pacman -S --noconfirm --needed ccache
-    pacman -Q
   fi
   setup_links
   command ccache --version
 }
 
-function esp-tool {
+esp_tool() {
   add_path "${tools}"/esp-tool
 
-  if ! type esptool &> /dev/null; then
+  if ! type esptool > /dev/null 2>&1; then
     local basefile
     basefile=esptool-v4.7.0-win64
     cd "${tools}"
@@ -110,10 +109,10 @@ function esp-tool {
   command esptool version
 }
 
-function gen-romfs {
+gen_romfs() {
   add_path "${tools}"/genromfs/usr/bin
 
-  if ! type genromfs &> /dev/null; then
+  if ! type genromfs > /dev/null 2>&1; then
     git clone https://bitbucket.org/nuttx/tools.git "${tools}"/nuttx-tools
     cd "${tools}"/nuttx-tools
     tar zxf genromfs-0.5.2.tar.gz
@@ -124,7 +123,7 @@ function gen-romfs {
   fi
 }
 
-function kconfig-frontends {
+kconfig_frontends() {
   add_path "${tools}"/kconfig-frontends/bin
 
   if [ ! -f "${tools}/kconfig-frontends/bin/kconfig-conf" ]; then
@@ -142,7 +141,18 @@ function kconfig-frontends {
   fi
 }
 
-function riscv-gcc-toolchain {
+mips_gcc_toolchain() {
+  add_path "${tools}"/pinguino-compilers/windows64/p32/bin
+
+  if [ ! -d "${tools}/pinguino-compilers" ]; then
+    cd "${tools}"
+    git clone https://github.com/PinguinoIDE/pinguino-compilers
+  fi
+
+  command p32-gcc --version
+}
+
+riscv_gcc_toolchain() {
   add_path "${tools}"/riscv-none-elf-gcc/bin
 
   if [ ! -f "${tools}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
@@ -158,14 +168,14 @@ function riscv-gcc-toolchain {
   command riscv-none-elf-gcc --version
 }
 
-function rust {
+rust() {
   add_path "${tools}"/rust/cargo/bin
   # Configuring the PATH environment variable
   export CARGO_HOME=${tools}/rust/cargo
   export RUSTUP_HOME=${tools}/rust/rustup
   echo "export CARGO_HOME=${tools}/rust/cargo" >> "${tools}"/env.sh
   echo "export RUSTUP_HOME=${tools}/rust/rustup" >> "${tools}"/env.sh
-  if ! type rustc &> /dev/null; then
+  if ! type rustc > /dev/null 2>&1; then
     local basefile
     basefile=x86_64-pc-windows-gnu
     mkdir -p "${tools}"/rust
@@ -182,7 +192,7 @@ function rust {
   command rustc --version
 }
 
-function sparc-gcc-toolchain {
+sparc_gcc_toolchain() {
   add_path "${tools}"/sparc-gaisler-elf-gcc/bin
 
   if [ ! -f "${tools}/sparc-gaisler-elf-gcc/bin/sparc-gaisler-elf-gcc" ]; then
@@ -199,7 +209,7 @@ function sparc-gcc-toolchain {
   command sparc-gaisler-elf-gcc --version
 }
 
-function xtensa-esp32-gcc-toolchain {
+xtensa_esp32_gcc_toolchain() {
   add_path "${tools}"/xtensa-esp32-elf/bin
 
   if [ ! -f "${tools}/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc" ]; then
@@ -215,7 +225,7 @@ function xtensa-esp32-gcc-toolchain {
   command xtensa-esp32-elf-gcc --version
 }
 
-function xtensa-esp32s2-gcc-toolchain {
+xtensa_esp32s2_gcc_toolchain() {
   add_path "${tools}"/xtensa-esp32s2-elf/bin
 
   if [ ! -f "${tools}/xtensa-esp32s2-elf/bin/xtensa-esp32s2-elf-gcc" ]; then
@@ -231,7 +241,7 @@ function xtensa-esp32s2-gcc-toolchain {
   command xtensa-esp32s2-elf-gcc --version
 }
 
-function xtensa-esp32s3-gcc-toolchain {
+xtensa_esp32s3_gcc_toolchain() {
   add_path "${tools}"/xtensa-esp32s3-elf/bin
 
   if [ ! -f "${tools}/xtensa-esp32s3-elf/bin/xtensa-esp32s3-elf-gcc" ]; then
@@ -247,7 +257,7 @@ function xtensa-esp32s3-gcc-toolchain {
   command xtensa-esp32s3-elf-gcc --version
 }
 
-function setup_links {
+setup_links() {
   # Configure ccache
   mkdir -p "${tools}"/ccache/bin/
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
@@ -272,21 +282,17 @@ function setup_links {
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-gcc
 }
 
-function install_build_tools {
+install_build_tools() {
   mkdir -p "${tools}"
-  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
-  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain kconfig-frontends riscv-gcc-toolchain rust"
+  echo "#!/usr/bin/env sh" > "${tools}"/env.sh
+  install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain kconfig_frontends riscv_gcc_toolchain rust"
 
-  pushd .
+  oldpath=$(cd . && pwd -P)
   for func in ${install}; do
     ${func}
   done
-  popd
+  cd "${oldpath}"
 
-  # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
-  # echo "PATH=${PATH}" >> "${tools}"/env.sh
-  # echo "export PATH" >> "${tools}"/env.sh
-  # echo "${EXTRA_PATH}" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
 }

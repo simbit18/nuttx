@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 ############################################################################
 # tools/ci/platforms/darwin.sh
 #
@@ -34,12 +34,12 @@ WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
 tools=${WORKSPACE}/tools
 EXTRA_PATH=
 
-function add_path {
+add_path() {
   PATH=$1:${PATH}
   EXTRA_PATH=$1:${EXTRA_PATH}
 }
 
-function arm-gcc-toolchain {
+arm_gcc_toolchain() {
   add_path "${tools}"/gcc-arm-none-eabi/bin
 
   if [ ! -f "${tools}/gcc-arm-none-eabi/bin/arm-none-eabi-gcc" ]; then
@@ -56,7 +56,7 @@ function arm-gcc-toolchain {
   command arm-none-eabi-gcc --version
 }
 
-function arm64-gcc-toolchain {
+arm64_gcc_toolchain() {
   add_path "${tools}"/gcc-aarch64-none-elf/bin
 
   if [ ! -f "${tools}/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc" ]; then
@@ -74,8 +74,8 @@ function arm64-gcc-toolchain {
   command aarch64-none-elf-gcc --version
 }
 
-function avr-gcc-toolchain {
-  if ! type avr-gcc &> /dev/null; then
+avr_gcc_toolchain() {
+  if ! type avr-gcc > /dev/null 2>&1; then
     brew tap osx-cross/avr
     brew install avr-gcc
   fi
@@ -83,11 +83,11 @@ function avr-gcc-toolchain {
   command avr-gcc --version
 }
 
-function binutils {
+binutils() {
   mkdir -p "${tools}"/bintools/bin
   add_path "${tools}"/bintools/bin
 
-  if ! type objcopy &> /dev/null; then
+  if ! type objcopy > /dev/null 2>&1; then
     brew install binutils
     # It is possible we cached prebuilt but did brew install so recreate
     # symlink if it exists
@@ -98,7 +98,7 @@ function binutils {
   command objcopy --version
 }
 
-function bloaty {
+bloaty() {
   add_path "${tools}"/bloaty/bin
 
   if [ ! -f "${tools}/bloaty/bin/bloaty" ]; then
@@ -108,8 +108,9 @@ function bloaty {
     # https://github.com/google/bloaty/pull/326
     git checkout 52948c107c8f81045e7f9223ec02706b19cfa882
     mkdir -p "${tools}"/bloaty
-    cmake -D BLOATY_PREFER_SYSTEM_CAPSTONE=NO -DCMAKE_SYSTEM_PREFIX_PATH="${tools}"/bloaty
-    make install
+    cmake -D BLOATY_PREFER_SYSTEM_CAPSTONE=NO -DCMAKE_INSTALL_PREFIX="${tools}"/bloaty
+    cmake --build build
+    cmake --build build --target install
     cd "${tools}"
     rm -rf bloaty-src
   fi
@@ -117,34 +118,32 @@ function bloaty {
   command bloaty --version
 }
 
-function c-cache {
+c_cache() {
   add_path "${tools}"/ccache/bin
 
-  if ! type ccache &> /dev/null; then
+  if ! type ccache > /dev/null 2>&1; then
     brew install ccache
   fi
   setup_links
   command ccache --version
 }
 
-function elf-toolchain {
-  if ! type x86_64-elf-gcc &> /dev/null; then
+elf_toolchain() {
+  if ! type x86_64-elf-gcc > /dev/null 2>&1; then
     brew install x86_64-elf-gcc
   fi
 
   command x86_64-elf-gcc --version
 }
 
-function gen-romfs {
-#  add_path "${tools}"/genromfs/usr/bin
-
-  if ! type genromfs &> /dev/null; then
+gen_romfs() {
+  if ! type genromfs > /dev/null 2>&1; then
     brew tap PX4/px4
     brew install genromfs
   fi
 }
 
-function gperf {
+gperf() {
   add_path "${tools}"/gperf/bin
 
   if [ ! -f "${tools}/gperf/bin/gperf" ]; then
@@ -163,7 +162,7 @@ function gperf {
   command gperf --version
 }
 
-function kconfig-frontends {
+kconfig_frontends() {
   add_path "${tools}"/kconfig-frontends/bin
 
   if [ ! -f "${tools}/kconfig-frontends/bin/kconfig-conf" ]; then
@@ -181,7 +180,7 @@ function kconfig-frontends {
   fi
 }
 
-function mips-gcc-toolchain {
+mips_gcc_toolchain() {
   add_path "${tools}"/pinguino-compilers/macosx/p32/bin
 
   if [ ! -d "${tools}/pinguino-compilers" ]; then
@@ -189,10 +188,10 @@ function mips-gcc-toolchain {
     git clone https://github.com/PinguinoIDE/pinguino-compilers
   fi
 
-   command mips-elf-gcc --version
+  command mips-elf-gcc --version
 }
 
-function python-tools {
+python_tools() {
   # Python User Env
   export PIP_USER=yes
   export PYTHONUSERBASE=${tools}/pylocal
@@ -228,7 +227,7 @@ function python-tools {
     pytest-repeat==0.9.1
 }
 
-function riscv-gcc-toolchain {
+riscv_gcc_toolchain() {
   add_path "${tools}"/riscv-none-elf-gcc/bin
 
   if [ ! -f "${tools}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
@@ -244,15 +243,15 @@ function riscv-gcc-toolchain {
   command riscv-none-elf-gcc --version
 }
 
-function rust {
-  if ! type rustc &> /dev/null; then
+rust() {
+  if ! type rustc > /dev/null 2>&1; then
     brew install rust
   fi
 
   command rustc --version
 }
 
-function xtensa-esp32-gcc-toolchain {
+xtensa_esp32_gcc_toolchain() {
   add_path "${tools}"/xtensa-esp32-elf/bin
 
   if [ ! -f "${tools}/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc" ]; then
@@ -268,14 +267,14 @@ function xtensa-esp32-gcc-toolchain {
   command xtensa-esp32-elf-gcc --version
 }
 
-function u-boot-tools {
-  if ! type mkimage &> /dev/null; then
+u_boot_tools() {
+  if ! type mkimage > /dev/null 2>&1; then
     brew install u-boot-tools
   fi
 }
 
-function util-linux {
-  if ! type flock &> /dev/null; then
+util_linux() {
+  if ! type flock > /dev/null 2>&1; then
     brew tap discoteq/discoteq
     brew install flock
   fi
@@ -283,7 +282,7 @@ function util-linux {
   command flock --version
 }
 
-function wasi-sdk {
+wasi_sdk() {
   add_path "${tools}"/wamrc
 
   if [ ! -f "${tools}/wamrc/wasi-sdk/bin/clang" ]; then
@@ -310,7 +309,7 @@ function wasi-sdk {
   command wamrc --version
 }
 
-function setup_links {
+setup_links() {
   # Configure ccache
   mkdir -p "${tools}"/ccache/bin/
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
@@ -335,11 +334,11 @@ function setup_links {
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32-elf-gcc
 }
 
-function install_build_tools {
+install_build_tools() {
   mkdir -p "${tools}"
-  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
-  # install="arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty elf-toolchain gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
-  install="arm-gcc-toolchain binutils elf-toolchain gen-romfs gperf kconfig-frontends python-tools u-boot-tools util-linux c-cache"
+  echo "#!/usr/bin/env sh" > "${tools}"/env.sh
+  # install="arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain binutils bloaty elf_toolchain gen_romfs gperf kconfig_frontends mips_gcc_toolchain python_tools riscv_gcc_toolchain rust xtensa_esp32_gcc_toolchain u_boot_tools util_linux wasi_sdk c_cache"
+  install="arm_gcc_toolchain binutils elf_toolchain gen_romfs gperf kconfig_frontends python_tools u_boot_tools util_linux c_cache"
   mkdir -p "${tools}"/homebrew
   export HOMEBREW_CACHE=${tools}/homebrew
   echo "export HOMEBREW_CACHE=${tools}/homebrew" >> "${tools}"/env.sh
@@ -352,16 +351,14 @@ function install_build_tools {
   # same for openssl
   rm -f /usr/local/bin/openssl || :
 
-  pushd .
+  oldpath=$(cd . && pwd -P)
   for func in ${install}; do
     ${func}
   done
-  popd
+  cd "${oldpath}"
 
-  # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
-  #echo "${EXTRA_PATH}" > "${tools}"/env.sh
 }
 
 install_build_tools

@@ -362,14 +362,12 @@ install_build_tools() {
 
   install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain gen_romfs kconfig_frontends rust"
 
-  # pushd .
   oldpath=$(cd . && pwd -P)
   echo "${oldpath}"
   for func in ${install}; do
     ${func}
   done
   echo "${oldpath}"
-  # popd
   cd "${oldpath}"
 
   echo "PATH=${PATH}" >> "${tools}"/env.sh
