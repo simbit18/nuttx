@@ -209,7 +209,7 @@ function rust {
   echo "export RUSTUP_HOME=${tools}/rust/rustup" >> "${tools}"/env.sh
   if ! type rustc &> /dev/null; then
     # Install Rust target x86_64-unknown-linux-musl
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -y -- --no-modify-path
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
     # Install targets supported from NuttX
     $CARGO_HOME/bin/rustup target add thumbv6m-none-eabi
     $CARGO_HOME/bin/rustup target add thumbv7m-none-eabi
