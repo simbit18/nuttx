@@ -27,6 +27,7 @@ CIWORKSPACE=$(cd "${CID}"/../../../ && pwd -P)
 CIPLAT=${CIWORKSPACE}/nuttx/tools/ci/platforms
 nuttx=${CIWORKSPACE}/nuttx
 apps=${CIWORKSPACE}/apps
+NUTTXTOOLS=${CIWORKSPACE}/tools
 
 os=$(uname -s)
 if [ -f /etc/os-release ]; then
@@ -34,10 +35,6 @@ if [ -f /etc/os-release ]; then
 else
   osname=${os}
 fi
-
-function modify_path {
-  export PATH=$1${PATH}
-}
 
 function to_do {
   echo ""
@@ -48,10 +45,12 @@ function to_do {
 }
 
 function install_tools {
+  mkdir -p "${NUTTXTOOLS}"
+  export "${NUTTXTOOLS}"
 
   case ${osname} in
     alpine)
-      "${CIPLAT}"/alpine.sh
+      to_do "alpine"
       ;;
     arch)
       to_do "arch"
@@ -87,10 +86,7 @@ function install_tools {
       to_do "unknown"
       ;;
   esac
-  # echo "$PATH"
-  # cat "${CIWORKSPACE}"/tools/env.sh
-  # modify_path $(cat "${CIWORKSPACE}"/tools/env.sh)
-  # echo "$PATH"
+
   source "${CIWORKSPACE}"/tools/env.sh
 }
 
