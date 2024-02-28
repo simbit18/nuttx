@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 ############################################################################
 # tools/ci/platforms/ubuntu.sh
 #
@@ -29,12 +29,12 @@ WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
 tools=${WORKSPACE}/tools
 EXTRA_PATH=
 
-function add_path {
+add_path() {
   PATH=$1:${PATH}
   EXTRA_PATH=$1:${EXTRA_PATH}
 }
 
-function arm-clang-toolchain {
+arm_clang_toolchain() {
   add_path "${tools}"/clang-arm-none-eabi/bin
 
   if [ ! -f "${tools}/clang-arm-none-eabi/bin/clang" ]; then
@@ -52,7 +52,7 @@ function arm-clang-toolchain {
   command clang --version
 }
 
-function arm-gcc-toolchain {
+arm_gcc_toolchain() {
   add_path "${tools}"/gcc-arm-none-eabi/bin
 
   if [ ! -f "${tools}/gcc-arm-none-eabi/bin/arm-none-eabi-gcc" ]; then
@@ -70,7 +70,7 @@ function arm-gcc-toolchain {
   command arm-none-eabi-gcc --version
 }
 
-function arm64-gcc-toolchain {
+arm64_gcc_toolchain() {
   add_path "${tools}"/gcc-aarch64-none-elf/bin
 
   if [ ! -f "${tools}/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc" ]; then
@@ -88,23 +88,23 @@ function arm64-gcc-toolchain {
   command aarch64-none-elf-gcc --version
 }
 
-function avr-gcc-toolchain {
-  if ! type avr-gcc &> /dev/null; then
+avr_gcc_toolchain() {
+  if ! type avr-gcc > /dev/null 2>&1; then
     sudo apt-get install -y binutils-avr gcc-avr avr-libc 
   fi
 
   command avr-gcc --version
 }
 
-function binutils {
-  if ! type objcopy &> /dev/null; then
+binutils() {
+  if ! type objcopy > /dev/null 2>&1; then
     sudo apt-get install -y binutils-dev
   fi
 
   command objcopy --version
 }
 
-function bloaty {
+bloaty() {
   add_path "${tools}"/bloaty/bin
 
   if [ ! -f "${tools}/bloaty/bin/bloaty" ]; then
@@ -122,44 +122,44 @@ function bloaty {
   command bloaty --version
 }
 
-function c-cache {
-  if ! type ccache &> /dev/null; then
+c_cache() {
+  if ! type ccache > /dev/null 2>&1; then
     sudo apt-get install -y ccache
   fi
   setup_links
   command ccache --version
 }
 
-function clang-tidy {
-  if ! type clang-tidy &> /dev/null; then
+clang_tidy() {
+  if ! type clang-tidy > /dev/null 2>&1; then
     sudo apt-get install -y clang clang-tidy
   fi
 
   command clang-tidy --version
 }
 
-function util-linux {
-  if ! type flock &> /dev/null; then
+util_linux() {
+  if ! type flock > /dev/null 2>&1; then
     sudo apt-get install -y util-linux
   fi
 
   command flock --version
 }
 
-function gen-romfs {
-  if ! type genromfs &> /dev/null; then
+gen_romfs() {
+  if ! type genromfs > /dev/null 2>&1; then
     sudo apt-get install -y genromfs
   fi
 }
 
-function gperf {
- if ! type gperf &> /dev/null; then
+gperf() {
+ if ! type gperf > /dev/null 2>&1; then
     sudo apt-get install -y gperf
   fi
 
 }
 
-function kconfig-frontends {
+kconfig_frontends() {
   add_path "${tools}"/kconfig-frontends/bin
 
   if [ ! -f "${tools}/kconfig-frontends/bin/kconfig-conf" ]; then
@@ -177,7 +177,7 @@ function kconfig-frontends {
   fi
 }
 
-function mips-gcc-toolchain {
+mips_gcc_toolchain() {
   add_path "${tools}"/pinguino-compilers/p32/bin
 
   if [ ! -d "${tools}/pinguino-compilers/p32/bin/p32-gcc" ]; then
@@ -195,7 +195,7 @@ function mips-gcc-toolchain {
   command p32-gcc --version
 }
 
-function python-tools {
+python_tools() {
 
   pip3 install \
     cmake-format \
@@ -214,7 +214,7 @@ function python-tools {
     pytest-repeat==0.9.1
 }
 
-function riscv-gcc-toolchain {
+riscv_gcc_toolchain() {
   add_path "${tools}"/riscv-none-elf-gcc/bin
 
   if [ ! -f "${tools}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
@@ -230,15 +230,26 @@ function riscv-gcc-toolchain {
   command riscv-none-elf-gcc --version
 }
 
-function rust {
-  if ! type rustc &> /dev/null; then
-    sudo sudo apt-get install rustc
+rust() {
+  add_path "${tools}"/rust/cargo/bin
+  # Configuring the PATH environment variable
+  export CARGO_HOME=${tools}/rust/cargo
+  export RUSTUP_HOME=${tools}/rust/rustup
+  echo "export CARGO_HOME=${tools}/rust/cargo" >> "${tools}"/env.sh
+  echo "export RUSTUP_HOME=${tools}/rust/rustup" >> "${tools}"/env.sh
+  if ! type rustc > /dev/null 2>&1; then
+    # Install Rust target x86_64-unknown-linux-musl
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
+    # Install targets supported from NuttX
+    "$CARGO_HOME"/bin/rustup target add thumbv6m-none-eabi
+    "$CARGO_HOME"/bin/rustup target add thumbv7m-none-eabi
+    
   fi
 
   command rustc --version
 }
 
-function rx-gcc-toolchain {
+rx_gcc_toolchain() {
   add_path "${tools}"/renesas-toolchain/rx-elf-gcc/bin
 
   if [ ! -f "${tools}/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc" ]; then
@@ -297,7 +308,7 @@ function rx-gcc-toolchain {
   command rx-elf-gcc --version
 }
 
-function sparc-gcc-toolchain {
+sparc_gcc_toolchain() {
   add_path "${tools}"/sparc-gaisler-elf-gcc/bin
 
   if [ ! -f "${tools}/sparc-gaisler-elf-gcc/bin/sparc-gaisler-elf-gcc" ]; then
@@ -315,7 +326,7 @@ function sparc-gcc-toolchain {
   command sparc-gaisler-elf-gcc --version
 }
 
-function xtensa-esp32-gcc-toolchain {
+xtensa_esp32_gcc_toolchain() {
   add_path "${tools}"/xtensa-esp32-elf/bin
 
   if [ ! -f "${tools}/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc" ]; then
@@ -332,7 +343,7 @@ function xtensa-esp32-gcc-toolchain {
   command xtensa-esp32-elf-gcc --version
 }
 
-function xtensa-esp32s2-gcc-toolchain {
+xtensa_esp32s2_gcc_toolchain() {
   add_path "${tools}"/xtensa-esp32s2-elf/bin
 
   if [ ! -f "${tools}/xtensa-esp32s2-elf/bin/xtensa-esp32s2-elf-gcc" ]; then
@@ -349,7 +360,7 @@ function xtensa-esp32s2-gcc-toolchain {
   command xtensa-esp32s2-elf-gcc --version
 }
 
-function xtensa-esp32s3-gcc-toolchain {
+xtensa_esp32s3_gcc_toolchain() {
   add_path "${tools}"/xtensa-esp32s3-elf/bin
 
   if [ ! -f "${tools}/xtensa-esp32s3-elf/bin/xtensa-esp32s3-elf-gcc" ]; then
@@ -366,13 +377,13 @@ function xtensa-esp32s3-gcc-toolchain {
   command xtensa-esp32s3-elf-gcc --version
 }
 
-function u-boot-tools {
-  if ! type mkimage &> /dev/null; then
+u_boot_tools() {
+  if ! type mkimage > /dev/null 2>&1; then
     sudo apt-get install -y u-boot-tools
   fi
 }
 
-function wasi-sdk {
+wasi_sdk() {
   add_path "${tools}"/wamrc
 
   if [ ! -f "${tools}/wasi-sdk/bin/clang" ]; then
@@ -403,7 +414,7 @@ function wasi-sdk {
   command wamrc --version
 }
 
-function setup_links {
+setup_links() {
   # Configure ccache
   mkdir -p "${tools}"/ccache/bin/
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
@@ -434,19 +445,18 @@ function setup_links {
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-g++
 }
 
-function install_build_tools {
+install_build_tools() {
   mkdir -p "${tools}"
-  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
+  echo "#!/usr/bin/env sh" > "${tools}"/env.sh
 
-  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain binutils bloaty clang-tidy gen-romfs gperf kconfig-frontends mips-gcc-toolchain python-tools riscv-gcc-toolchain rust rx-gcc-toolchain sparc-gcc-toolchain xtensa-esp32-gcc-toolchain u-boot-tools util-linux wasi-sdk c-cache"
+  install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain binutils bloaty clang_tidy gen_romfs gperf kconfig_frontends mips_gcc_toolchain python_tools riscv_gcc_toolchain rust rx_gcc_toolchain sparc_gcc_toolchain xtensa_esp32_gcc_toolchain u_boot_tools util_linux wasi_sdk c_cache"
 
-  pushd .
+  oldpath=$(cd . && pwd -P)
   for func in ${install}; do
     ${func}
   done
-  popd
+  cd "${oldpath}"
 
-  # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
 }
