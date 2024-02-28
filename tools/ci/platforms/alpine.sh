@@ -358,19 +358,20 @@ setup_links() {
 
 install_build_tools() {
   mkdir -p "${tools}"
-  echo "#!/usr/bin/env bash" > "${tools}"/env.sh
+  echo "#!/usr/bin/env sh" > "${tools}"/env.sh
 
   install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain gen_romfs kconfig_frontends rust"
 
   # pushd .
   oldpath=$(cd . && pwd -P)
+  echo "${oldpath}"
   for func in ${install}; do
     ${func}
   done
+  echo "${oldpath}"
   # popd
   cd "${oldpath}"
 
-  # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
   echo "export PATH" >> "${tools}"/env.sh
 }
