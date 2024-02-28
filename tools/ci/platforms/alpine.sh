@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 ############################################################################
 # tools/ci/platforms/alpine.sh
 #
@@ -29,13 +29,13 @@ WORKSPACE=$(cd "${WD}"/../../../../ && pwd -P)
 tools=${WORKSPACE}/tools
 EXTRA_PATH=
 
-function add_path {
+add_path() {
   PATH=$1:${PATH}
   EXTRA_PATH=$1:${EXTRA_PATH}
 }
 
-function arm-clang-toolchain {
-  if ! type clang &> /dev/null; then
+arm_clang_toolchain() {
+  if ! type clang > /dev/null 2>&1; then
     apk --no-cache --update add clang
   fi
   
@@ -43,8 +43,8 @@ function arm-clang-toolchain {
   clang --version
 }
 
-function arm-gcc-toolchain {
-  if ! type arm-none-eabi-gcc &> /dev/null; then
+arm_gcc_toolchain() {
+  if ! type arm-none-eabi-gcc > /dev/null 2>&1; then
     apk --no-cache --update add clang gcc-arm-none-eabi \
           newlib-arm-none-eabi \
           g++-arm-none-eabi
@@ -54,16 +54,16 @@ function arm-gcc-toolchain {
   arm-none-eabi-gcc --version
 }
 
-function arm64-gcc-toolchain {
-  if ! type aarch64-none-elf-gcc &> /dev/null; then
+arm64_gcc_toolchain() {
+  if ! type aarch64-none-elf-gcc > /dev/null 2>&1; then
     apk --no-cache --update add gcc-aarch64-none-elf
   fi
   
   aarch64-none-elf-gcc --version
 }
 
-function avr-gcc-toolchain {
-  if ! type avr-gcc &> /dev/null; then
+avr_gcc_toolchain() {
+  if ! type avr-gcc > /dev/null 2>&1; then
     apk --no-cache --update add gcc-avr
   fi
 
@@ -78,7 +78,7 @@ function avr-gcc-toolchain {
   # command objcopy --version
 # }
 
-function bloaty {
+bloaty() {
   add_path "${tools}"/bloaty/bin
 
   if [ ! -f "${tools}/bloaty/bin/bloaty" ]; then
@@ -96,8 +96,8 @@ function bloaty {
   command bloaty --version
 }
 
-function c-cache {
-  if ! type ccache &> /dev/null; then
+c_cache() {
+  if ! type ccache > /dev/null 2>&1; then
     apk --no-cache --update add ccache
   fi
   setup_links
@@ -123,10 +123,10 @@ function c-cache {
   # command flock --version
 # }
 
-function gen-romfs {
+gen_romfs() {
   add_path "${tools}"/genromfs/usr/bin
 
-  if ! type genromfs &> /dev/null; then
+  if ! type genromfs > /dev/null 2>&1; then
     git clone https://bitbucket.org/nuttx/tools.git "${tools}"/nuttx-tools
     cd "${tools}"/nuttx-tools
     tar zxf genromfs-0.5.2.tar.gz
@@ -144,7 +144,7 @@ function gen-romfs {
 
 # }
 
-function kconfig-frontends {
+kconfig_frontends() {
   add_path "${tools}"/kconfig-frontends/bin
 
   if [ ! -f "${tools}/kconfig-frontends/bin/kconfig-conf" ]; then
@@ -200,19 +200,19 @@ function kconfig-frontends {
   # command riscv-none-elf-gcc --version
 # }
 
-function rust {
+rust() {
   add_path "${tools}"/rust/cargo/bin
   # Configuring the PATH environment variable
   export CARGO_HOME=${tools}/rust/cargo
   export RUSTUP_HOME=${tools}/rust/rustup
   echo "export CARGO_HOME=${tools}/rust/cargo" >> "${tools}"/env.sh
   echo "export RUSTUP_HOME=${tools}/rust/rustup" >> "${tools}"/env.sh
-  if ! type rustc &> /dev/null; then
+  if ! type rustc > /dev/null 2>&1; then
     # Install Rust target x86_64-unknown-linux-musl
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
     # Install targets supported from NuttX
-    $CARGO_HOME/bin/rustup target add thumbv6m-none-eabi
-    $CARGO_HOME/bin/rustup target add thumbv7m-none-eabi
+    "$CARGO_HOME"/bin/rustup target add thumbv6m-none-eabi
+    "$CARGO_HOME"/bin/rustup target add thumbv7m-none-eabi
     
   fi
 
@@ -325,7 +325,7 @@ function rust {
   # command wamrc --version
 # }
 
-function setup_links {
+setup_links() {
   # Configure ccache
   mkdir -p "${tools}"/ccache/bin/
   ln -sf "$(which ccache)" "${tools}"/ccache/bin/aarch64-none-elf-gcc
@@ -356,17 +356,19 @@ function setup_links {
 #  ln -sf "$(which ccache)" "${tools}"/ccache/bin/xtensa-esp32s3-elf-g++
 }
 
-function install_build_tools {
+install_build_tools() {
   mkdir -p "${tools}"
   echo "#!/usr/bin/env bash" > "${tools}"/env.sh
 
-  install="arm-clang-toolchain arm-gcc-toolchain arm64-gcc-toolchain avr-gcc-toolchain gen-romfs kconfig-frontends rust"
+  install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain gen_romfs kconfig_frontends rust"
 
-  pushd .
+  # pushd .
+  oldpath=$(cd . && pwd -P)
   for func in ${install}; do
     ${func}
   done
-  popd
+  # popd
+  cd "${oldpath}"
 
   # echo "#!/usr/bin/env bash" > "${tools}"/env.sh
   echo "PATH=${PATH}" >> "${tools}"/env.sh
