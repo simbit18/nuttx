@@ -27,7 +27,7 @@
 #  - wget
 
 set -e
-set -o xtrace
+# set -o xtrace
 
 add_path() {
   PATH=$1:${PATH}
@@ -102,9 +102,8 @@ bloaty() {
     # https://github.com/google/bloaty/pull/326
     git checkout 52948c107c8f81045e7f9223ec02706b19cfa882
     mkdir -p "${NUTTXTOOLS}"/bloaty
-    cmake -D BLOATY_PREFER_SYSTEM_CAPSTONE=NO -DCMAKE_INSTALL_PREFIX="${NUTTXTOOLS}"/bloaty
-    cmake --build build
-    cmake --build build --target install
+    cmake -D BLOATY_PREFER_SYSTEM_CAPSTONE=NO -DCMAKE_SYSTEM_PREFIX_PATH="${NUTTXTOOLS}"/bloaty
+    make install -j 4
     cd "${NUTTXTOOLS}"
     rm -rf bloaty-src
   fi
@@ -332,7 +331,7 @@ install_build_tools() {
   mkdir -p "${NUTTXTOOLS}"
   echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
   # install="arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain binutils bloaty elf_toolchain gen_romfs gperf kconfig_frontends mips_gcc_toolchain python_tools riscv_gcc_toolchain rust xtensa_esp32_gcc_toolchain u_boot_tools util_linux wasi_sdk c_cache"
-  install="arm_gcc_toolchain binutils elf_toolchain gen_romfs gperf kconfig_frontends python_tools u_boot_tools util_linux c_cache"
+  install="arm_gcc_toolchain binutils bloaty elf_toolchain gen_romfs gperf kconfig_frontends python_tools u_boot_tools util_linux c_cache"
   mkdir -p "${NUTTXTOOLS}"/homebrew
   export HOMEBREW_CACHE=${NUTTXTOOLS}/homebrew
   echo "export HOMEBREW_CACHE=${NUTTXTOOLS}/homebrew" >> "${NUTTXTOOLS}"/env.sh
