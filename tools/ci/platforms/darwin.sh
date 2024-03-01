@@ -29,8 +29,6 @@
 set -e
 set -o xtrace
 
-HTTP_FETCH=
-
 add_path() {
   PATH=$1:${PATH}
 }
@@ -42,7 +40,7 @@ arm_gcc_toolchain() {
     local basefile
     basefile=arm-gnu-toolchain-13.2.rel1-darwin-x86_64-arm-none-eabi
     cd "${NUTTXTOOLS}"
-    $HTTP_FETCH https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/${basefile}.tar.xz
+    wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/${basefile}.tar.xz
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
     mv ${basefile} gcc-arm-none-eabi
@@ -60,7 +58,7 @@ arm64_gcc_toolchain() {
     basefile=arm-gnu-toolchain-13.2.Rel1-darwin-x86_64-aarch64-none-elf
     cd "${NUTTXTOOLS}"
     # Download the latest ARM64 GCC toolchain prebuilt by ARM
-    $HTTP_FETCH https://developer.arm.com/-/media/Files/downloads/gnu/13.2.Rel1/binrel/${basefile}.tar.xz
+    wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu/13.2.Rel1/binrel/${basefile}.tar.xz
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
     mv ${basefile} gcc-aarch64-none-elf
@@ -146,7 +144,7 @@ gperf() {
     basefile=gperf-3.1
 
     cd "${NUTTXTOOLS}"
-    $HTTP_FETCH http://ftp.gnu.org/pub/gnu/gperf/${basefile}.tar.gz
+    wget --quiet http://ftp.gnu.org/pub/gnu/gperf/${basefile}.tar.gz
     tar zxf ${basefile}.tar.gz
     cd "${NUTTXTOOLS}"/${basefile}
     ./configure --prefix="${NUTTXTOOLS}"/gperf; make; make install
@@ -230,7 +228,7 @@ riscv_gcc_toolchain() {
     basefile=xpack-riscv-none-elf-gcc-13.2.0-2-darwin-x64
     cd "${NUTTXTOOLS}"
     # Download the latest RISCV GCC toolchain prebuilt by xPack
-    $HTTP_FETCH https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-2/${basefile}.tar.gz
+    wget --quiet https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-2/${basefile}.tar.gz
     tar zxf ${basefile}.tar.gz
     mv xpack-riscv-none-elf-gcc-13.2.0-2 riscv-none-elf-gcc
     rm ${basefile}.tar.gz
@@ -253,7 +251,7 @@ xtensa_esp32_gcc_toolchain() {
     local basefile
     basefile=xtensa-esp32-elf-12.2.0_20230208-x86_64-apple-darwin
     cd "${NUTTXTOOLS}"
-    $HTTP_FETCH https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/${basefile}.tar.xz
+    wget --quiet https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/${basefile}.tar.xz
     xz -d ${basefile}.tar.xz
     tar xf ${basefile}.tar
     rm ${basefile}.tar
@@ -287,12 +285,12 @@ wasi_sdk() {
     wasmbasefile=wamrc-1.1.2-x86_64-macos-latest
     cd "${NUTTXTOOLS}"
     mkdir wamrc
-    $HTTP_FETCH https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-19/${wasibasefile}.tar.gz
+    wget --quiet https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-19/${wasibasefile}.tar.gz
     tar xzf ${wasibasefile}.tar.gz
     mv wasi-sdk-19.0 wasi-sdk
     rm ${wasibasefile}.tar.gz
     cd wamrc
-    $HTTP_FETCH https://github.com/bytecodealliance/wasm-micro-runtime/releases/download/WAMR-1.1.2/${wasmbasefile}.tar.gz
+    wget --quiet https://github.com/bytecodealliance/wasm-micro-runtime/releases/download/WAMR-1.1.2/${wasmbasefile}.tar.gz
     tar xzf ${wasmbasefile}.tar.gz
     rm ${wasmbasefile}.tar.gz
   fi
@@ -330,10 +328,6 @@ setup_links() {
 }
 
 install_build_tools() {
-  [ -z "$HTTP_FETCH" ] && type wget  >/dev/null 2>&1 && HTTP_FETCH="wget -q"
-  [ -z "$HTTP_FETCH" ] && type curl  >/dev/null 2>&1 && HTTP_FETCH="curl -sOL"
-  [ -z "$HTTP_FETCH" ] && type fetch >/dev/null 2>&1 && HTTP_FETCH="fetch -q"
-
   mkdir -p "${NUTTXTOOLS}"
   echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
   # install="arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain binutils bloaty elf_toolchain gen_romfs gperf kconfig_frontends mips_gcc_toolchain python_tools riscv_gcc_toolchain rust xtensa_esp32_gcc_toolchain u_boot_tools util_linux wasi_sdk c_cache"
