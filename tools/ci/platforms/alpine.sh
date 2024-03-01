@@ -172,7 +172,7 @@ kconfig_frontends() {
   # command p32-gcc --version
 # }
 
-function riscv-gcc-toolchain {
+riscv-gcc-toolchain() {
   add_path "${NUTTXTOOLS}"/riscv-none-elf-gcc/bin
 
   if [ ! -f "${NUTTXTOOLS}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
@@ -191,7 +191,7 @@ function riscv-gcc-toolchain {
     apk add glibc-2.35-r1.apk
     rm glibc-2.35-r1.apk
   fi
-  command riscv-none-elf-gcc --version
+  riscv-none-elf-gcc --version
 }
 
 rust() {
