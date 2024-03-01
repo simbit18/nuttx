@@ -172,27 +172,27 @@ kconfig_frontends() {
   # command p32-gcc --version
 # }
 
-# function riscv-gcc-toolchain {
-  # add_path "${NUTTXTOOLS}"/riscv-none-elf-gcc/bin
+function riscv-gcc-toolchain {
+  add_path "${NUTTXTOOLS}"/riscv-none-elf-gcc/bin
 
-  # if [ ! -f "${NUTTXTOOLS}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
-    # ## Add glibc-to-musl compatibility, because xPack GCC was compiled for glibc
-    # ## From https://github.com/sgerrand/alpine-pkg-glibc
-    # wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-    # wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r1/glibc-2.35-r1.apk
-    # apk add glibc-2.35-r1.apk
-
-    # local basefile
-    # basefile=xpack-riscv-none-elf-gcc-13.2.0-2-linux-x64
-    # cd "${NUTTXTOOLS}"
-    # # Download the latest RISCV GCC toolchain prebuilt by xPack
-    # wget --quiet https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-2/${basefile}.tar.gz
-    # tar zxf ${basefile}.tar.gz
-    # mv xpack-riscv-none-elf-gcc-13.2.0-2 riscv-none-elf-gcc
-    # rm ${basefile}.tar.gz
-  # fi
-  # command riscv-none-elf-gcc --version
-# }
+  if [ ! -f "${NUTTXTOOLS}/riscv-none-elf-gcc/bin/riscv-none-elf-gcc" ]; then
+    local basefile
+    basefile=xpack-riscv-none-elf-gcc-13.2.0-2-linux-x64
+    cd "${NUTTXTOOLS}"
+    # Download the latest RISCV GCC toolchain prebuilt by xPack
+    wget --quiet https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/download/v13.2.0-2/${basefile}.tar.gz
+    tar zxf ${basefile}.tar.gz
+    mv xpack-riscv-none-elf-gcc-13.2.0-2 riscv-none-elf-gcc
+    rm ${basefile}.tar.gz
+    ## Add glibc-to-musl compatibility, because xPack GCC was compiled for glibc
+    ## From https://github.com/sgerrand/alpine-pkg-glibc
+    wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
+    wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.35-r1/glibc-2.35-r1.apk
+    apk add glibc-2.35-r1.apk
+    rm glibc-2.35-r1.apk
+  fi
+  command riscv-none-elf-gcc --version
+}
 
 rust() {
   add_path "${NUTTXTOOLS}"/rust/cargo/bin
@@ -354,7 +354,7 @@ install_build_tools() {
   mkdir -p "${NUTTXTOOLS}"
   echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
 
-  install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain gen_romfs kconfig_frontends rust"
+  install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain gen_romfs kconfig_frontends riscv-gcc-toolchain rust"
 
   oldpath=$(cd . && pwd -P)
   echo "${oldpath}"
