@@ -231,7 +231,7 @@ xtensa_esp_gcc_toolchain() {
 setup_links() {
   # Configure ccache
   mkdir -p "${NUTTXTOOLS}"/ccache/bin/
-  export MSYS=winsymlinks:lnk
+  export MSYS=winsymlinks:nativestrict
   ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/aarch64-none-elf-gcc
   ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/aarch64-none-elf-g++
   ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/arm-none-eabi-gcc
