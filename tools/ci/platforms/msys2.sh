@@ -82,8 +82,8 @@ arm64_gcc_toolchain() {
 
 c_cache() {
   add_path "${NUTTXTOOLS}"/ccache/bin
-  export CCACHE_DIR=${NUTTXTOOLS}/ccache/bin
-  echo "export CCACHE_DIR=${NUTTXTOOLS}/ccache/bin" >> "${NUTTXTOOLS}"/env.sh
+  # export CCACHE_DIR=${NUTTXTOOLS}/ccache/bin
+  # echo "export CCACHE_DIR=${NUTTXTOOLS}/ccache/bin" >> "${NUTTXTOOLS}"/env.sh
   if ! type ccache > /dev/null 2>&1; then
     pacman -S --noconfirm --needed ccache
   fi
@@ -259,6 +259,7 @@ setup_links() {
   # Configure ccache
   mkdir -p "${NUTTXTOOLS}"/ccache/bin/
   export MSYS=winsymlinks:nativestrict
+  echo "${PATH}"
   ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/aarch64-none-elf-gcc
   ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/aarch64-none-elf-g++
   ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/arm-none-eabi-gcc
@@ -279,6 +280,10 @@ setup_links() {
   ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/x86_64-elf-gcc
   ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/x86_64-elf-g++
   ln -sf "$(which ccache)" "${NUTTXTOOLS}"/ccache/bin/xtensa-esp32-elf-gcc
+  export MSYS=
+  echo "${PATH}"
+  ls "${NUTTXTOOLS}"/ccache/bin/
+  ls "${NUTTXTOOLS}"/ccache/
 }
 
 install_build_tools() {
