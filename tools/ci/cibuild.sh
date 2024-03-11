@@ -61,7 +61,7 @@ function install_tools {
       to_do "debian"
       ;;
     fedora)
-      to_do "fedora"
+      "${CIPLAT}"/fedora.sh
       ;;
     freebsd)
       to_do "freebsd"
