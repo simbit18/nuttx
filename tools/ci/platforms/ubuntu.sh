@@ -151,7 +151,6 @@ gperf() {
  if ! type gperf > /dev/null 2>&1; then
     sudo apt-get install -y gperf
   fi
-
 }
 
 kconfig_frontends() {
@@ -222,6 +221,7 @@ riscv_gcc_toolchain() {
     mv xpack-riscv-none-elf-gcc-13.2.0-2 riscv-none-elf-gcc
     rm ${basefile}.tar.gz
   fi
+
   command riscv-none-elf-gcc --version
 }
 
@@ -233,7 +233,7 @@ rust() {
   echo "export CARGO_HOME=${NUTTXTOOLS}/rust/cargo" >> "${NUTTXTOOLS}"/env.sh
   echo "export RUSTUP_HOME=${NUTTXTOOLS}/rust/rustup" >> "${NUTTXTOOLS}"/env.sh
   if ! type rustc > /dev/null 2>&1; then
-    # Install Rust target x86_64-unknown-linux-musl
+    # Install Rust target stable-x86_64-unknown-linux-gnu
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
     # Install targets supported from NuttX
     "$CARGO_HOME"/bin/rustup target add thumbv6m-none-eabi
