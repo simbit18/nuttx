@@ -174,6 +174,24 @@ riscv_gcc_toolchain() {
   command riscv-none-elf-gcc --version
 }
 
+rust() {
+  add_path "${NUTTXTOOLS}"/rust/cargo/bin
+  # Configuring the PATH environment variable
+  export CARGO_HOME=${NUTTXTOOLS}/rust/cargo
+  export RUSTUP_HOME=${NUTTXTOOLS}/rust/rustup
+  echo "export CARGO_HOME=${NUTTXTOOLS}/rust/cargo" >> "${NUTTXTOOLS}"/env.sh
+  echo "export RUSTUP_HOME=${NUTTXTOOLS}/rust/rustup" >> "${NUTTXTOOLS}"/env.sh
+  if ! type rustc > /dev/null 2>&1; then
+    # Install Rust target stable-x86_64-unknown-linux-gnu
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
+    # Install targets supported from NuttX
+    "$CARGO_HOME"/bin/rustup target add thumbv6m-none-eabi
+    "$CARGO_HOME"/bin/rustup target add thumbv7m-none-eabi
+  fi
+
+  command rustc --version
+}
+
 rx_gcc_toolchain() {
   add_path "${NUTTXTOOLS}"/renesas-toolchain/rx-elf-gcc/bin
 
