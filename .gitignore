@@ -62,7 +62,7 @@ uImage
 .vscode
 .DS_Store
 tools/gdb/__pycache__
-tools/ci/pyyaml
+tools/ci/pyyaml\ *
 /build
 .ccls-cache
 compile_commands.json
