@@ -21,3 +21,4 @@
 /.k2h-apndx.dat
 /jlink-nuttx.so
 __pycache__
+/ci/pyyaml/
