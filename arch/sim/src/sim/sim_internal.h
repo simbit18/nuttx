@@ -27,7 +27,6 @@
 
 #ifdef __SIM__
 #  include "config.h"
-#  include <setjmp.h>
 #endif
 
 #ifndef __ASSEMBLY__
