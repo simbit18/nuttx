@@ -33,6 +33,7 @@
 #  include <sys/types.h>
 #  include <stdbool.h>
 #  include <stdint.h>
+#  include <setjmp.h>
 #  if defined(CONFIG_SIM_NETDEV_TAP)
 #    include <netinet/in.h>
 #  endif
