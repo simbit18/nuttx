@@ -24,6 +24,8 @@
 
 #include <nuttx/config.h>
 
+#include <setjmp.h>
+
 #include <sched.h>
 #include <debug.h>
 
