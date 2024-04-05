@@ -39,8 +39,7 @@ NUTTX = $(call CONVERT_PATH,$(TOPDIR)$(DELIM)nuttx$(EXEEXT))
 # are called only from the host OS-specific logic(HOSTOBJS)
 
 LINKOBJS = sim_head$(OBJEXT)
-# REQUIREDOBJS = $(LINKOBJS) sim_doirq$(OBJEXT)
-REQUIREDOBJS = $(LINKOBJS)
+REQUIREDOBJS = $(LINKOBJS) sim_doirq$(OBJEXT)
 ifeq ($(CONFIG_SIM_NETUSRSOCK),y)
   REQUIREDOBJS += sim_usrsock$(OBJEXT)
 endif
