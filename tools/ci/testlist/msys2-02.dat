@@ -1,0 +1,8 @@
+# Chose a minimalistic subset of board/configs due to MSYS2 builds
+# being extremely slow on GitHub
+
+# RISC-V
+
+/risc-v/bl602/bl602evb/configs/nsh
+
+/risc-v/qemu-rv/rv-virt/configs/nsh
