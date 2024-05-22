@@ -281,7 +281,7 @@ install_build_tools() {
   mkdir -p "${NUTTXTOOLS}"
   echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
 
-  install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain esp_tool gen-romfs kconfig_frontends riscv_gcc_toolchain rust xtensa_esp32_gcc_toolchain"
+  install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain esp_tool gen_romfs kconfig_frontends riscv_gcc_toolchain rust xtensa_esp32_gcc_toolchain"
 
   oldpath=$(cd . && pwd -P)
   for func in ${install}; do
