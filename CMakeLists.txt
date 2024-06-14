@@ -370,7 +370,6 @@ endif()
 # Include .cmake files #######################################################
 
 # this exposes all Kconfig vars to CMake
-include(menuconfig)
 include(nuttx_sethost)
 nuttx_sethost()
 
