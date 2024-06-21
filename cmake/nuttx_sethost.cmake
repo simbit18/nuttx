@@ -21,6 +21,12 @@
 include(nuttx_kconfig)
 
 function(nuttx_sethost)
+
+if(MSVC)
+  # https://learn.microsoft.com/en-us/windows/win32/winprog64/wow64-implementation-details
+  message(STATUS "ENV{PROCESSOR_ARCHITEW6432} = $ENV{PROCESSOR_ARCHITEW6432}")
+  message(STATUS "ENV{PROCESSOR_ARCHITECTURE} = $ENV{PROCESSOR_ARCHITECTURE}")
+else()
   execute_process(
     COMMAND uname -m
     COMMAND tr -d '\n'
@@ -29,6 +35,12 @@ function(nuttx_sethost)
   execute_process(
     COMMAND uname -s 
     OUTPUT_VARIABLE uname)
+  # info uname
+  #foreach(v IN ITEMS m p r s)
+  #  execute_process(COMMAND uname -${v} OUTPUT_VARIABLE uname_${v} OUTPUT_STRIP_TRAILING_WHITESPACE)
+  #  message(STATUS "uname -${v} = ${uname_${v}}")
+  # endforeach()
+endif()
 
   if(MSVC)
     message(" Select MSVC HOST_WINDOWS=y")
@@ -87,4 +99,5 @@ function(nuttx_sethost)
     message(" Select HOST_ARM64=y")
     nuttx_setconfig(HOST_ARM64=y)
   endif()
+
 endfunction()
