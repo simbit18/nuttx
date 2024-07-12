@@ -87,7 +87,11 @@ if(NOT EXISTS ${extra_library} AND CONFIG_ARCH_TOOLCHAIN_CLANG)
     OUTPUT_VARIABLE extra_library)
 endif()
 
-list(APPEND EXTRA_LIB ${extra_library})
+if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux|Darwin|FreeBSD")
+  list(APPEND EXTRA_LIB ${extra_library})
+else()
+  list(APPEND EXTRA_LIB -l:libgcc.a)
+endif()
 
 if(NOT CONFIG_LIBM)
   execute_process(
@@ -95,7 +99,11 @@ if(NOT CONFIG_LIBM)
             --print-file-name=libm.a
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE extra_library)
-  list(APPEND EXTRA_LIB ${extra_library})
+  if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux|Darwin|FreeBSD")
+    list(APPEND EXTRA_LIB ${extra_library})
+  else()
+    list(APPEND EXTRA_LIB -l:libm.a)
+  endif()
 endif()
 
 if(CONFIG_LIBSUPCXX)
