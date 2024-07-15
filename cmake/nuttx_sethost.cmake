@@ -62,7 +62,7 @@ endif()
       # Enable the System V ABI
       nuttx_setconfig(SIM_X8664_SYSTEMV=y)
     else()
-      if(CMAKE_HOST_SYSTEM_NAME MATCHES "MSYS|CYGWIN|Windows|")
+      if(CMAKE_HOST_SYSTEM_NAME MATCHES "MSYS|CYGWIN|Windows")
         # Enable Windows and the Microsoft ABI
         message(" Select HOST_WINDOWS=y")
         nuttx_setconfig(HOST_LINUX=n)
