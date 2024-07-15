@@ -1,8 +1,10 @@
 # Chose a minimalistic subset of board/configs due to MSYS2 builds
 # being extremely slow on GitHub
 
+/arm/stm32/nucleo-l152re/configs/nsh,CONFIG_ARM_TOOLCHAIN_GNU_EABI
 /arm/stm32/nucleo-f4x1re/configs/f411-nsh,CONFIG_ARM_TOOLCHAIN_GNU_EABI
 
+
 # Boards build by CMake
-CMake,nucleo-f4x1re:f411-nsh
+CMake,nucleo-l152re:nsh
 CMake,nucleo-f4x1re:f411-nsh
