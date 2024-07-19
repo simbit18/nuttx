@@ -198,6 +198,7 @@ set(ENV{DRIVERS_PLATFORM_DIR} dummy) # TODO
 
 set(ENV{HOST_LINUX} n)
 set(ENV{HOST_MACOS} n)
+set(ENV{HOST_BSD} n)
 set(ENV{HOST_WINDOWS} n)
 set(ENV{HOST_OTHER} n)
 
