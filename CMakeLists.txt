@@ -201,17 +201,21 @@ set(ENV{HOST_MACOS} n)
 set(ENV{HOST_WINDOWS} n)
 set(ENV{HOST_OTHER} n)
 
-if(APPLE)
-  set(ENV{HOST_MACOS} y)
-elseif(WIN32)
-  set(ENV{HOST_WINDOWS} y)
-elseif(UNIX)
-  set(ENV{HOST_LINUX} y)
-  set(LINUX TRUE)
-else()
-  set(ENV{HOST_OTHER} y)
-  set(OTHER_OS TRUE)
-endif()
+# we define host
+include(nuttx_sethost)
+nuttx_sethost()
+
+#if(APPLE)
+#  set(ENV{HOST_MACOS} y)
+#elseif(WIN32)
+#  set(ENV{HOST_WINDOWS} y)
+#elseif(UNIX)
+#  set(ENV{HOST_LINUX} y)
+#  set(LINUX TRUE)
+#else()
+#  set(ENV{HOST_OTHER} y)
+#  set(OTHER_OS TRUE)
+#endif()
 
 include(nuttx_parse_function_args)
 include(nuttx_add_subdirectory)
@@ -370,8 +374,8 @@ endif()
 # Include .cmake files #######################################################
 
 # this exposes all Kconfig vars to CMake
-include(nuttx_sethost)
-nuttx_sethost()
+# include(nuttx_sethost)
+# nuttx_sethost()
 
 nuttx_export_kconfig(${CMAKE_BINARY_DIR}/.config)
 
