@@ -19,6 +19,15 @@
 ############################################################################
 
 export TOPDIR := ${shell echo $(CURDIR) | sed -e 's/ /\\ /g'}
+WSDIR := ${shell cd "${TOPDIR}"/.. && pwd -P}
+
+export NXTMPDIR := $(WSDIR)/nxtmpdir
+$(info $$NXTMPDIR = $(NXTMPDIR))
+
+ifeq ($(wildcard $(NXTMPDIR)),)
+$(shell mkdir -p $(NXTMPDIR))
+$(info "nxtmpdir folder created !!!")
+endif
 
 ifeq ($(V),)
   MAKE := $(MAKE) -s --no-print-directory
