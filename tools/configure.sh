@@ -23,14 +23,16 @@ set -e
 
 WD=`test -d ${0%/*} && cd ${0%/*}; pwd`
 TOPDIR="${WD}/.."
+WSDIR=`cd "${TOPDIR}/.." && pwd -P`
 MAKECMD="make"
 USAGE="
 
-USAGE: ${0} [-E] [-e] [-l|m|c|g|n|B] [-L [boardname]] [-a <app-dir>] <board-selection> [make-opts]
+USAGE: ${0} [-E] [-e] [-S] [-l|m|c|g|n|B] [-L [boardname]] [-a <app-dir>] <board-selection> [make-opts]
 
 Where:
   -E enforces distclean if already configured.
   -e performs distclean if configuration changed.
+  -S removes nxtmpdir folder with third-party packages.
   -l selects the Linux (l) host environment.
   -m selects the macOS (m) host environment.
   -c selects the Windows host and Cygwin (c) environment.
@@ -70,6 +72,7 @@ unset appdir
 unset host
 unset enforce_distclean
 unset distclean
+unset clean_nxtmpdir
 
 function dumpcfgs
 {
@@ -121,6 +124,9 @@ while [ ! -z "$1" ]; do
     shift
     dumpcfgs $1
     exit 0
+    ;;
+  -S )
+    clean_nxtmpdir=y
     ;;
   *)
     boardconfig=$1
@@ -216,6 +222,14 @@ if [ -r ${dest_config} ]; then
     fi
   fi
 fi
+
+if [ "X${clean_nxtmpdir}" = "Xy" ]; then
+  if [ -d "${WSDIR}/nxtmpdir" ]; then
+    rm -rf "${WSDIR}/nxtmpdir"
+    echo "Folder nxtmpdir clean."
+  fi
+fi
+
 
 # Okay... Everything looks good.  Setup the configuration
 
