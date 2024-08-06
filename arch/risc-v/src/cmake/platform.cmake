@@ -41,7 +41,13 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE
   OUTPUT_VARIABLE extra_library)
 
-list(APPEND EXTRA_LIB ${extra_library})
+if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux|Darwin|FreeBSD")
+  list(APPEND EXTRA_LIB ${extra_library})
+else()
+  #list(APPEND EXTRA_LIB -l:libgcc.a)
+  cmake_path(GET extra_library FILENAME extra_filename_library)
+  list(APPEND EXTRA_LIB -l:${extra_filename_library})
+endif()
 
 if(NOT CONFIG_LIBM)
   execute_process(
@@ -49,7 +55,14 @@ if(NOT CONFIG_LIBM)
             --print-file-name=libm.a
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE extra_library)
-  list(APPEND EXTRA_LIB ${extra_library})
+  # list(APPEND EXTRA_LIB ${extra_library})
+  if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux|Darwin|FreeBSD")
+    list(APPEND EXTRA_LIB ${extra_library})
+  else()
+    # list(APPEND EXTRA_LIB -l:libm.a)
+    cmake_path(GET extra_library FILENAME extra_filename_library)
+    list(APPEND EXTRA_LIB -l:${extra_filename_library})
+  endif()
 endif()
 
 if(CONFIG_LIBSUPCXX)
@@ -58,7 +71,13 @@ if(CONFIG_LIBSUPCXX)
             --print-file-name=libsupc++.a
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE extra_library)
-  list(APPEND EXTRA_LIB ${extra_library})
+  # list(APPEND EXTRA_LIB ${extra_library})
+  if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux|Darwin|FreeBSD")
+    list(APPEND EXTRA_LIB ${extra_library})
+  else()
+    cmake_path(GET extra_library FILENAME extra_filename_library)
+    list(APPEND EXTRA_LIB -l:${extra_filename_library})
+  endif()
 endif()
 
 if(CONFIG_ARCH_COVERAGE)
@@ -67,7 +86,13 @@ if(CONFIG_ARCH_COVERAGE)
             --print-file-name=libgcov.a
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE extra_library)
-  list(APPEND EXTRA_LIB ${extra_library})
+  # list(APPEND EXTRA_LIB ${extra_library})
+  if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux|Darwin|FreeBSD")
+    list(APPEND EXTRA_LIB ${extra_library})
+  else()
+    cmake_path(GET extra_library FILENAME extra_filename_library)
+    list(APPEND EXTRA_LIB -l:${extra_filename_library})
+  endif()
 endif()
 
 nuttx_add_extra_library(${EXTRA_LIB})
