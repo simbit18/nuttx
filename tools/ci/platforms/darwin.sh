@@ -187,7 +187,7 @@ mips_gcc_toolchain() {
   command mips-elf-gcc --version
 }
 
-ninja() {
+ninja_brew() {
   if ! type ninja > /dev/null 2>&1; then
     brew install ninja
   fi
@@ -342,7 +342,7 @@ install_build_tools() {
   mkdir -p "${NUTTXTOOLS}"
   echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
 
-  install="arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain binutils bloaty elf_toolchain gen_romfs gperf kconfig_frontends mips_gcc_toolchain ninja python_tools riscv_gcc_toolchain rust xtensa_esp32_gcc_toolchain u_boot_tools util_linux wasi_sdk c_cache"
+  install="arm_gcc_toolchain arm64_gcc_toolchain avr_gcc_toolchain binutils bloaty elf_toolchain gen_romfs gperf kconfig_frontends mips_gcc_toolchain ninja_brew python_tools riscv_gcc_toolchain rust xtensa_esp32_gcc_toolchain u_boot_tools util_linux wasi_sdk c_cache"
 
   mkdir -p "${NUTTXTOOLS}"/homebrew
   export HOMEBREW_CACHE=${NUTTXTOOLS}/homebrew
