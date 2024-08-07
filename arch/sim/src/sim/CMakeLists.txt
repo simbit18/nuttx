@@ -176,7 +176,9 @@ endif()
 
 if(CONFIG_SIM_X11FB)
   list(APPEND HOSTSRCS sim_x11framebuffer.c)
-
+  if(APPLE AND X11_FOUND)
+    set(X11_ROOT "/opt/X11")
+  endif()
   find_package(X11 REQUIRED)
   if(X11_FOUND)
     target_include_directories(nuttx PRIVATE ${X11_INCLUDE_DIR})
@@ -200,10 +202,8 @@ endif()
 
 if(CONFIG_SIM_NETDEV_TAP)
   list(APPEND SRCS sim_netdriver.c)
-
   if(NOT CYGWIN)
     list(APPEND HOSTSRCS sim_tapdev.c)
-
   else() # CYGWIN != y
     list(APPEND HOSTSRCS sim_wpcap.c)
     list(APPEND STDLIBS /lib/w32api/libws2_32.a /lib/w32api/libiphlpapi.a)

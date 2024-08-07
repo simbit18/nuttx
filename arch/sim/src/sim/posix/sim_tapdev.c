@@ -73,9 +73,11 @@
 #include <time.h>
 #include <net/route.h>
 #include <net/if.h>
+#ifdef linux
 #include <linux/sockios.h>
 #include <linux/if_tun.h>
 #include <linux/net.h>
+#endif /* linux */
 #include <netinet/in.h>
 
 #include "sim_internal.h"
