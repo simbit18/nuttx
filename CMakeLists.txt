@@ -863,3 +863,14 @@ if(CONFIG_BUILD_KERNEL)
   # TODO: generate nuttx-export-xxx.tar.gz for userland development
 
 endif()
+
+# Ninja requires to be forced for response files
+if ("${CMAKE_GENERATOR}" MATCHES "Ninja")
+    # known issue ARMClang and Ninja with response files for windows
+    # https://gitlab.kitware.com/cmake/cmake/-/issues/21093
+    # This gets fixed in newer cmake version
+    # https://gitlab.kitware.com/cmake/cmake/-/merge_requests/6484
+    if((CMAKE_HOST_SYSTEM_NAME MATCHES "MSYS|CYGWIN|Windows") AND ((${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.22.0") OR (NOT CMAKE_CXX_COMPILER_ID MATCHES "ARMClang")))
+        set(CMAKE_NINJA_FORCE_RESPONSE_FILE 1 CACHE INTERNAL "")
+    endif()
+endif()
