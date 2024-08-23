@@ -33,6 +33,18 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+message(STATUS "CMake ${CMAKE_VERSION}")
+# Ninja requires to be forced for response files
+if ("${CMAKE_GENERATOR}" MATCHES "Ninja")
+
+  if(CMAKE_GENERATOR MATCHES "Ninja")
+    execute_process(COMMAND ninja --version OUTPUT_VARIABLE ninja_version OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message(STATUS "Ninja ${ninja_version}")
+  endif()
+
+endif()
+
+
 # Handle newer CMake versions correctly by setting policies
 
 if(POLICY CMP0115)
