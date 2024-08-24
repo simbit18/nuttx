@@ -136,7 +136,6 @@ function run_builds {
   else
     ncpus=$(grep -c ^processor /proc/cpuinfo)
   fi
-
   options+="-j ${ncpus}"
 
   for build in "${builds[@]}"; do
