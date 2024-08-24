@@ -36,6 +36,14 @@ macro(decode_semicolon contents)
   string(REGEX REPLACE "__SEMICOLON__" ";" ${contents} "${${contents}}")
 endmacro()
 
+function(nuttx_parent_scope result)
+    if (${ARGN})
+        set("${result}" 1 PARENT_SCOPE)
+    else()
+        set("${result}" 0 PARENT_SCOPE)
+    endif()
+endfunction()
+
 function(nuttx_export_kconfig_by_value kconfigfile config)
   file(STRINGS ${kconfigfile} ConfigContents)
   encode_brackets(ConfigContents)
@@ -107,6 +115,19 @@ function(nuttx_export_kconfig kconfigfile)
         true
         PARENT_SCOPE)
   endif()
+
+  # Alternative
+  # if(CMAKE_HOST_SYSTEM_NAME MATCHES "Linux|Darwin|FreeBSD")
+    # nuttx_parent_scope(CONFIG_HOST_LINUX CMAKE_HOST_SYSTEM_NAME MATCHES "Linux")
+    # nuttx_parent_scope(CONFIG_HOST_MACOS CMAKE_HOST_SYSTEM_NAME MATCHES "Darwin")
+  # elseif(CMAKE_HOST_SYSTEM_NAME MATCHES "MSYS|CYGWIN|Windows")
+    # nuttx_parent_scope(CONFIG_HOST_WINDOWS CMAKE_HOST_SYSTEM_NAME MATCHES "MSYS|CYGWIN|Windows")
+  # else()
+    # set(CONFIG_HOST_OTHER
+          # true
+          # PARENT_SCOPE)
+  # endif()
+
 endfunction()
 
 function(nuttx_generate_kconfig)
