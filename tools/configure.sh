@@ -32,7 +32,7 @@ USAGE: ${0} [-E] [-e] [-S] [-l|m|c|g|n|B] [-L [boardname]] [-a <app-dir>] <board
 Where:
   -E enforces distclean if already configured.
   -e performs distclean if configuration changed.
-  -S removes nxtmpdir folder with third-party packages.
+  -S adds the nxtmpdir folder for third-party packages.
   -l selects the Linux (l) host environment.
   -m selects the macOS (m) host environment.
   -c selects the Windows host and Cygwin (c) environment.
@@ -72,7 +72,7 @@ unset appdir
 unset host
 unset enforce_distclean
 unset distclean
-unset clean_nxtmpdir
+unset store_nxtmpdir
 
 function dumpcfgs
 {
@@ -126,7 +126,7 @@ while [ ! -z "$1" ]; do
     exit 0
     ;;
   -S )
-    clean_nxtmpdir=y
+    store_nxtmpdir=y
     ;;
   *)
     boardconfig=$1
@@ -223,7 +223,12 @@ if [ -r ${dest_config} ]; then
   fi
 fi
 
-if [ "X${clean_nxtmpdir}" = "Xy" ]; then
+if [ "X${store_nxtmpdir}" = "Xy" ]; then
+  if [ ! -d "${WSDIR}/nxtmpdir" ]; then
+    mkdir -p "${WSDIR}/nxtmpdir"
+    echo "Folder nxtmpdir create."
+  fi
+else
   if [ -d "${WSDIR}/nxtmpdir" ]; then
     rm -rf "${WSDIR}/nxtmpdir"
     echo "Folder nxtmpdir clean."
@@ -303,8 +308,8 @@ if [ -z "${appdir}" ]; then
     if [ -d "${TOPDIR}/../apps-${CONFIG_VERSION_STRING}" ]; then
       appdir="../apps-${CONFIG_VERSION_STRING}"
     else
-        echo "ERROR: Could not find the path to the appdir"
-        exit 7
+      echo "ERROR: Could not find the path to the appdir"
+      exit 7
     fi
   fi
 fi

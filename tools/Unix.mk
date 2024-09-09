@@ -26,10 +26,6 @@ WSDIR := ${shell cd "${TOPDIR}"/.. && pwd -P}
 export NXTMPDIR := $(WSDIR)/nxtmpdir
 $(info $$NXTMPDIR = $(NXTMPDIR))
 
-ifeq ($(wildcard $(NXTMPDIR)),)
-$(shell mkdir -p $(NXTMPDIR))
-endif
-
 ifeq ($(V),)
   MAKE := $(MAKE) -s --no-print-directory
 endif

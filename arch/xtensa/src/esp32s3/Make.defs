@@ -225,10 +225,14 @@ endif
 
 chip/$(ESP_HAL_3RDPARTY_REPO):
 	$(Q) echo "Cloning Espressif HAL for 3rd Party Platforms"
-	$(Q) if [ ! -d "$(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO)" ]; then \
-		git clone --quiet $(ESP_HAL_3RDPARTY_URL) $(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO); \
-	 fi
-	$(Q) cp -fr $(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO) chip/$(ESP_HAL_3RDPARTY_REPO)
+	$(Q) if [ -d "$(NXTMPDIR)" ]; then \
+			if [ ! -d "$(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO)" ]; then \
+				git clone --quiet $(ESP_HAL_3RDPARTY_URL) $(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO); \
+			fi; \
+			cp -fr $(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO) chip/$(ESP_HAL_3RDPARTY_REPO); \
+		 else \
+			git clone --quiet $(ESP_HAL_3RDPARTY_URL) chip/$(ESP_HAL_3RDPARTY_REPO); \
+		 fi
 	$(Q) echo "Espressif HAL for 3rd Party Platforms: ${ESP_HAL_3RDPARTY_VERSION}"
 	$(Q) git -C chip/$(ESP_HAL_3RDPARTY_REPO) checkout --quiet $(ESP_HAL_3RDPARTY_VERSION)
 
