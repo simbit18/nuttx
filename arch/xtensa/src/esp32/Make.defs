@@ -20,6 +20,8 @@
 
 include common/Make.defs
 
+STORAGETMP = $(if $(wildcard $(NXTMPDIR)/.*),y,)
+
 # The start-up, "head", file.  May be either a .S or a .c file.
 
 HEAD_CSRC  = esp32_start.c esp32_wdt.c
@@ -224,14 +226,12 @@ endif
 
 chip/$(ESP_HAL_3RDPARTY_REPO):
 	$(Q) echo "Cloning Espressif HAL for 3rd Party Platforms"
-	$(Q) if [ -d "$(NXTMPDIR)" ]; then \
-			if [ ! -d "$(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO)" ]; then \
-				git clone --quiet $(ESP_HAL_3RDPARTY_URL) $(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO); \
-			fi; \
-			 cp -fr $(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO) chip/$(ESP_HAL_3RDPARTY_REPO); \
-		 else \
-			git clone --quiet $(ESP_HAL_3RDPARTY_URL) chip/$(ESP_HAL_3RDPARTY_REPO); \
-		 fi
+ifeq ($(STORAGETMP),y)
+	$(Q) $(call COMMITSHA, $(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO),$(ESP_HAL_3RDPARTY_VERSION))
+	$(Q) $(call CLONE, $(ESP_HAL_3RDPARTY_URL),chip/$(ESP_HAL_3RDPARTY_REPO),$(NXTMPDIR)/$(ESP_HAL_3RDPARTY_REPO))
+else
+	$(Q) $(call CLONE, $(ESP_HAL_3RDPARTY_URL),chip/$(ESP_HAL_3RDPARTY_REPO))
+endif
 	$(Q) echo "Espressif HAL for 3rd Party Platforms: ${ESP_HAL_3RDPARTY_VERSION}"
 	$(Q) git -C chip/$(ESP_HAL_3RDPARTY_REPO) checkout --quiet $(ESP_HAL_3RDPARTY_VERSION)
 
