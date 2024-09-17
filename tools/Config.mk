@@ -620,6 +620,25 @@ define DOWNLOAD
 	$(ECHO_END)
 endef
 
+# CURLSTORE - Download file. The URL base is joined with TARBALL by '/' and
+#            downloaded to the TARBALL file.
+#            The third argument is an output path. The second argument is used
+#            if it is not provided or is empty.
+# Example: $(call CURLSTORE,$(FOO_URL_BASE),$(FOO_TARBALL),foo.out,store.out)
+
+define CURLSTORE
+	echo "Downloading: $(if $4,$4,$3) "
+	if [ -z $4 ]; then \
+		curl -L -Ss $1/$2 -o $3/$2; \
+	else \
+		if [ ! -f $4/$2 ]; then \
+			curl -L -Ss $1/$2 -o $4/$2; \
+		fi; \
+		echo "Copy the file from $4 to $3"; \
+		cp -f $4/$2 $3/$2; \
+	fi
+endef
+
 # CLONE - Git clone repository. Initializes a new Git repository in the 
 #         folder on your local machine and populates it with the contents
 #         of the central repository.
