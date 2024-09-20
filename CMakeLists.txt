@@ -204,9 +204,7 @@ set(ENV{HOST_BSD} n)
 set(ENV{HOST_WINDOWS} n)
 set(ENV{HOST_OTHER} n)
 
-# We define host
 include(nuttx_sethost)
-nuttx_sethost()
 
 include(nuttx_parse_function_args)
 include(nuttx_add_subdirectory)
@@ -328,13 +326,6 @@ if(NOT EXISTS ${CMAKE_BINARY_DIR}/.config OR NOT "${NUTTX_DEFCONFIG}" STREQUAL
     RESULT_VARIABLE KCONFIG_STATUS
     WORKING_DIRECTORY ${NUTTX_DIR})
 
-  file(RENAME ${CMAKE_BINARY_DIR}/.config.compressed
-       ${CMAKE_BINARY_DIR}/.config)
-  set(ENV{KCONFIG_CONFIG} ${CMAKE_BINARY_DIR}/.config)
-
-  # store original expanded .config
-  configure_file(${CMAKE_BINARY_DIR}/.config ${CMAKE_BINARY_DIR}/.config.orig
-                 COPYONLY)
   if(KCONFIG_ERROR)
     message(WARNING "Kconfig Configuration Error: ${KCONFIG_ERROR}")
   endif()
@@ -345,12 +336,27 @@ if(NOT EXISTS ${CMAKE_BINARY_DIR}/.config OR NOT "${NUTTX_DEFCONFIG}" STREQUAL
         "Failed to initialize Kconfig configuration: ${KCONFIG_OUTPUT}")
   endif()
 
+  file(RENAME ${CMAKE_BINARY_DIR}/.config.compressed
+       ${CMAKE_BINARY_DIR}/.config)
+
+  set(ENV{KCONFIG_CONFIG} ${CMAKE_BINARY_DIR}/.config)
+
+  # store original expanded .config
+  configure_file(${CMAKE_BINARY_DIR}/.config ${CMAKE_BINARY_DIR}/.config.orig
+                 COPYONLY)
+
+  # We define host
+  nuttx_sethost()
+
   set(NUTTX_DEFCONFIG_SAVED
       ${NUTTX_DEFCONFIG}
       CACHE INTERNAL "Saved defconfig path" FORCE)
 
   # Print configuration choices
-
+  message(STATUS "  CMake   ${CMAKE_VERSION}")
+  if(CMAKE_GENERATOR MATCHES "Ninja")
+    message(STATUS "  Ninja  ${ninja_version}")
+  endif()
   message(STATUS "  Board:  ${NUTTX_BOARD}")
   message(STATUS "  Config: ${NUTTX_CONFIG}")
   message(STATUS "  Appdir: ${NUTTX_APPS_DIR}")
