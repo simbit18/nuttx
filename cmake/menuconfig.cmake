@@ -30,7 +30,7 @@ set(KCONFIG_ENV
     "DRIVERS_PLATFORM_DIR=dummy"
     "APPSBINDIR=${NUTTX_APPS_BINDIR}"
     "BINDIR=${CMAKE_BINARY_DIR}"
-    "HOST_LINUX=$<IF:$<BOOL:{LINUX}>,y,n>"
+    "HOST_LINUX=$<IF:$<BOOL:${LINUX}>,y,n>"
     "HOST_MACOS=$<IF:$<BOOL:${APPLE}>,y,n>"
     "HOST_WINDOWS=$<IF:$<BOOL:${WIN32}>,y,n>"
     "HOST_OTHER=$<IF:$<BOOL:${OTHER_OS}>,y,n>")
@@ -72,8 +72,8 @@ add_custom_target(
           ${CMAKE_BINARY_DIR}/defconfig.tmp
   COMMAND ${CMAKE_COMMAND} -P ${NUTTX_DIR}/cmake/savedefconfig.cmake
           ${CMAKE_BINARY_DIR}/.config ${CMAKE_BINARY_DIR}/defconfig.tmp
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/defconfig
-          ${NUTTX_DEFCONFIG}
+  #COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/defconfig
+  #        ${NUTTX_DEFCONFIG}
   WORKING_DIRECTORY ${NUTTX_DIR})
 
 # utility target to restore .config from board's defconfig
