@@ -97,5 +97,6 @@ add_custom_target(
   COMMAND ${CMAKE_COMMAND} -E env ${CMAKE_BINARY_DIR}/.config olddefconfig
   COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} savedefconfig --out
           ${CMAKE_BINARY_DIR}/defconfig
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/defconfig ${NUTTX_DEFCONFIG}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_BINARY_DIR}/defconfig
+          ${NUTTX_DEFCONFIG}
   WORKING_DIRECTORY ${NUTTX_DIR})
