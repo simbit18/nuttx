@@ -450,8 +450,8 @@ function refresh_cmake {
     kconfig-tweak --file $nuttx/build/.config -d $toolchain
   fi
 
-  if ! cmake --build build -t savedefconfig 1>/dev/null; then
-    cmake --build build -t savedefconfig
+  if ! cmake --build build -t job_refresh 1>/dev/null; then
+    cmake --build build -t job_refresh
     fail=1
   fi
 
