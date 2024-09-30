@@ -91,9 +91,9 @@ add_custom_target(
   COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_PARENT_LIST_FILE}
   WORKING_DIRECTORY ${NUTTX_DIR})
 
-# refresh .config from board's defconfig
+# refresh .config from board's defconfig for GITHUB
 add_custom_target(
-  job_refresh
+  nuttx_job_refresh
   COMMAND ${CMAKE_COMMAND} -E remove -f
           ${CMAKE_BINARY_DIR}/SAVEconfig
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/.config
