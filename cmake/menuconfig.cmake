@@ -39,7 +39,6 @@ set(KCONFIG_ENV
 if(${Python3_FOUND})
     set(Python_EXECUTABLE ${Python3_EXECUTABLE})
     set(Python_EST ".py")
-    )
 endif()
 
 
