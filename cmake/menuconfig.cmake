@@ -34,15 +34,24 @@ set(KCONFIG_ENV
 # Use qconfig instead of menuconfig since PowerShell not support curses
 # redirection
 
+
+
+if(${Python3_FOUND})
+    set(Python_EXECUTABLE ${Python3_EXECUTABLE})
+    set(Python_EST ".py")
+    )
+endif()
+
+
 if(WIN32)
-  set(MENUCONFIG guiconfig)
+  set(MENUCONFIG guiconfig${Python_EST})
 else()
-  set(MENUCONFIG menuconfig)
+  set(MENUCONFIG menuconfig${Python_EST})
 endif()
 
 add_custom_target(
   menuconfig
-  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} ${MENUCONFIG}
+  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} ${Python_EXECUTABLE} ${MENUCONFIG}
   COMMAND ${CMAKE_COMMAND} -E remove -f
           ${CMAKE_BINARY_DIR}/include/nuttx/config.h # invalidate existing
                                                      # config
@@ -64,7 +73,7 @@ add_custom_target(
 
 add_custom_target(
   savedefconfig
-  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} savedefconfig --out
+  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} ${Python_EXECUTABLE} savedefconfig${Python_EST} --out
           ${CMAKE_BINARY_DIR}/defconfig.tmp
   COMMAND ${CMAKE_COMMAND} -P ${NUTTX_DIR}/cmake/savedefconfig.cmake
           ${CMAKE_BINARY_DIR}/.config ${CMAKE_BINARY_DIR}/defconfig.tmp
@@ -77,7 +86,7 @@ add_custom_target(
   resetconfig
   COMMAND ${CMAKE_COMMAND} -E copy ${NUTTX_DEFCONFIG}
           ${CMAKE_BINARY_DIR}/.config
-  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} olddefconfig
+  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} ${Python_EXECUTABLE} olddefconfig${Python_EST}
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/.config
           ${CMAKE_BINARY_DIR}/.config.orig
   COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_PARENT_LIST_FILE}
@@ -94,8 +103,8 @@ add_custom_target(
           ${CMAKE_BINARY_DIR}/.config
   COMMAND ${CMAKE_COMMAND} -E copy ${NUTTX_DEFCONFIG}
           ${CMAKE_BINARY_DIR}/.config
-  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} olddefconfig
-  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} savedefconfig --out
+  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} ${Python_EXECUTABLE} olddefconfig${Python_EST}
+  COMMAND ${CMAKE_COMMAND} -E env ${KCONFIG_ENV} ${Python_EXECUTABLE} savedefconfig${Python_EST} --out
           ${CMAKE_BINARY_DIR}/defconfig.tmp
   COMMAND ${CMAKE_COMMAND} -P ${NUTTX_DIR}/cmake/savedefconfig.cmake
           ${CMAKE_BINARY_DIR}/.config ${CMAKE_BINARY_DIR}/defconfig.tmp
