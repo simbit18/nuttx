@@ -319,22 +319,23 @@ if(NOT EXISTS ${CMAKE_BINARY_DIR}/.config OR NOT "${NUTTX_DEFCONFIG}" STREQUAL
   set(ENV{KCONFIG_CONFIG} ${CMAKE_BINARY_DIR}/.config.compressed)
 
   # Do olddefconfig step to expand the abbreviated defconfig into normal config
-  execute_process(
-    COMMAND olddefconfig
-    ERROR_VARIABLE KCONFIG_ERROR
-    OUTPUT_VARIABLE KCONFIG_OUTPUT
-    RESULT_VARIABLE KCONFIG_STATUS
-    WORKING_DIRECTORY ${NUTTX_DIR})
+  # execute_process(
+    # COMMAND olddefconfig
+    # ERROR_VARIABLE KCONFIG_ERROR
+    # OUTPUT_VARIABLE KCONFIG_OUTPUT
+    # RESULT_VARIABLE KCONFIG_STATUS
+    # WORKING_DIRECTORY ${NUTTX_DIR})
 
-  if(KCONFIG_ERROR)
-    message(WARNING "Kconfig Configuration Error: ${KCONFIG_ERROR}")
-  endif()
+  # if(KCONFIG_ERROR)
+    # message(WARNING "Kconfig Configuration Error: ${KCONFIG_ERROR}")
+  # endif()
 
-  if(KCONFIG_STATUS AND NOT KCONFIG_STATUS EQUAL 0)
-    message(
-      FATAL_ERROR
-        "Failed to initialize Kconfig configuration: ${KCONFIG_OUTPUT}")
-  endif()
+  # if(KCONFIG_STATUS AND NOT KCONFIG_STATUS EQUAL 0)
+    # message(
+      # FATAL_ERROR
+        # "Failed to initialize Kconfig configuration: ${KCONFIG_OUTPUT}")
+  # endif()
+  nuttx_olddefconfig()
 
   file(RENAME ${CMAKE_BINARY_DIR}/.config.compressed
        ${CMAKE_BINARY_DIR}/.config)

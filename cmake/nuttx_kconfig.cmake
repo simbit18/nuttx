@@ -160,10 +160,39 @@ function(nuttx_generate_kconfig)
 endfunction()
 
 
+function(nuttx_olddefconfig)
+  if(${Python3_FOUND})
+    set(Python_EXECUTABLE ${Python3_EXECUTABLE})
+    set(Python_EST ".py")
+  endif()
+
+  execute_process(
+    COMMAND ${Python3_EXECUTABLE} olddefconfig${Python_EST}
+    ERROR_VARIABLE KCONFIG_ERROR
+    OUTPUT_VARIABLE KCONFIG_OUTPUT
+    RESULT_VARIABLE KCONFIG_STATUS
+    WORKING_DIRECTORY ${NUTTX_DIR})
+
+  if(KCONFIG_ERROR)
+    message(WARNING "Kconfig Configuration Error: ${KCONFIG_ERROR}")
+  endif()
+
+  if(KCONFIG_STATUS AND NOT KCONFIG_STATUS EQUAL 0)
+    message(
+      FATAL_ERROR
+        "nuttx_setconfig: Failed to initialize Kconfig configuration: ${KCONFIG_OUTPUT}")
+  endif()
+endfunction()
+
 function(nuttx_setconfig)
+  if(${Python3_FOUND})
+    set(Python_EXECUTABLE ${Python3_EXECUTABLE})
+    set(Python_EST ".py")
+  endif()
+
   set(ENV{KCONFIG_CONFIG} ${CMAKE_BINARY_DIR}/.config)
   execute_process(
-    COMMAND setconfig ${ARGN}
+    COMMAND ${Python3_EXECUTABLE} setconfig${Python_EST} ${ARGN}
     --kconfig ${NUTTX_DIR}/Kconfig
     ERROR_VARIABLE KCONFIG_ERROR
     OUTPUT_VARIABLE KCONFIG_OUTPUT
