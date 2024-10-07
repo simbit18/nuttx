@@ -417,7 +417,7 @@ function build {
 function refresh_default {
   # Ensure defconfig in the canonical form
 
-  if ! ./tools/refresh.sh --silent $config; then
+  if ! ./tools/refresh.sh --silent ${JOPTION} $config; then
     fail=1
   fi
 

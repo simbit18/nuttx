@@ -26,6 +26,7 @@ USAGE="USAGE: $0 [options] <board>:<config>+"
 ADVICE="Try '$0 --help' for more information"
 
 unset CONFIGS
+unset JOPTION
 diff=0
 debug=n
 defaults=n
@@ -41,6 +42,9 @@ while [ ! -z "$1" ]; do
     defaults=y
     prompt=n
     ;;
+  -j )
+    shift
+    JOPTION="-j $1"
   --prompt )
     prompt=y
     ;;
@@ -233,15 +237,15 @@ for CONFIG in ${CONFIGS}; do
 
     if [ "X${defaults}" == "Xy" ]; then
       if [ "X${debug}" == "Xy" ]; then
-        make olddefconfig V=1
+        make olddefconfig V=1 ${JOPTION}
       else
-        make olddefconfig 1>/dev/null
+        make olddefconfig ${JOPTION} 1>/dev/null
       fi
     else
       if [ "X${debug}" == "Xy" ]; then
-        make oldconfig V=1
+        make oldconfig V=1 ${JOPTION}
       else
-        make oldconfig
+        make oldconfig ${JOPTION}
       fi
     fi
   fi
@@ -249,9 +253,9 @@ for CONFIG in ${CONFIGS}; do
   # Run savedefconfig to create the new defconfig file
 
   if [ "X${debug}" == "Xy" ]; then
-    make savedefconfig V=1
+    make savedefconfig V=1 ${JOPTION}
   else
-    make savedefconfig 1>/dev/null
+    make savedefconfig ${JOPTION} 1>/dev/null
   fi
 
   # Show differences
@@ -292,9 +296,9 @@ for CONFIG in ${CONFIGS}; do
       { echo "ERROR: Failed to move SAVEconfig to .config"; exit 1; }
 
     if [ "X${debug}" == "Xy" ]; then
-      ./tools/sethost.sh V=1
+      ./tools/sethost.sh V=1 ${JOPTION}
     else
-      ./tools/sethost.sh 1>/dev/null
+      ./tools/sethost.sh ${JOPTION} 1>/dev/null
     fi
   fi
 done
