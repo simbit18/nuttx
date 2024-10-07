@@ -2603,7 +2603,7 @@ endchoice # Optimization Level
 
 config DEBUG_OPTLEVEL
 	string "Custom Optimization Level"
-	default "/O2" if HOST_WINDOWS
+	default "/O2" if HOST_WINDOWS && !WINDOWS_MSYS
 	default "-O2"
 	depends on DEBUG_CUSTOMOPT
 	---help---
