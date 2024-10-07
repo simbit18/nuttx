@@ -45,6 +45,7 @@ while [ ! -z "$1" ]; do
   -j )
     shift
     JOPTION="-j $1"
+    ;;
   --prompt )
     prompt=y
     ;;
