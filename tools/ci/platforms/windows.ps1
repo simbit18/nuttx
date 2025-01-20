@@ -134,6 +134,32 @@ Write-Host "riscv_gcc_toolchain !!!"
   }
 }
 
+# GitHub Actions runners already have rustup installed
+function rust() {
+Write-Host "rust !!!"
+  add_path "$NUTTXTOOLS\rust\cargo\bin"
+  # Configuring the PATH environment variable
+  $env:CARGO_HOME = "$NUTTXTOOLS\rust\cargo"
+  $env:RUSTUP_HOME="$NUTTXTOOLS\rust\rustup"
+
+  if ($null -eq (Get-Command rustc -ErrorAction SilentlyContinue)) {
+      # Download the file
+      $basefile="x86_64-pc-windows-gnu"
+      New-Item -ItemType Directory -Path "$NUTTXTOOLS\rust" -Force
+      Set-Location "$NUTTXTOOLS"
+      # Download tool rustup-init.exe
+      Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-gnu/rustup-init.exe -OutFile "rustup-init.exe" -ErrorAction Stop
+      # Install Rust target x86_64-pc-windows-gnu
+      cmd /c start /wait rustup-init.exe -y --default-host $basefile --no-modify-path
+      # Install targets supported from NuttX
+      cmd /c start /wait rustup.exe target add thumbv6m-none-eabi
+      cmd /c start /wait rustup.exe target add thumbv7m-none-eabi
+      cmd /c start /wait rustup.exe target add riscv64gc-unknown-none-elf
+      Remove-Item rustup-init.exe -Force
+  }
+  rustc --version
+}
+
 function install_build_tools {
   $install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain kconfig_frontends"
   $splitArray=$install.Split(" ")
