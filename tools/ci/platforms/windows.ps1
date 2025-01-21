@@ -114,6 +114,24 @@ Write-Host "kconfig_frontends !!!"
   }
 }
 
+function ninja_tool {
+Write-Host "ninja !!!"
+  add_path "$NUTTXTOOLS\ninja"
+  if ($null -eq (Get-Command ninja -ErrorAction SilentlyContinue)) {
+    Write-Host "install ninja !!!"
+    # Download the file
+    $basefile="ninja-win"
+    # New-Item -ItemType Directory -Path "$NUTTXTOOLS\ninja" -Force
+    Set-Location "$NUTTXTOOLS"
+    # Download tool ninja.exe
+    Invoke-WebRequest -Uri "https://github.com/ninja-build/ninja/releases/download/v1.12.1/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
+    Expand-Archive "$NUTTXTOOLS\$basefile.zip" # -DestinationPath  "$basefile"
+    Move-Item -Path "$basefile\ninja.exe" -Destination "ninja"
+    Remove-Item "$basefile*" -Force
+ }
+  ninja --version
+}
+
 
 function riscv_gcc_toolchain() {
 Write-Host "riscv_gcc_toolchain !!!"
@@ -161,7 +179,7 @@ Write-Host "rust !!!"
 }
 
 function install_build_tools {
-  $install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain kconfig_frontends"
+  $install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain kconfig_frontends ninja_tool"
   $splitArray=$install.Split(" ")
   $oldpath = Get-Location
 
