@@ -53,8 +53,6 @@ if ($IsWindows -or $ENV:OS) {
 }
 
 function install_tools {
-#  export NUTTXTOOLS=${CIWORKSPACE}/tools
-#  mkdir -p "${NUTTXTOOLS}"
    $NUTTXTOOLS="$CIWORKSPACE\tools"
    $env:NUTTXTOOLS = "$NUTTXTOOLS"
    if (-not (Test-Path -Path $NUTTXTOOLS)) {
@@ -67,7 +65,6 @@ function install_tools {
            # Run the script
            Write-Host "Executing script: $Pathps1"
            & $Pathps1
-           Write-Host "Script executed successfully." -ForegroundColor Yellow
        }
        catch {
            # Handle errors
@@ -110,12 +107,12 @@ function setup_repos {
 }
 # Function to check if Git is installed
 function Check-Git {
-    try {
-        git --version | Out-Null
-    } catch {
-        Write-Host "Git is not installed. Please install Git to use this script." -ForegroundColor Red
-        exit 1
-    }
+  try {
+    git --version | Out-Null
+  } catch {
+    Write-Host "Git is not installed. Please install Git to use this script." -ForegroundColor Red
+    exit 1
+  }
 }
 
 
@@ -126,14 +123,10 @@ function run_builds {
   }
   
   Write-Host "options: $options build: $builds" -ForegroundColor Yellow
-<#   foreach ( $build in $builds ) {
+  foreach ( $build in $builds ) {
     & $nuttx\tools\testbuild.ps1 $options $build
-  } #>
+  }
 
-<#   if [ -d "${CCACHE_DIR}" ]; then
-    # Print a summary of configuration and statistics counters
-    ccache -s
-  fi #>
 }
 
 
@@ -152,11 +145,6 @@ for ( $i = 0; $i -lt $args.count; $i++ ) {
         '-h' {
             usage
         }
-<#         '-d' {
-            Write-Host "Debug -d" -ForegroundColor Green
-            Set-PSDebug -Trace 1
-            continue
-        } #>
         '-i' {
             install_tools
             continue
