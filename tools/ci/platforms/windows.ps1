@@ -126,7 +126,7 @@ Write-Host "kconfig_frontends !!!"
 function ninja_tool {
 Write-Host "ninja !!!"
   add_path "$NUTTXTOOLS\ninja"
-  if (-not (Test-Path -Path "$NUTTXTOOLS\ninja\ninja.exe")) {
+  if ($null -eq (Get-Command ninja -ErrorAction SilentlyContinue)) {
     Write-Host "install ninja !!!"
     # Download the file
     $basefile="ninja-win"
@@ -135,7 +135,7 @@ Write-Host "ninja !!!"
     # Download tool ninja.exe
     Invoke-WebRequest -Uri "https://github.com/ninja-build/ninja/releases/download/v1.12.1/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
     Expand-Archive "$NUTTXTOOLS\$basefile.zip" # -DestinationPath  "$basefile"
-    Move-Item -Path "$basefile\ninja.exe" -Destination "ninja"
+    Move-Item -Path "$basefile" -Destination "ninja"
     Remove-Item "$basefile*" -Force
  }
   ninja --version
