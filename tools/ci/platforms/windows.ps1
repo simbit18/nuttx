@@ -126,7 +126,7 @@ Write-Host "kconfig_frontends !!!"
 function ninja_tool {
 Write-Host "ninja !!!"
   add_path "$NUTTXTOOLS\ninja"
-  if ($null -eq (Get-Command ninja -ErrorAction SilentlyContinue)) {
+  if (-not (Test-Path -Path "$NUTTXTOOLS\ninja\ninja.exe")) {
     Write-Host "install ninja !!!"
     # Download the file
     $basefile="ninja-win"
