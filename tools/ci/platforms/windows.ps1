@@ -28,10 +28,20 @@ Set-PSDebug -Trace 0
 Write-Host "Run windows.ps1 !!!" -ForegroundColor Yellow
 Write-Host "======================"
 function add_path() {
-   param (
-        [string]$path
-    )
-  $env:PATH = "$path;$env:PATH"
+  param (
+       [string]$path
+  )
+  # $env:PATH = "$path;$env:PATH"
+  if (!$Path) {
+      Write-Host "Error: add_path path file not found" -ForegroundColor Red
+      return
+    }
+    $envPaths = $env:Path -split ';'
+    if ($envPaths -notcontains $Path) {
+        Write-Host "Entrato: $Path file not found" -ForegroundColor Red
+        $env:PATH = "$Path;" + $env:PATH
+    }
+}
 }
 
 function arm_clang_toolchain {
@@ -56,22 +66,22 @@ Write-Host "arm_clang_toolchain !!!"
 
 function arm_gcc_toolchain() {
 Write-Host "arm_gcc_toolchain !!!"
-    add_path "$NUTTXTOOLS\gcc-arm-none-eabi\bin"
-    try {
-        if (-not (Test-Path -Path "$NUTTXTOOLS\gcc-arm-none-eabi\bin\arm-none-eabi-gcc.exe")) {
-            # Download the file
-            $basefile="arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi"
-            Set-Location "$NUTTXTOOLS"
-            # Download the latest ARM GCC toolchain prebuilt by ARM
-            Invoke-WebRequest -Uri "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
-            Expand-Archive "$NUTTXTOOLS\$basefile.zip"
-            Move-Item -Path "$basefile\$basefile" -Destination "gcc-arm-none-eabi"
-            Remove-Item "$basefile*" -Force
-        }
-        arm-none-eabi-gcc --version
-    } catch {
-        Write-Error "Failed to download the file: $_"
-    }
+  add_path "$NUTTXTOOLS\gcc-arm-none-eabi\bin"
+  try {
+      if (-not (Test-Path -Path "$NUTTXTOOLS\gcc-arm-none-eabi\bin\arm-none-eabi-gcc.exe")) {
+          # Download the file
+          $basefile="arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi"
+          Set-Location "$NUTTXTOOLS"
+          # Download the latest ARM GCC toolchain prebuilt by ARM
+          Invoke-WebRequest -Uri "https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
+          Expand-Archive "$NUTTXTOOLS\$basefile.zip"
+          Move-Item -Path "$basefile\$basefile" -Destination "gcc-arm-none-eabi"
+          Remove-Item "$basefile*" -Force
+      }
+      arm-none-eabi-gcc --version
+  } catch {
+      Write-Error "Failed to download the file: $_"
+  }
 }
 
 function arm64_gcc_toolchain() {
@@ -157,8 +167,10 @@ function rust() {
 Write-Host "rust !!!"
   add_path "$NUTTXTOOLS\rust\cargo\bin"
   # Configuring the PATH environment variable
-  $env:CARGO_HOME = "$NUTTXTOOLS\rust\cargo"
+  $env:CARGO_HOME="$NUTTXTOOLS\rust\cargo"
   $env:RUSTUP_HOME="$NUTTXTOOLS\rust\rustup"
+  Add-Content -Path "$NUTTXTOOLS\env" -Value "CARGO_HOME=$NUTTXTOOLS\rust\cargo"
+  Add-Content -Path "$NUTTXTOOLS\env" -Value "RUSTUP_HOME=$NUTTXTOOLS\rust\rustup"
 
   if ($null -eq (Get-Command rustc -ErrorAction SilentlyContinue)) {
       # Download the file
@@ -189,6 +201,7 @@ function install_build_tools {
     & $node
   }
   Set-Location "$oldpath"
+  Add-Content -Path "$NUTTXTOOLS\env" -Value "PATH=$env:PATH"
 }
 
 install_build_tools
