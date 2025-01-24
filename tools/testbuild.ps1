@@ -29,7 +29,7 @@ $WD=Resolve-Path("Get-Location\..\..\..\..")
 Write-Host "The WD path $WD" -ForegroundColor Green
 $nuttx="$WD\nuttx"
 Write-Host "The nuttx path $nuttx" -ForegroundColor Green
-
+$KCONFIGPATH = "$WD\TOOLS\kconfig-frontends\bin"
 $fail=0
 $APPSDIR="$WD\apps"
 Write-Host "The apps path $APPSDIR" -ForegroundColor Green
@@ -303,11 +303,11 @@ function configure_cmake {
       Write-Host "original_toolchain: $original_toolchain"
       if ($original_toolchain) {
         Write-Host "  Disabling $original_toolchain"
-        kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $original_toolchain
+        & $KCONFIGPATH\kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $original_toolchain
       }
 
       Write-Host "  Enabling $toolchain"
-      kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $toolchain
+      & $KCONFIGPATH\kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $toolchain
   }
 
   return $fail
@@ -419,10 +419,10 @@ function refresh_cmake {
       Write-Host "CMake toolchain: $toolchain." -ForegroundColor Green
      if ($original_toolchain) {
         Write-Host "kconfig-tweak  Enable: $original_toolchain" -ForegroundColor Green
-        kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $original_toolchain
+        & $KCONFIGPATH\kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $original_toolchain
       } 
         Write-Host "kconfig-tweak  Disable: $toolchain" -ForegroundColor Green
-        kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $toolchain
+        & $KCONFIGPATH\kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $toolchain
   }
   
   try {
