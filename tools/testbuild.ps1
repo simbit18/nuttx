@@ -303,11 +303,11 @@ function configure_cmake {
       Write-Host "original_toolchain: $original_toolchain"
       if ($original_toolchain) {
         Write-Host "  Disabling $original_toolchain"
-        & $KCONFIGPATH\kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $original_toolchain
+        kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $original_toolchain
       }
 
       Write-Host "  Enabling $toolchain"
-      & $KCONFIGPATH\kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $toolchain
+      kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $toolchain
   }
 
   return $fail
@@ -419,10 +419,10 @@ function refresh_cmake {
       Write-Host "CMake toolchain: $toolchain." -ForegroundColor Green
      if ($original_toolchain) {
         Write-Host "kconfig-tweak  Enable: $original_toolchain" -ForegroundColor Green
-        & $KCONFIGPATH\kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $original_toolchain
+        kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $original_toolchain
       } 
         Write-Host "kconfig-tweak  Disable: $toolchain" -ForegroundColor Green
-        & $KCONFIGPATH\kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $toolchain
+        kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $toolchain
   }
   
   try {
