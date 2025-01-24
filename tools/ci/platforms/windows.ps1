@@ -38,7 +38,7 @@ function add_path() {
     }
     $envPaths = $env:Path -split ';'
     if ($envPaths -notcontains $Path) {
-        Write-Host "Entrato: $Path file not found" -ForegroundColor Red
+        Write-Host "Path: $Path file not found" -ForegroundColor Red
         $env:PATH = "$Path;" + $env:PATH
     }
 }
