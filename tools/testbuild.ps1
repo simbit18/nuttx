@@ -547,7 +547,7 @@ function dotest {
   $boarddir=$($tmparr[0])
   Write-Host "boarddir: $boarddir"
   
-  if (($boarddir -eq "sim") -and ($MSVC -ne 1)) {
+  if ($boarddir -eq "sim") -and ($MSVC -ne 1) {
     Write-Host "Skipping: $configfull"
     $skip=1
   }
