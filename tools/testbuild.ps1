@@ -540,14 +540,14 @@ function dotest {
     return
   }
 
-  $tmparr = $($configarr[0].Split("\\")) # $($configarr[0] -split ':')
+  $tmparr = $config -split '\\' #$($configarr[0].Split("\\")) # $($configarr[0] -split ':')
   $configdir=$($tmparr[1])
   Write-Host "configdir: $configdir"
   
   $boarddir=$($tmparr[0])
   Write-Host "boarddir: $boarddir"
   
-  if ($boarddir -eq "sim" -and $MSVC -ne 1) {
+  if (($boarddir -eq "sim") -and ($MSVC -ne 1)) {
     Write-Host "Skipping: $configfull"
     $skip=1
   }
