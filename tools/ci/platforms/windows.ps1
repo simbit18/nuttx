@@ -42,7 +42,6 @@ function add_path() {
         $env:PATH = "$Path;" + $env:PATH
     }
 }
-}
 
 function arm_clang_toolchain {
 Write-Host "arm_clang_toolchain !!!"
