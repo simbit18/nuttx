@@ -92,10 +92,12 @@ function Find-VisualStudio {
     }
 
     if ($MSVC -eq 1) {
-        Write-Output "Found Visual Studio 2022 installations"
+        # Write-Output "Found Visual Studio 2022 installations"
+        Write-Host "Found Visual Studio 2022 installations"
         return $MSVC=1
     } else {
-        Write-Output "Visual Studio 2022 is not installed on this system."
+        # Write-Output "Visual Studio 2022 is not installed on this system."
+        Write-Host "Visual Studio 2022 is not installed on this system."
         return $MSVC=0
     }
 
