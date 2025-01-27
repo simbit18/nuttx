@@ -279,7 +279,10 @@ function configure_cmake {
       Write-Host "CMake vs2022: $tmpconfig"
       if ($MSVC -eq 1) {
         Write-Output "Found Visual Studio 2022 installations"
-        cmake -B build -DBOARD_CONFIG="$tmpconfig" -G"Visual Studio 17 2022" -A Win32
+        if (cmake -B build -DBOARD_CONFIG="$tmpconfig" -G"Visual Studio 17 2022" -A Win32 2>$null) {
+            cmake -B build -DBOARD_CONFIG="$tmpconfig" -G"Visual Studio 17 2022" -A Win32
+            $fail=1
+        }
       } else {
         Write-Output "Visual Studio 2022 is not installed on this system."
       }
@@ -454,7 +457,7 @@ function refresh_cmake {
 
   if ($CHECKCLEAN -ne 0) {
     if ((Test-Path -Path "$nuttx\.git") -or (Test-Path -Path "$APPSDIR\.git")){
-      Write-Host "Git ENTRATO" -ForegroundColor Red
+      Write-Host "Git OK" -ForegroundColor Red
       try {
            if (git -C $nuttx status -s 2>$null) {
               git -C $nuttx status -s
@@ -641,5 +644,5 @@ foreach($line in $testlist) {
 ##Set-Location "$CID"
 #####
 Write-Host "===================================================================================="
-dir $ARTIFACTDIR
+# dir $ARTIFACTDIR
 exit $fail
