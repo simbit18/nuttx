@@ -190,7 +190,7 @@ $patterntestlist = '^\\'
 $patternblacklist = '^-'
 
 if ($NINJACMAKE -eq 1) {
-  Write-Host "Entrato $NINJACMAKE -----" -ForegroundColor Yellow
+  Write-Host "OK $NINJACMAKE -----" -ForegroundColor Yellow
   $patterncmakelist = '^[C|c][M|m][A|a][K|k][E|e][,]'
 }
 
@@ -526,7 +526,7 @@ function dotest {
 
   $cmake = $null
   if ($NINJACMAKE -eq 1) {
-    Write-Host "Entrato $NINJACMAKE -----" -ForegroundColor Yellow
+    Write-Host "OK $NINJACMAKE -----" -ForegroundColor Yellow
     foreach($l in $cmakelist) {
       Write-Host "find cmake: $l" -ForegroundColor Green
       if ("Cmake," + $config -replace '\\', ':' -eq "$l") {
