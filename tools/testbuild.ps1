@@ -123,7 +123,8 @@ function Check-CMake {
 # Main script execution
 
 Check-CMake
-Find-VisualStudio
+$MSVC=Find-VisualStudio
+Write-Host "MSVC $MSVC." -ForegroundColor Red
 Test-GitVersion
 write-host "There are a total of $($args.count) arguments"
 if (!$args[0]) {
@@ -635,4 +636,5 @@ foreach($line in $testlist) {
 ##Set-Location "$CID"
 #####
 Write-Host "===================================================================================="
+dir $ARTIFACTDIR
 exit $fail
