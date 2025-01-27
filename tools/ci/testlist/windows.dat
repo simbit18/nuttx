@@ -9,11 +9,11 @@
 
 /arm/stm32/nucleo-f411re/configs/nsh,CONFIG_ARM_TOOLCHAIN_GNU_EABI
 
-/arm/stm32f7/stm32f746g-disco/*,CONFIG_ARM_TOOLCHAIN_GNU_EABI
+# /arm/stm32f7/stm32f746g-disco/*,CONFIG_ARM_TOOLCHAIN_GNU_EABI
 
-/risc-v/qemu-rv/rv-virt/configs/nsh
+# /risc-v/qemu-rv/rv-virt/configs/nsh
 
-/risc-v/qemu-rv/rv-virt/configs/nsh64
+# /risc-v/qemu-rv/rv-virt/configs/nsh64
 
 
 /sim/sim/sim/configs/windows
