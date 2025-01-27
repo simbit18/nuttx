@@ -284,7 +284,10 @@ function configure_cmake {
         Write-Output "Visual Studio 2022 is not installed on this system."
       }
     } else {
-      cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja
+     if (cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja 2>$null) {
+         cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja
+         $fail=1
+      }
     }
     Write-Host "CMake configuration completed successfully."
   } catch {
