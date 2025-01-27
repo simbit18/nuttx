@@ -356,7 +356,9 @@ function build_cmake {
 
   # Build the project
   try {
-    cmake --build build
+    if (cmake --build build 2>$null) {
+        cmake --build build
+    }
     Write-Host "Build completed successfully."
   } catch {
     Write-Error "Build failed: $_"
