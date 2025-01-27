@@ -29,7 +29,7 @@ $WD=Resolve-Path("Get-Location\..\..\..\..")
 Write-Host "The WD path $WD" -ForegroundColor Green
 $nuttx="$WD\nuttx"
 Write-Host "The nuttx path $nuttx" -ForegroundColor Green
-$KCONFIGPATH = "$WD\TOOLS\kconfig-frontends\bin"
+# $KCONFIGPATH = "$WD\TOOLS\kconfig-frontends\bin"
 $fail=0
 $APPSDIR="$WD\apps"
 Write-Host "The apps path $APPSDIR" -ForegroundColor Green
@@ -49,7 +49,6 @@ $RUN=0
 $MSVC=0
 
 function showusage {
-    # cls
     Write-Host ""
     Write-Host "====================" -ForegroundColor Cyan
     Write-Host "      Run Menu      " -ForegroundColor Yellow
@@ -544,7 +543,7 @@ function dotest {
   $configdir=$($tmparr[1])
   Write-Host "configdir: $configdir"
   
-  $boarddir=$($tmparr[0])
+  $boarddir=$($tmparr[0]).Trim()
   Write-Host "boarddir: $boarddir"
   
   if (($boarddir -eq "sim") -and ($MSVC -ne 1)) {
