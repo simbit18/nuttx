@@ -438,7 +438,10 @@ function refresh_cmake {
   }
   
   try {
-    cmake --build build -t refreshsilent
+    if (cmake --build build -t refreshsilent 2>$null) {
+        cmake --build build -t refreshsilent
+        $global:fail=1
+    }
     Write-Host "refreshsilent completed successfully."
   } catch {
     Write-Error "refreshsilent failed: $_"
@@ -643,6 +646,7 @@ foreach($line in $testlist) {
 
 ##Set-Location "$CID"
 #####
+$global:fail=0
 Write-Host "===================================================================================="
 # dir $ARTIFACTDIR
 exit $global:fail
