@@ -30,7 +30,7 @@ Write-Host "The WD path $WD" -ForegroundColor Green
 $nuttx="$WD\nuttx"
 Write-Host "The nuttx path $nuttx" -ForegroundColor Green
 # $KCONFIGPATH = "$WD\TOOLS\kconfig-frontends\bin"
-$fail=0
+$global:$fail=0
 $APPSDIR="$WD\apps"
 Write-Host "The apps path $APPSDIR" -ForegroundColor Green
 
@@ -248,22 +248,22 @@ function distclean {
               if (git -C $nuttx status --ignored -s 2>$null) {
                 git -C $nuttx status --ignored -s
                 Write-Host "distclean: Git $nuttx status --ignored"
-                $fail = 1
+                $global:$fail = 1
               }
               if (git -C $APPSDIR status --ignored -s 2>$null) {
                 git -C $APPSDIR status --ignored -s
                 Write-Host "distclean: Git $APPSDIR status --ignored"
-                $fail = 1
+                $global:$fail = 1
               }
             } catch {
               Write-Host "Git is not installed. Please install Git to use this script." -ForegroundColor Red
-              $fail = 1
+              $global:$fail = 1
             }
           }
         }
      }
   }
-  return $fail
+  return $global:$fail
 }
 
 
@@ -281,7 +281,7 @@ function configure_cmake {
         Write-Output "Found Visual Studio 2022 installations"
         if (cmake -B build -DBOARD_CONFIG="$tmpconfig" -G"Visual Studio 17 2022" -A Win32 2>$null) {
             cmake -B build -DBOARD_CONFIG="$tmpconfig" -G"Visual Studio 17 2022" -A Win32
-            $fail=1
+            $global:$fail=1
         }
       } else {
         Write-Output "Visual Studio 2022 is not installed on this system."
@@ -289,13 +289,13 @@ function configure_cmake {
     } else {
      if (cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja 2>$null) {
          cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja
-         $fail=1
+         $global:$fail=1
       }
     }
     Write-Host "CMake configuration completed successfully."
   } catch {
     Write-Error "CMake configuration failed: $_"
-    $fail=1
+    $global:$fail=1
   }
    
   if ($toolchain) {
@@ -320,7 +320,7 @@ function configure_cmake {
       kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $toolchain
   }
 
-  return $fail
+  return $global:$fail
 
 }
 
@@ -365,7 +365,7 @@ function build_cmake {
     Write-Host "Build completed successfully."
   } catch {
     Write-Error "Build failed: $_"
-    $fail=1
+    $global:$fail=1
   }
   if ($SAVEARTIFACTS -eq 1) {
     $artifactconfigdir="$ARTIFACTDIR\$config"
@@ -442,7 +442,7 @@ function refresh_cmake {
     Write-Host "refreshsilent completed successfully."
   } catch {
     Write-Error "refreshsilent failed: $_"
-    $fail=1
+    $global:$fail=1
   }
 
   # rm -rf build
@@ -462,16 +462,16 @@ function refresh_cmake {
            if (git -C $nuttx status -s 2>$null) {
               git -C $nuttx status -s
               Write-Host "Git $nuttx status "
-              $fail=1
+              $global:$fail=1
            }
            if (git -C $APPSDIR status -s 2>$null) {
               git -C $APPSDIR status -s
               Write-Host "Git $APPSDIR status "
-              $fail=1
+              $global:$fail=1
            }
       } catch {
           Write-Host "Git is not installed. Please install Git to use this script." -ForegroundColor Red
-          $fail=1
+          $global:$fail=1
       }
     }
   }
@@ -645,4 +645,4 @@ foreach($line in $testlist) {
 #####
 Write-Host "===================================================================================="
 # dir $ARTIFACTDIR
-exit $fail
+exit $global:$fail
