@@ -56,7 +56,7 @@ function install_tools {
    $NUTTXTOOLS="$CIWORKSPACE\tools"
    $env:NUTTXTOOLS = "$NUTTXTOOLS"
    if (-not (Test-Path -Path $NUTTXTOOLS)) {
-      New-Item -ItemType Directory -Path $NUTTXTOOLS -Force
+      New-Item -ItemType Directory -Path $NUTTXTOOLS -Force > $null
    }
    $Pathps1="$CIPLAT\windows.ps1"
    # Check if the file exists
