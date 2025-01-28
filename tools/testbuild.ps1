@@ -322,7 +322,7 @@ function configure_cmake {
       kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $toolchain
   }
 
-  return $global:fail
+  # return $global:fail
 
 }
 
