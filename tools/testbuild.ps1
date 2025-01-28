@@ -237,9 +237,9 @@ function distclean {
   if ((Test-Path ".config") -or (Test-Path "build\.config")) {
      if (($GITCLEAN -eq 1) -or ($cmake)) {
         git -C $nuttx clean -xfdq
-        Write-Host "distclean: git -C $nuttx clean -xfdq"
+        #Write-Host "distclean: git -C $nuttx clean -xfdq"
         git -C $APPSDIR clean -xfdq
-        Write-Host "git -C $APPSDIR clean -xfdq"
+        #Write-Host "git -C $APPSDIR clean -xfdq"
      } else {
         # Remove .version manually because this file is shipped with
         # the release package and then distclean has to keep it.
@@ -442,7 +442,7 @@ function refresh_cmake {
   }
   
   try {
-    if (cmake --build build -t refreshsilent 2>$null) {
+    if (cmake --build build -t refreshsilent 1>$null) {
         cmake --build build -t refreshsilent
         $global:fail=1
     }
