@@ -263,7 +263,7 @@ function distclean {
         }
      }
   }
-  return $global:fail
+  # return $global:fail
 }
 
 
