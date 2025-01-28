@@ -289,12 +289,14 @@ function configure_cmake {
     } else {
      if (cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja 2>$null) {
          cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja
+         Write-Output "cmake -B build -DBOARD_CONFIG=$tmpconfig -GNinja"
          $global:fail=1
       }
     }
     Write-Host "CMake configuration completed successfully."
   } catch {
-    Write-Error "CMake configuration failed: $_"
+    # Write-Error "CMake configuration failed: $_"
+    Write-Host "CMake configuration failed: $_"
     $global:fail=1
   }
    
