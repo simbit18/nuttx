@@ -648,7 +648,7 @@ foreach($line in $testlist) {
 
 ##Set-Location "$CID"
 #####
-$global:fail=0
+# $global:fail=0
 Write-Host "===================================================================================="
 # dir $ARTIFACTDIR
 exit $global:fail
