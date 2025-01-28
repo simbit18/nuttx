@@ -237,7 +237,9 @@ function distclean {
   if ((Test-Path ".config") -or (Test-Path "build\.config")) {
      if (($GITCLEAN -eq 1) -or ($cmake)) {
         git -C $nuttx clean -xfdq
+        Write-Host "distclean: git -C $nuttx clean -xfdq"
         git -C $APPSDIR clean -xfdq
+        Write-Host "git -C $APPSDIR clean -xfdq"
      } else {
         # Remove .version manually because this file is shipped with
         # the release package and then distclean has to keep it.
@@ -591,7 +593,6 @@ function dotest {
     configure
     build
     refresh
-
   } else {
     Write-Host "  Skipping: $config" -ForegroundColor Green
   }
