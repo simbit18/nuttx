@@ -67,7 +67,7 @@ function showusage {
     exit 1
 }
 
-function Test-GitVersion ($version = $([string](git --version 2> $null))) {
+function Test-GitVersion ($version = $([string](git --version 2>$null))) {
     if ($version -notmatch '(?<ver>\d+(?:\.\d+)+)(?<g4w>(?<rc>[-.]rc\d+)?\.windows|\.vfs)?') {
         Write-Warning "posh-git could not parse Git version ($version)"
     }
@@ -308,13 +308,13 @@ function configure_cmake {
       $contentconfig = Get-Content "$nuttx\build\.config"
 
       $listtoolchain = $contentconfig | Select-String $patternallitem -AllMatches
-      Write-Host "CMake toolchain: $listtoolchain" -ForegroundColor Green
+      # Write-Host "CMake toolchain: $listtoolchain" -ForegroundColor Green
       $listtoolchain = $listtoolchain | Select-String 'CONFIG_TOOLCHAIN_WINDOWS', 'CONFIG_ARCH_TOOLCHAIN_*' -NotMatch | Select-String '=y' -AllMatches
-      Write-Host "CMake toolchain: $listtoolchain" -ForegroundColor Green
+      # Write-Host "CMake toolchain: $listtoolchain" -ForegroundColor Green
       $toolchainarr = $listtoolchain -split '='
-      Write-Host "toolchainarr: $toolchainarr"
+      # Write-Host "toolchainarr: $toolchainarr"
       $original_toolchain = $($toolchainarr[0])
-      Write-Host "original_toolchain: $original_toolchain"
+      # Write-Host "original_toolchain: $original_toolchain"
       if ($original_toolchain) {
         Write-Host "  Disabling $original_toolchain"
         kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $original_toolchain
@@ -374,7 +374,7 @@ function build_cmake {
   if ($SAVEARTIFACTS -eq 1) {
     $artifactconfigdir="$ARTIFACTDIR\$config"
     Write-Host "Copy in artifactconfigdir: $artifactconfigdir"
-    New-Item -Force -ItemType directory -Path $artifactconfigdir
+    New-Item -Force -ItemType directory -Path $artifactconfigdir > $null
     $contentmanifest = $null
     $contentmanifest = Get-Content "$nuttx\build\nuttx.manifest"
     Write-Host "Manifest contentmanifest: $contentmanifest"
@@ -649,7 +649,7 @@ foreach($line in $testlist) {
 
 ##Set-Location "$CID"
 #####
-# $global:fail=0
+$global:fail=0
 Write-Host "===================================================================================="
 # dir $ARTIFACTDIR
 exit $global:fail
