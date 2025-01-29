@@ -21,21 +21,21 @@
 #
 ############################################################################
 
-Set-PSDebug -Trace 0
+# Set-PSDebug -Trace 0
 
 Write-Host "===================================================================================="
-Write-Host "Run cibuild.ps1 !!!" -ForegroundColor Yellow
+# Write-Host "Run cibuild.ps1 !!!" -ForegroundColor Yellow
 $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
 Write-Host "Start: $timestamp" -ForegroundColor Yellow
-Write-Host "======================"
+Write-Host "------------------------------------------------------------------------------------"
 
 
 $CID = Get-Location
-Write-Host "CID: $CID" -ForegroundColor Green
+# Write-Host "CID: $CID" -ForegroundColor Green
 $CIWORKSPACE = Resolve-Path("$CID\..\..\..") # "$CID".Split("\", 3)
-Write-Host "CIWORKSPACE: $CIWORKSPACE" -ForegroundColor Green
+# Write-Host "CIWORKSPACE: $CIWORKSPACE" -ForegroundColor Green
 $CIPLAT="$CIWORKSPACE\nuttx\tools\ci\platforms"
-Write-Host "CIPLAT: $CIPLAT" -ForegroundColor Green
+# Write-Host "CIPLAT: $CIPLAT" -ForegroundColor Green
 $nuttx="$CIWORKSPACE\nuttx"
 $apps="$CIWORKSPACE\apps"
 
@@ -47,7 +47,7 @@ if (-Not (Test-Path -Path $apps)) {
 
 
 if ($IsWindows -or $ENV:OS) {
-    Write-Host "Windows $ENV:OS"
+    Write-Host "SO $ENV:OS"
 } else {
     Write-Host "Not Windows"
 }
@@ -115,32 +115,30 @@ function Check-Git {
   }
 }
 
-
 function run_builds {
   if ($builds -eq $null) {
    Write-Host "ERROR: Missing test list file"  -ForegroundColor Red
    usage
   }
   
-  Write-Host "options: $options build: $builds" -ForegroundColor Yellow
+  # Write-Host "options: $options build: $builds" -ForegroundColor Yellow
   foreach ( $build in $builds ) {
+    Write-Host "testlist: windows.dat" -ForegroundColor Yellow
     & $nuttx\tools\testbuild.ps1 $options $build
   }
 
 }
 
-
-
 # Main script execution
 Check-Git
 
 $builds = @()
-write-host "There are a total of $($args.count) arguments"
+# write-host "There are a total of $($args.count) arguments"
 if (!$args[0]) {
    usage
 }
 for ( $i = 0; $i -lt $args.count; $i++ ) {
-    write-host "Argument  $i is $($args[$i])"
+    # write-host "Argument  $i is $($args[$i])"
         switch -regex -casesensitive ($($args[$i])) {
         '-h' {
             usage
@@ -158,12 +156,12 @@ for ( $i = 0; $i -lt $args.count; $i++ ) {
             continue
         }
         { $_ -like '-*' } {
-            Write-Host "3 -*" -ForegroundColor Green
+            # Write-Host "3 -*" -ForegroundColor Green
             $options += "$($args[$i]) " #$args[0]
             continue
         }
         default {
-            Write-Host "Default $($args[$i])" -ForegroundColor Green
+            # Write-Host "Default $($args[$i])" -ForegroundColor Green
             $builds += $($args[$i])
         }
     }
