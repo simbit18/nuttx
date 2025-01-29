@@ -23,10 +23,10 @@
 
 # windows native
 
-Set-PSDebug -Trace 0
+# Set-PSDebug -Trace 0
 
-Write-Host "Run windows.ps1 !!!" -ForegroundColor Yellow
-Write-Host "======================"
+# Write-Host "Run windows.ps1 !!!" -ForegroundColor Yellow
+# Write-Host "======================"
 function add_path() {
   param (
        [string]$path
@@ -38,17 +38,18 @@ function add_path() {
     }
     $envPaths = $env:Path -split ';'
     if ($envPaths -notcontains $Path) {
-        Write-Host "Path: $Path file not found" -ForegroundColor Red
+        # Write-Host "Path: $Path file not found" -ForegroundColor Red
         $env:PATH = "$Path;" + $env:PATH
     }
 }
 
 function arm_clang_toolchain {
-Write-Host "arm_clang_toolchain !!!"
+  Write-Host "Check ARM clang toolchain ..." -ForegroundColor Green
   add_path "$NUTTXTOOLS\clang-arm-none-eabi\bin"
   try {
       if (-not (Test-Path -Path "$NUTTXTOOLS\clang-arm-none-eabi\bin\clang.exe")) {
           # Download the file
+          Write-Host "Download: ARM clang toolchain" -ForegroundColor Green
           $basefile="LLVMEmbeddedToolchainForArm-17.0.1-Windows-x86_64"
           Set-Location "$NUTTXTOOLS"
           # Download the latest ARM clang toolchain prebuilt by ARM
@@ -64,11 +65,12 @@ Write-Host "arm_clang_toolchain !!!"
 }
 
 function arm_gcc_toolchain() {
-Write-Host "arm_gcc_toolchain !!!"
+  Write-Host "Check ARM GCC toolchain toolchain ..." -ForegroundColor Green
   add_path "$NUTTXTOOLS\gcc-arm-none-eabi\bin"
   try {
       if (-not (Test-Path -Path "$NUTTXTOOLS\gcc-arm-none-eabi\bin\arm-none-eabi-gcc.exe")) {
           # Download the file
+          Write-Host "Download: ARM GCC toolchain" -ForegroundColor Green
           $basefile="arm-gnu-toolchain-13.2.Rel1-mingw-w64-i686-arm-none-eabi"
           Set-Location "$NUTTXTOOLS"
           # Download the latest ARM GCC toolchain prebuilt by ARM
@@ -84,11 +86,12 @@ Write-Host "arm_gcc_toolchain !!!"
 }
 
 function arm64_gcc_toolchain() {
-Write-Host "arm64_gcc_toolchain !!!"
+  Write-Host "Check ARM64 GCC toolchain toolchain ..." -ForegroundColor Green
   add_path "$NUTTXTOOLS\gcc-aarch64-none-elf\bin"
   try {
       if (-not (Test-Path -Path "$NUTTXTOOLS\gcc-aarch64-none-elf\bin\aarch64-none-elf-gcc.exe")) {
           # Download the file
+          Write-Host "Download: ARM64 GCC toolchain" -ForegroundColor Green
           $basefile="arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-aarch64-none-elf"
           Set-Location "$NUTTXTOOLS"
           # Download the latest ARM64 GCC toolchain prebuilt by ARM
@@ -104,11 +107,12 @@ Write-Host "arm64_gcc_toolchain !!!"
 }
 
 function kconfig_frontends() {
-Write-Host "kconfig_frontends !!!"
+  Write-Host "Check kconfig-frontends ..." -ForegroundColor Green
   add_path "$NUTTXTOOLS\kconfig-frontends\bin"
   try {
       if (-not (Test-Path -Path "$NUTTXTOOLS\kconfig-frontends\bin\kconfig-conf.exe")) {
           # Download the file
+          Write-Host "Download: kconfig-frontends package" -ForegroundColor Green
           $basefile="kconfig-frontends-windows-mingw64"
           Set-Location "$NUTTXTOOLS"
           # Download the kconfig-frontends toolchain prebuilt
@@ -124,10 +128,10 @@ Write-Host "kconfig_frontends !!!"
 }
 
 function ninja_tool {
-Write-Host "ninja !!!"
+  Write-Host "Check Ninja ..." -ForegroundColor Green
   add_path "$NUTTXTOOLS\ninja"
   if ($null -eq (Get-Command ninja -ErrorAction SilentlyContinue)) {
-    Write-Host "install ninja !!!"
+    Write-Host "Download: Ninja package" -ForegroundColor Green
     # Download the file
     $basefile="ninja-win"
     # New-Item -ItemType Directory -Path "$NUTTXTOOLS\ninja" -Force
@@ -143,10 +147,11 @@ Write-Host "ninja !!!"
 
 
 function riscv_gcc_toolchain() {
-Write-Host "riscv_gcc_toolchain !!!"
+  Write-Host "Check RISCV GCC toolchain ..." -ForegroundColor Green
   add_path "$NUTTXTOOLS\riscv-none-elf-gcc\bin"
   try {
       if (-not (Test-Path -Path "$NUTTXTOOLS\riscv-none-elf-gcc\bin\riscv-none-elf-gcc.exe")) {
+          Write-Host "Download: RISCV GCC toolchain" -ForegroundColor Green
           $basefile="xpack-riscv-none-elf-gcc-13.2.0-2-win32-x64"
           Set-Location "$NUTTXTOOLS"
           # Download the latest RISCV GCC toolchain prebuilt by xPack
@@ -163,7 +168,7 @@ Write-Host "riscv_gcc_toolchain !!!"
 
 # GitHub Actions runners already have rustup installed
 function rust() {
-Write-Host "rust !!!"
+  Write-Host "Check Rust ..."
   add_path "$NUTTXTOOLS\rust\cargo\bin"
   # Configuring the PATH environment variable
   $env:CARGO_HOME="$NUTTXTOOLS\rust\cargo"
@@ -172,6 +177,7 @@ Write-Host "rust !!!"
   Add-Content -Path "$NUTTXTOOLS\env" -Value "RUSTUP_HOME=$NUTTXTOOLS\rust\rustup"
 
   if ($null -eq (Get-Command rustc -ErrorAction SilentlyContinue)) {
+      Write-Host "Download: Rust package" -ForegroundColor Green
       # Download the file
       $basefile="x86_64-pc-windows-gnu"
       New-Item -ItemType Directory -Path "$NUTTXTOOLS\rust" -Force
@@ -194,7 +200,7 @@ function install_build_tools {
   $splitArray=$install.Split(" ")
   $oldpath = Get-Location
 
-  Write-Host "oldpath: $oldpath" -ForegroundColor Green
+  #Write-Host "oldpath: $oldpath" -ForegroundColor Green
   foreach ( $node in $splitArray )
   {
     & $node
