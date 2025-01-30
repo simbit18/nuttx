@@ -19,24 +19,23 @@
 # under the License.
 #
 
-Set-PSDebug -Trace 0
+# Set-PSDebug -Trace 0
 
-Write-Host "Run testbuild.ps1 !!!" -ForegroundColor Yellow
-Write-Host "======================"
+# Write-Host "Run testbuild.ps1 !!!" -ForegroundColor Yellow
+# Write-Host "======================"
 $CID = Get-Location
-Write-Host "The CID path $CID" -ForegroundColor Green
+# Write-Host "The CID path $CID" -ForegroundColor Green
 $WD=Resolve-Path("Get-Location\..\..\..\..")
-Write-Host "The WD path $WD" -ForegroundColor Green
+# Write-Host "The WD path $WD" -ForegroundColor Green
 $nuttx="$WD\nuttx"
-Write-Host "The nuttx path $nuttx" -ForegroundColor Green
-# $KCONFIGPATH = "$WD\TOOLS\kconfig-frontends\bin"
+# Write-Host "The nuttx path $nuttx" -ForegroundColor Green
 $global:fail=0
 $APPSDIR="$WD\apps"
-Write-Host "The apps path $APPSDIR" -ForegroundColor Green
+# Write-Host "The apps path $APPSDIR" -ForegroundColor Green
 
 if ($null -eq $ARTIFACTDIR) {
   $ARTIFACTDIR="$WD\buildartifacts"
-  Write-Host "The path ARTIFACTDIR: $ARTIFACTDIR" -ForegroundColor Green
+  # Write-Host "The path ARTIFACTDIR: $ARTIFACTDIR" -ForegroundColor Green
 }
 
 $PRINTLISTONLY=0
@@ -122,11 +121,12 @@ function Check-CMake {
 
 # Main script execution
 
-Check-CMake
+# Check-CMake
 $MSVC=Find-VisualStudio
-Write-Host "MSVC $MSVC." -ForegroundColor Red
-Test-GitVersion
-write-host "There are a total of $($args.count) arguments"
+# Write-Host "MSVC $MSVC." -ForegroundColor Red
+
+# Test-GitVersion
+# write-host "There are a total of $($args.count) arguments"
 if (!$args[0]) {
    usage
 }
@@ -135,27 +135,27 @@ for ( $i = 0; $i -lt $args.count; $i++ ) {
         # switch ($($args[$i].replace(" ",''))) {
         switch -regex -casesensitive ($($args[$i])) {
         '-h' {
-            Write-Host "-h" -ForegroundColor Green
+            # Write-Host "-h" -ForegroundColor Green
             usage
         }
         '-p' {
-            Write-Host "-p" -ForegroundColor Green
+            # Write-Host "-p" -ForegroundColor Green
             $PRINTLISTONLY=1
         }
         '-G' {
-            Write-Host "-G" -ForegroundColor Green
+            # Write-Host "-G" -ForegroundColor Green
             $GITCLEAN=1
         }
         '-A' {
-            Write-Host "-A" -ForegroundColor Green
+            # Write-Host "-A" -ForegroundColor Green
             $SAVEARTIFACTS=1
         }
         '-C' {
-            Write-Host "-C" -ForegroundColor Green
+            # Write-Host "-C" -ForegroundColor Green
             $CHECKCLEAN=0
         }
         '-N' {
-            Write-Host "-N" -ForegroundColor Green
+            # Write-Host "-N" -ForegroundColor Green
             $NINJACMAKE=1
         }
         default {
@@ -165,8 +165,8 @@ for ( $i = 0; $i -lt $args.count; $i++ ) {
     }
 }
 
-Write-Host "NINJACMAKE: $NINJACMAKE"
-Write-Host "SAVEARTIFACTS: $SAVEARTIFACTS"
+# Write-Host "NINJACMAKE: $NINJACMAKE"
+# Write-Host "SAVEARTIFACTS: $SAVEARTIFACTS"
 
 
 # Check if testfile file exists
@@ -193,7 +193,7 @@ $patterntestlist = '^\\'
 $patternblacklist = '^-'
 
 if ($NINJACMAKE -eq 1) {
-  Write-Host "OK $NINJACMAKE -----" -ForegroundColor Yellow
+  # Write-Host "NINJACMAKE $NINJACMAKE -----" -ForegroundColor Yellow
   $patterncmakelist = '^[C|c][M|m][A|a][K|k][E|e][,]'
 }
 
@@ -265,13 +265,20 @@ function distclean {
         }
      }
   }
+  Write-Host "distclean fail: $global:fail"
   # return $global:fail
 }
 
-
+function run_command ($command)
+{
+    invoke-expression "$command" *>$null
+    Write-Host "run_command $_"
+    return $_
+}
 
 function configure_cmake {
   # Run CMake with specified configurations
+
   try {
     $tmpconfig=$config -replace '\\', ':'
 
@@ -280,19 +287,21 @@ function configure_cmake {
     if ($tmpconfig -match "windows") {
       Write-Host "CMake vs2022: $tmpconfig"
       if ($MSVC -eq 1) {
-        Write-Output "Found Visual Studio 2022 installations"
-        if (cmake -B build -DBOARD_CONFIG="$tmpconfig" -G"Visual Studio 17 2022" -A Win32 2>$null) {
+        Write-Host  "Found Visual Studio 2022 installations"
+        if (cmake -B build -DBOARD_CONFIG="$tmpconfig" -G"Visual Studio 17 2022" -A Win32 1>$null) {
             cmake -B build -DBOARD_CONFIG="$tmpconfig" -G"Visual Studio 17 2022" -A Win32
             $global:fail=1
         }
       } else {
-        Write-Output "Visual Studio 2022 is not installed on this system."
+        Write-Host  "Visual Studio 2022 is not installed on this system."
       }
     } else {
-     if (cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja 2>$null) {
+      #if (!(run_command "cmake -B build -DBOARD_CONFIG=$tmpconfig -GNinja")) {
+      if (cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja 1> $null) {
          cmake -B build -DBOARD_CONFIG="$tmpconfig" -GNinja
-         Write-Output "cmake -B build -DBOARD_CONFIG=$tmpconfig -GNinja"
+         Write-Host "cmake -B build -DBOARD_CONFIG=$tmpconfig -GNinja"
          $global:fail=1
+         
       }
     }
     Write-Host "CMake configuration completed successfully."
@@ -303,7 +312,7 @@ function configure_cmake {
   }
    
   if ($toolchain) {
-      Write-Host "CMake toolchain: $toolchain" -ForegroundColor Green
+      # Write-Host "CMake toolchain: $toolchain" -ForegroundColor Green
       $patternallitem = '_TOOLCHAIN_'
       $contentconfig = Get-Content "$nuttx\build\.config"
 
@@ -323,7 +332,7 @@ function configure_cmake {
       Write-Host "  Enabling $toolchain"
       kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $toolchain
   }
-
+  Write-Host "configure_cmake fail: $global:fail"
   # return $global:fail
 
 }
@@ -332,10 +341,10 @@ function configure {
 
   Write-Host "  Configuring..."
   if ($cmake) {
-    Write-Host "  configure_cmake" -ForegroundColor Green
+    # Write-Host "  configure_cmake" -ForegroundColor Green
     configure_cmake
   } else {
-    Write-Host "  configure_default" -ForegroundColor Green
+    #Write-Host "  configure_default" -ForegroundColor Green
   }
   
 }
@@ -363,8 +372,9 @@ function build_cmake {
 
   # Build the project
   try {
-    if (cmake --build build 2>$null) {
+    if (cmake --build build 1> $null) {
         cmake --build build
+        $global:fail=1
     }
     Write-Host "Build completed successfully."
   } catch {
@@ -377,11 +387,11 @@ function build_cmake {
     New-Item -Force -ItemType directory -Path $artifactconfigdir > $null
     $contentmanifest = $null
     $contentmanifest = Get-Content "$nuttx\build\nuttx.manifest"
-    Write-Host "Manifest contentmanifest: $contentmanifest"
+    # Write-Host "Manifest contentmanifest: $contentmanifest"
     # Copy files with error handling
     try {
         foreach($ma in $contentmanifest) {
-          Write-Host "find manifest: $ma" -ForegroundColor Green
+          # Write-Host "find manifest: $ma" -ForegroundColor Green
           Copy-Item -Path "$nuttx\build\$ma" -Destination $artifactconfigdir -Force -ErrorAction Stop
         }
         #Copy-Item -Path "$Source\*" -Destination $Destination -Recurse -Force -ErrorAction Stop
@@ -390,7 +400,7 @@ function build_cmake {
         Write-Host "An error occurred while copying files: $_" -ForegroundColor Red
     }
   }
-  
+  Write-Host "build_cmake fail: $global:fail"
 }
 
 function build {
@@ -432,17 +442,17 @@ function refresh_default {
 function refresh_cmake {
   # Ensure defconfig in the canonical form
   if ($toolchain) {
-      Write-Host "CMake toolchain: $toolchain." -ForegroundColor Green
+      # Write-Host "CMake toolchain: $toolchain." -ForegroundColor Green
      if ($original_toolchain) {
-        Write-Host "kconfig-tweak  Enable: $original_toolchain" -ForegroundColor Green
+        # Write-Host "kconfig-tweak  Enable: $original_toolchain" -ForegroundColor Green
         kconfig-tweak.ps1 --file "$nuttx\build\.config" -e $original_toolchain
       } 
-        Write-Host "kconfig-tweak  Disable: $toolchain" -ForegroundColor Green
+        # Write-Host "kconfig-tweak  Disable: $toolchain" -ForegroundColor Green
         kconfig-tweak.ps1 --file "$nuttx\build\.config" -d $toolchain
   }
   
   try {
-    if (cmake --build build -t refreshsilent 2>$null) {
+    if (cmake --build build -t refreshsilent 1> $null) {
         cmake --build build -t refreshsilent
         $global:fail=1
     }
@@ -454,7 +464,7 @@ function refresh_cmake {
 
   # rm -rf build
   try {
-    Write-Host "Remove-Item build -Force."
+    # Write-Host "Remove-Item build -Force."
     Remove-Item build -Recurse -Force
   } catch {
     Write-Error "Remove-Item failed: $_"
@@ -464,16 +474,16 @@ function refresh_cmake {
 
   if ($CHECKCLEAN -ne 0) {
     if ((Test-Path -Path "$nuttx\.git") -or (Test-Path -Path "$APPSDIR\.git")){
-      Write-Host "Git OK" -ForegroundColor Red
+      # Write-Host "Git OK" -ForegroundColor Red
       try {
-           if (git -C $nuttx status -s 2>$null) {
+           if (git -C $nuttx status -s 2> $null) {
+              Write-Host "Git $nuttx status " -ForegroundColor Yellow
               git -C $nuttx status -s
-              Write-Host "Git $nuttx status "
               $global:fail=1
            }
-           if (git -C $APPSDIR status -s 2>$null) {
+           if (git -C $APPSDIR status -s 2> $null) {
+              Write-Host "Git $APPSDIR status " -ForegroundColor Yellow
               git -C $APPSDIR status -s
-              Write-Host "Git $APPSDIR status "
               $global:fail=1
            }
       } catch {
@@ -487,15 +497,16 @@ function refresh_cmake {
 
   git -C $nuttx clean -f -xfdq
   git -C $APPSDIR clean -f -xfdq
+  Write-Host "refresh_cmake fail: $global:fail"
 }
 
 function refresh {
 
   if ($cmake) {
-    Write-Host "  refresh_cmake" -ForegroundColor Green
+    # Write-Host "  refresh_cmake" -ForegroundColor Green
     refresh_cmake
   } else {
-    Write-Host "  refresh_default" -ForegroundColor Green
+    # Write-Host "  refresh_default" -ForegroundColor Green
   }
   
 }
@@ -521,21 +532,21 @@ function dotest {
     )
 
   Write-Host "===================================================================================="
-  Write-Host "configfull: $configfull"
+  # Write-Host "configfull: $configfull"
   $configarr = $configfull -split ','
-  Write-Host "configarr: $configarr"
+  # Write-Host "configarr: $configarr"
   $config=$($configarr[0])
-  Write-Host "config: $config"
-  # $check="Windows,$config"
+  # Write-Host "config: $config"
+
   $check="Windows," + $config -replace '\\', ':'
-  Write-Host "check: $check"
+  # Write-Host "check: $check"
   
  # config=`echo $1 | cut -d',' -f1`
  # check=${HOST},${config/\//:}
 
   $skip=0
   foreach($re in $blacklist) {
-    Write-Host "find blacklist: $re" -ForegroundColor Green
+    # Write-Host "find blacklist: $re" -ForegroundColor Green
     if ("-$check" -eq "$re") {
       Write-Host "Skipping: $configfull"
       $skip=1
@@ -544,11 +555,11 @@ function dotest {
 
   $cmake = $null
   if ($NINJACMAKE -eq 1) {
-    Write-Host "OK $NINJACMAKE -----" -ForegroundColor Yellow
+    # Write-Host "OK $NINJACMAKE -----" -ForegroundColor Yellow
     foreach($l in $cmakelist) {
-      Write-Host "find cmake: $l" -ForegroundColor Green
+      # Write-Host "find cmake: $l" -ForegroundColor Green
       if ("Cmake," + $config -replace '\\', ':' -eq "$l") {
-        Write-Host "Cmake in present: $configfull"
+        # Write-Host "Cmake in present: $configfull" -ForegroundColor Green
         $cmake=1
       }
     }
@@ -561,10 +572,10 @@ function dotest {
 
   $tmparr = $config -split '\\' #$($configarr[0].Split("\\")) # $($configarr[0] -split ':')
   $configdir=$($tmparr[1])
-  Write-Host "configdir: $configdir"
+  # Write-Host "configdir: $configdir"
   
   $boarddir=$($tmparr[0]).Trim()
-  Write-Host "boarddir: $boarddir"
+  # Write-Host "boarddir: $boarddir"
   
   if (($boarddir -eq "sim") -and ($MSVC -ne 1)) {
     Write-Host "Skipping: boarddir $boarddir MSVC: $MSVC"
@@ -573,7 +584,7 @@ function dotest {
   }
 
   $path="$nuttx\boards\*\*\$boarddir\configs\$configdir"
-  Write-Host "path: $path"
+  # Write-Host "path: $path"
   if (-Not (Test-Path -Path $path)) {
     Write-Host "ERROR: no configuration found at $path" -ForegroundColor Red
     showusage
@@ -583,10 +594,10 @@ function dotest {
   $original_toolchain = $null
   if ($config -ne $configfull) {
     $toolchain=$($configarr[1])
-    Write-Host "toolchain '$toolchain'"
+    # Write-Host "toolchain '$toolchain'"
   }
 
-  Write-Host (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+  Write-Host (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")  -ForegroundColor Yellow
   Write-Host "------------------------------------------------------------------------------------"
   distclean
   if ($skip -ne 1 ) {
@@ -599,41 +610,39 @@ function dotest {
 }
 
 
-Write-Host "There are a total of $($testlist.count) arguments."
-Write-Host " Start ..."
+# Write-Host "There are a total of $($testlist.count) arguments."
+# Write-Host " Start ..."
 
 foreach($line in $testlist) {
-    Write-Host "Find config: $linea" -ForegroundColor Green
+    # Write-Host "Find config: $line" -ForegroundColor Green
 
     $firstch = [string[]]$line | ForEach-Object { $_[0] }
 
     $arr = $line -split ','
     if ($firstch -eq '\') {
         $dir = $arr
-        Write-Host "dir: $($dir[0])"
-        Write-host "dir: There are a total of $($dir.count) arguments"
+        # Write-Host "dir: $($dir[0])"
+        # Write-host "dir: There are a total of $($dir.count) arguments"
         
         if (!$dir[1]) {
           $cnftoolchain=""
         } else {
           $cnftoolchain="," + $dir[1]
         }
-        Write-host "cnftoolchain: $cnftoolchain"
-
+        # Write-host "cnftoolchain: $cnftoolchain"
 
        # Searching for the file
-       Write-Host "Searching for the path boards: boards$($dir[0])" -ForegroundColor Green
+       # Write-Host "Searching for the path boards: boards$($dir[0])" -ForegroundColor Green
        $filePath = Get-ChildItem -Path "boards$($dir[0])" -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Name -eq "defconfig" }
        if ($filePath) {
-        Write-Host "File found: $($filePath.FullName)" -ForegroundColor Green
-
+        #Write-Host "File found: $($filePath.FullName)" -ForegroundColor Green
         foreach($i in $filePath) {
           $arrpath = $($i.FullName) -split '\\'
-          Write-host "arrpath: There are a total of $($arrpath.count) arguments"
-          Write-Host "File found: $($arrpath)" -ForegroundColor Green
-          Write-Host "File found: $($arrpath[$arrpath.count - 4]):$($arrpath[$arrpath.count - 2])" -ForegroundColor Green
+          # Write-host "arrpath: There are a total of $($arrpath.count) arguments"
+          # Write-Host "File found: $($arrpath)" -ForegroundColor Green
+          # Write-Host "File found: $($arrpath[$arrpath.count - 4]):$($arrpath[$arrpath.count - 2])" -ForegroundColor Green
           $list="$($arrpath[$arrpath.count - 4])\$($arrpath[$arrpath.count - 2])"
-          Write-Host "list: $list"
+          # Write-Host "list: $list"
           dotest "$list$cnftoolchain"
         }
 
@@ -649,7 +658,8 @@ foreach($line in $testlist) {
 
 ##Set-Location "$CID"
 #####
-$global:fail=0
+# $global:fail=0
+Write-Host "fail: $global:fail"
 Write-Host "===================================================================================="
 # dir $ARTIFACTDIR
 exit $global:fail
