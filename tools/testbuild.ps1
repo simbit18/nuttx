@@ -128,7 +128,7 @@ $MSVC=Find-VisualStudio
 # Test-GitVersion
 # write-host "There are a total of $($args.count) arguments"
 if (!$args[0]) {
-   usage
+   showusage
 }
 for ( $i = 0; $i -lt $args.count; $i++ ) {
     write-host "Argument  $i is $($args[$i])"
@@ -136,7 +136,7 @@ for ( $i = 0; $i -lt $args.count; $i++ ) {
         switch -regex -casesensitive ($($args[$i])) {
         '-h' {
             # Write-Host "-h" -ForegroundColor Green
-            usage
+            showusage
         }
         '-p' {
             # Write-Host "-p" -ForegroundColor Green
