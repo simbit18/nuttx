@@ -115,7 +115,7 @@ function kconfig_frontends() {
           Write-Host "Download: kconfig-frontends package" -ForegroundColor Green
           $basefile="kconfig-frontends-windows-mingw64"
           Set-Location "$NUTTXTOOLS"
-          # Download the kconfig-frontends toolchain prebuilt
+          # Download the kconfig-frontends prebuilt
           Invoke-WebRequest -Uri "https://github.com/simbit18/kconfig-frontends-windows-mingw64/releases/download/kconfig-frontends-4.11.0/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
           Expand-Archive "$NUTTXTOOLS\$basefile.zip"
           Move-Item -Path "$basefile\$basefile" -Destination "kconfig-frontends"
@@ -195,8 +195,30 @@ function rust() {
   rustc --version
 }
 
+function win_tools() {
+  Write-Host "Check win-tools ..." -ForegroundColor Green
+  add_path "$NUTTXTOOLS\win-tools"
+  try {
+      if (-not (Test-Path -Path "$NUTTXTOOLS\win-tools\busybox.exe")) {
+          # Download the file
+          Write-Host "Download: win-tools package" -ForegroundColor Green
+          $basefile="win-tools-v1.38.0"
+          Set-Location "$NUTTXTOOLS"
+          # Download the win_tools
+          Invoke-WebRequest -Uri "https://github.com/simbit18/win-tools/releases/download/win-tools-v1.38.0/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
+          Expand-Archive "$NUTTXTOOLS\$basefile.zip"
+          Move-Item -Path "$basefile\win-tools" -Destination "win-tools"
+          Remove-Item "$basefile*" -Force
+          Write-Host "File downloaded successfully to win-tools"
+      }
+  } catch {
+      Write-Error "Failed to download the file: $_"
+  }
+  busybox --list
+}
+
 function install_build_tools {
-  $install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain kconfig_frontends ninja_tool"
+  $install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain kconfig_frontends ninja_tool win_tools"
   $splitArray=$install.Split(" ")
   $oldpath = Get-Location
 
