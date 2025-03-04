@@ -83,7 +83,8 @@ ifeq ($(CONFIG_WINDOWS_NATIVE),y)
 
 # In the Windows native environment, the MinGW GCC compiler is used
 
-HOSTCC ?= mingw32-gcc.exe
+# HOSTCC ?= mingw32-gcc.exe
+HOSTCC ?= gcc.exe
 HOSTCFLAGS ?= -O2 -Wall -Wstrict-prototypes -Wshadow -DCONFIG_WINDOWS_NATIVE=y
 
 else
@@ -261,7 +262,7 @@ OBJPATH ?= .
 
 ifeq ($(CONFIG_WINDOWS_NATIVE),y)
   DEFINE ?= $(TOPDIR)\tools\define.bat
-  INCDIR ?= $(TOPDIR)\tools\incdir.bat
+  INCDIR ?= $(TOPDIR)\tools\incdir$(HOSTEXEEXT)
 else ifeq ($(CONFIG_CYGWIN_WINTOOL),y)
   DEFINE ?= "$(TOPDIR)/tools/define.sh" -w
   INCDIR ?= "$(TOPDIR)/tools/incdir$(HOSTEXEEXT)" -w
@@ -585,6 +586,22 @@ define CATFILE
 	$(Q) if [ -z "$(strip $(2))" ]; then echo '' > $(1); else cat $(2) > $1; fi
 endef
 endif
+
+# MKDIRECTORY -  Create one directory
+#
+# USAGE: $(call MKDIRECTORY,dest)
+
+ifeq ($(CONFIG_WINDOWS_NATIVE),y)
+define MKDIRECTORY
+	$(Q) if not exist $1 (mkdir $1)
+endef
+else
+define MKDIRECTORY
+	$(Q) mkdir -p $1
+endef
+endif
+
+
 
 # RWILDCARD - Recursive wildcard used to get lists of files from directories
 #

@@ -101,7 +101,8 @@ rem Check if we have to build configure.exe
 
 if exist configure.exe goto :HaveConfigureExe
 
-set cc=mingw32-gcc.exe
+rem set cc=mingw32-gcc.exe
+set cc=gcc.exe
 set cflags=-Wall -Wstrict-prototypes -Wshadow -g -I. -DCONFIG_WINDOWS_NATIVE=y
 echo %cc% %cflags% -o configure.exe configure.c cfgparser.c
 %cc% %cflags% -o configure.exe configure.c cfgparser.c
