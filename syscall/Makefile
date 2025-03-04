@@ -26,6 +26,9 @@ include proxies/Make.defs
 include stubs/Make.defs
 include wraps/Make.defs
 
+# ROOTSYSCALL=$(TOPDIR)$(DELIM)syscall
+
+
 MKSYSCALL = "$(TOPDIR)$(DELIM)tools$(DELIM)mksyscall$(HOSTEXEEXT)"
 CSVFILE = "$(TOPDIR)$(DELIM)syscall$(DELIM)syscall.csv"
 
@@ -52,10 +55,16 @@ COBJS = $(CSRCS:.c=$(OBJEXT))
 SRCS = $(ASRCS) $(CSRCS)
 OBJS = $(AOBJS) $(COBJS)
 
-PROXYDEPPATH = --dep-path proxies
-STUBDEPPATH = --dep-path stubs
-WRAPDEPPATH = --dep-path wraps
-VPATH = proxies:stubs:wraps
+
+VPATH += proxies
+VPATH += stubs
+VPATH += wraps
+PROVA = "$(patsubst %,--dep-path %,$(subst :, ,$(VPATH)))"
+$(info $$PROVA = $(PROVA))
+# PROXYDEPPATH = --dep-path proxies
+# STUBDEPPATH = --dep-path stubs
+# WRAPDEPPATH = --dep-path wraps
+# VPATH = proxies:stubs:wraps
 
 BIN1 = libproxies$(LIBEXT)
 BIN2 = libstubs$(LIBEXT)
@@ -87,13 +96,14 @@ makedepfile: $(CSRCS:.c=.ddc) $(ASRCS:.S=.dds)
 	$(call DELFILE, $^)
 
 .depend: Makefile $(SRCS) $(TOPDIR)$(DELIM).config
-	$(Q) $(MAKE) makedepfile DEPPATH="$(PROXYDEPPATH) $(STUBDEPPATH) $(WRAPDEPPATH)"
+	$(Q) $(MAKE) makedepfile DEPPATH="$(patsubst %,--dep-path %,$(subst :, ,$(VPATH)))"
+# $(Q) $(MAKE) makedepfile DEPPATH="$(PROXYDEPPATH) $(STUBDEPPATH) $(WRAPDEPPATH)"
 	$(Q) touch $@
 
 depend: .depend
 
 .context: syscall.csv
-	$(Q) $(MAKE) -C $(TOPDIR)$(DELIM)tools -f Makefile.host mksyscall
+	$(Q) $(MAKE) -C $(TOPDIR)$(DELIM)tools -f Makefile.host mksyscall$(HOSTEXEEXT)
 ifeq ($(CONFIG_LIB_SYSCALL),y)
 	$(Q) (cd proxies; $(MKSYSCALL) -p $(CSVFILE);)
 	$(Q) (cd stubs; $(MKSYSCALL) -s $(CSVFILE);)
@@ -108,6 +118,7 @@ endif
 context: .context
 
 clean:
+	$(Q) $(info $$REM2 = $(DELIM))
 	$(call DELFILE, $(BIN1))
 	$(call DELFILE, $(BIN2))
 	$(call DELFILE, $(BIN3))
@@ -119,6 +130,7 @@ endif
 	$(call CLEAN)
 
 distclean: clean
+	$(info $$REM3 = $(DELIM))
 	$(call DELFILE, .context)
 	$(call DELFILE, Make.dep)
 	$(call DELFILE, .depend)
