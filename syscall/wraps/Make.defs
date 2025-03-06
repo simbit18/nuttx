@@ -21,4 +21,4 @@
 ############################################################################
 
 # WRAP_SRCS := ${shell cd wraps; ls *.c 2>/dev/null }
-WRAP_SRCS := $(notdir $(wildcard WRAP_SRCS/*.c))
+WRAP_SRCS := $(notdir $(wildcard wraps/*.c))
