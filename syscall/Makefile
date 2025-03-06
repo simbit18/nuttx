@@ -39,6 +39,7 @@ ifeq ($(CONFIG_LIB_SYSCALL),y)
 PROXY_SRCS += syscall_names.c
 else
 WRAP_SRCS += syscall_names.c
+$(info $$WRAP_SRCS = $(WRAP_SRCS))
 endif
 endif
 STUB_SRCS += syscall_stublookup.c
