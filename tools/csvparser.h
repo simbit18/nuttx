@@ -34,7 +34,7 @@
  * Pre-processor Definitions
  ****************************************************************************/
 
-#define LINESIZE      (PATH_MAX > 320 ? PATH_MAX : 320)
+#define LINESIZE      (PATH_MAX > 512 ? PATH_MAX : 512)
 
 #define MAX_FIELDS    16
 #define MAX_PARMSIZE  256
