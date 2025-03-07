@@ -76,7 +76,7 @@ ifneq ($(CONFIG_SEGGER_RTT)$(CONFIG_SEGGER_SYSVIEW),)
 
 # Download and unpack tarball if no git repo found
 ifeq ($(wildcard $(SGDIR)/SystemView/.git),)
-TARGET_ZIP = $(SGDIR)/$(SYSVIEW_ZIP)
+TARGET_ZIP = $(SGDIR)$(DELIM)$(SYSVIEW_ZIP)
 
 $(SGDIR)/$(SYSVIEW_ZIP):
 	$(call DOWNLOAD,https://www.segger.com/downloads/systemview,$(SYSVIEW_ZIP),$(TARGET_ZIP))
@@ -89,6 +89,6 @@ context:: $(TARGET_ZIP)
 
 distclean::
 ifeq ($(wildcard $(SGDIR)/SystemView/.git),)
-	$(call DELDIR, $(SGDIR)/SystemView)
+	$(call DELDIR, $(SGDIR)$(DELIM)SystemView)
 endif
 	$(call DELFILE, $(TARGET_ZIP))
