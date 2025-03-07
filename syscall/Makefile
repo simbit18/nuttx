@@ -105,6 +105,17 @@ depend: .depend
 
 .context: syscall.csv
 	$(Q) $(MAKE) -C $(TOPDIR)$(DELIM)tools -f Makefile.host mksyscall$(HOSTEXEEXT)
+ifeq ($(CONFIG_WINDOWS_NATIVE),y)
+ifeq ($(CONFIG_LIB_SYSCALL),y)
+	$(Q) (cd proxies & $(MKSYSCALL) -p $(CSVFILE);)
+	$(Q) (cd stubs & $(MKSYSCALL) -s $(CSVFILE);)
+endif
+ifeq ($(CONFIG_SCHED_INSTRUMENTATION_SYSCALL),y)
+	$(Q) (cd wraps & $(MKSYSCALL) -w $(CSVFILE))
+	$(Q) $(CPP) $(CPPFLAGS) $(SYSCALLWRAPS:.ldcmd=.h) | \
+	  sed -e "1,/WRAPOPTSTARTS/d" -e "/^#/d" > $(SYSCALLWRAPS)
+endif
+else
 ifeq ($(CONFIG_LIB_SYSCALL),y)
 	$(Q) (cd proxies; $(MKSYSCALL) -p $(CSVFILE);)
 	$(Q) (cd stubs; $(MKSYSCALL) -s $(CSVFILE);)
@@ -113,6 +124,7 @@ ifeq ($(CONFIG_SCHED_INSTRUMENTATION_SYSCALL),y)
 	$(Q) (cd wraps; $(MKSYSCALL) -w $(CSVFILE);)
 	$(Q) $(CPP) $(CPPFLAGS) $(SYSCALLWRAPS:.ldcmd=.h) | \
 	  sed -e '1,/WRAPOPTSTARTS/d' -e '/^#/d' > $(SYSCALLWRAPS)
+endif
 endif
 	$(Q) touch $@
 
