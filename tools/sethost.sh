@@ -228,4 +228,5 @@ fi
 
 echo "  Refreshing..."
 
-${MAKECMD} olddefconfig $* || { echo "ERROR: failed to refresh"; exit 1; }
+#${MAKECMD} olddefconfig $* || { echo "ERROR: failed to refresh"; exit 1; }
+make olddefconfig $* || { echo "ERROR: failed to refresh"; exit 1; }
