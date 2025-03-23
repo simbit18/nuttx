@@ -20,6 +20,7 @@
 #
 
 set -e
+set -o xtrace
 
 WD=`test -d ${0%/*} && cd ${0%/*}; pwd`
 TOPDIR="${WD}/.."
