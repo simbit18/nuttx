@@ -20,6 +20,7 @@
 #
 
 set -e
+set -o xtrace
 
 progname=$0
 host=
