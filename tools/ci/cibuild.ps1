@@ -1,6 +1,7 @@
 #!/usr/bin/env pswd
 ############################################################################
 # tools/ci/cibuild.ps1
+# PowerShell script for CI on Windows Native
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -24,69 +25,55 @@
 # Set-PSDebug -Trace 0
 
 Write-Host "===================================================================================="
-# Write-Host "Run cibuild.ps1 !!!" -ForegroundColor Yellow
 $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
-Write-Host "Start: $timestamp" -ForegroundColor Yellow
+Write-Host "Start CI build: $timestamp" -ForegroundColor Yellow
 Write-Host "------------------------------------------------------------------------------------"
 
 
+$myname = $($MyInvocation.MyCommand.Name)
+
 $CID = Get-Location
-# Write-Host "CID: $CID" -ForegroundColor Green
-$CIWORKSPACE = Resolve-Path("$CID\..\..\..") # "$CID".Split("\", 3)
-# Write-Host "CIWORKSPACE: $CIWORKSPACE" -ForegroundColor Green
-$CIPLAT="$CIWORKSPACE\nuttx\tools\ci\platforms"
-# Write-Host "CIPLAT: $CIPLAT" -ForegroundColor Green
-$nuttx="$CIWORKSPACE\nuttx"
-$apps="$CIWORKSPACE\apps"
+$CIWORKSPACE = Resolve-Path("$CID\..\..\..")
+$CIPLAT = "$CIWORKSPACE\nuttx\tools\ci\platforms"
+$nuttx = "$CIWORKSPACE\nuttx"
+$apps = "$CIWORKSPACE\apps"
 
-# Check if source directory exists
-if (-Not (Test-Path -Path $apps)) {
-    Write-Host "Directory '$apps' does not exist." -ForegroundColor Red
-    exit 1
+if ($IsWindows -or ($Env:OS -match '^($|(Windows )?Win)')) {
+    Write-Host "$ENV:OS"
 }
-
-
-if ($IsWindows -or $ENV:OS) {
-    Write-Host "SO $ENV:OS"
-} else {
+else {
     Write-Host "Not Windows"
 }
 
 function install_tools {
-   $NUTTXTOOLS="$CIWORKSPACE\tools"
-   $env:NUTTXTOOLS = "$NUTTXTOOLS"
-   if (-not (Test-Path -Path $NUTTXTOOLS)) {
-      New-Item -ItemType Directory -Path $NUTTXTOOLS -Force > $null
-   }
-   $Pathps1="$CIPLAT\windows.ps1"
-   # Check if the file exists
-   if (Test-Path $Pathps1) {
-       try {
-           # Run the script
-           Write-Host "Executing script: $Pathps1"
-           & $Pathps1
-       }
-       catch {
-           # Handle errors
-           Write-Host "An error occurred while executing the script: $_" -ForegroundColor Red
-       }
-   }
-   else {
-       Write-Host "The specified script does not exist: $Pathps1" -ForegroundColor Red
-       exit 1
-   }
-
-#  source "${CIWORKSPACE}"/tools/env.sh
+    $NUTTXTOOLS = "$CIWORKSPACE\tools"
+    $env:NUTTXTOOLS = "$NUTTXTOOLS"
+    if (-not (Test-Path -Path $NUTTXTOOLS)) {
+        New-Item -ItemType Directory -Path $NUTTXTOOLS -Force > $null
+    }
+    $Pathps1 = "$CIPLAT\windows.ps1"
+    # Check if the file exists
+    if (Test-Path $Pathps1) {
+        try {
+            # Run the script
+            & $Pathps1
+        }
+        catch {
+            # Handle errors
+            Write-Host "An error occurred while executing the script: $_" -ForegroundColor Red
+        }
+    }
+    else {
+        Write-Host "The specified script does not exist: $Pathps1" -ForegroundColor Red
+        exit 1
+    }
 }
 
 # Function to display the help
 function usage {
-    # cls
     Write-Host ""
-    Write-Host "====================" -ForegroundColor Cyan
-    Write-Host "      Build NuttX      " -ForegroundColor Yellow
-    Write-Host "====================" -ForegroundColor Cyan
-    Write-Host "USAGE: $0 [-h] [-i] [-s] [-c] [-*] <testlist>"
+    Write-Host "USAGE: $myname [-h] [-i] [-s] [-c] [-*] <testlist>"
+    Write-Host ""
     Write-Host "Where:"
     Write-Host "  -i install tools"
     Write-Host "  -s setup repos"
@@ -99,47 +86,56 @@ function usage {
 }
 
 function enable_ccache {
-  Write-Host "enable_ccache: to-do"
+    # Currently for windows not needed
+    Write-Host "enable_ccache: to-do"
 }
 
 function setup_repos {
-  Write-Host "setup_repos: to-do"
-}
-# Function to check if Git is installed
-function Check-Git {
-  try {
-    git --version | Out-Null
-  } catch {
-    Write-Host "Git is not installed. Please install Git to use this script." -ForegroundColor Red
-    exit 1
-  }
+    $oldpath = Get-Location
+    
+    if (Test-Path $nuttx) {
+        Set-Location "$nuttx"
+        git pull
+        
+    }
+    else {
+        git clone https://github.com/apache/nuttx.git "$nuttx"
+        Set-Location "$nuttx"
+    }
+    git log -1
+
+    if (Test-Path $apps) {
+        Set-Location "$apps"
+        git pull
+    }
+    else {
+        git clone https://github.com/apache/nuttx-apps.git "$apps"
+        Set-Location "$apps"
+    }
+    git log -1
+
+    Set-Location "$oldpath"
 }
 
 function run_builds {
-  if ($builds -eq $null) {
-   Write-Host "ERROR: Missing test list file"  -ForegroundColor Red
-   usage
-  }
+    if ($null -eq $builds) {
+        Write-Host "ERROR: Missing test list file" -ForegroundColor Yellow
+        usage
+    }
   
-  # Write-Host "options: $options build: $builds" -ForegroundColor Yellow
-  foreach ( $build in $builds ) {
-    Write-Host "testlist: windows.dat" -ForegroundColor Yellow
-    & $nuttx\tools\testbuild.ps1 $options $build
-  }
+    foreach ( $build in $builds ) {
+        & $nuttx\tools\testbuild.ps1 $options $build
+    }
 
 }
-
-# Main script execution
-Check-Git
 
 $builds = @()
-# write-host "There are a total of $($args.count) arguments"
+
 if (!$args[0]) {
-   usage
+    usage
 }
 for ( $i = 0; $i -lt $args.count; $i++ ) {
-    # write-host "Argument  $i is $($args[$i])"
-        switch -regex -casesensitive ($($args[$i])) {
+    switch -regex -casesensitive ($($args[$i])) {
         '-h' {
             usage
         }
@@ -156,15 +152,14 @@ for ( $i = 0; $i -lt $args.count; $i++ ) {
             continue
         }
         { $_ -like '-*' } {
-            # Write-Host "3 -*" -ForegroundColor Green
-            $options += "$($args[$i]) " #$args[0]
+            $options += "$($args[$i]) "
             continue
         }
         default {
-            # Write-Host "Default $($args[$i])" -ForegroundColor Green
             $builds += $($args[$i])
         }
     }
 }
 
+# Main script execution
 run_builds
