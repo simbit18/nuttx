@@ -324,6 +324,32 @@ function rust() {
   rustc --version
 }
 
+function win_tools() {
+  Write-Host "Check win-tools ..." -ForegroundColor Green
+  add_path "$NUTTXTOOLS\win-tools"
+  $env:BB_GLOBBING=0
+  try {
+    if (-not (Test-Path -Path "$NUTTXTOOLS\win-tools\busybox.exe")) {
+      # Download the file
+      Write-Host "Download: win-tools package" -ForegroundColor Green
+      $basefile = "win-tools-v1.38.0"
+      Set-Location "$NUTTXTOOLS"
+      # Download the win_tools
+      Invoke-WebRequest -Uri "https://github.com/simbit18/win-tools/releases/download/win-tools-v1.38.0/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
+      Expand-Archive "$NUTTXTOOLS\$basefile.zip"
+      Move-Item -Path "$basefile\win-tools" -Destination "win-tools"
+      Remove-Item "$basefile*" -Force
+      Write-Host "File downloaded successfully to win-tools"
+    }
+    
+    busybox uname -a
+    Write-Host ""
+  }
+  catch {
+    Write-Error "Failed to download the file: $_"
+  }
+}
+
 function run_command ($command) {
   if ($null -eq (Get-Command "$command" -ErrorAction SilentlyContinue)) {
     return 1
@@ -337,8 +363,8 @@ function install_build_tools {
   if (-not (Test-Path -Path "$NUTTXTOOLS\env.ps1")) {
     add_envpath "$NUTTXTOOLS\env.ps1"
   }
-  $install = "arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain pico_sdk pico_tool cmake_tool kconfig_frontends ninja_tool"
 
+  $install = "arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain pico_sdk pico_tool cmake_tool kconfig_frontends ninja_tool"
   $splitArray = $install.Split(" ")
   $oldpath = Get-Location
 
