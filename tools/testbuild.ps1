@@ -34,6 +34,10 @@ $APPSDIR = "$WD\apps"
 if ($null -eq $ARTIFACTDIR) {
   $ARTIFACTDIR = "$WD\buildartifacts"
 }
+$MAKE = "make"
+$HOPTION = $null
+$STORE = $null
+$JOPTION = $null
 
 $PRINTLISTONLY = 0
 $GITCLEAN = 0
@@ -97,8 +101,17 @@ for ( $i = 0; $i -lt $args.count; $i++ ) {
     '-h' {
       showusage
     }
+    '-n' {
+      Write-Host "-c|-g|-l|-m" -ForegroundColor Green
+      $HOPTION += " $($args[$i])"
+    }
     '-p' {
       $PRINTLISTONLY = 1
+    }
+    '-j' {
+      Write-Host "-j $($args[$i + 1])" -ForegroundColor Green
+      $JOPTION = "-j $($args[$i + 1])"
+      $i += 1
     }
     '-G' {
       $GITCLEAN = 1
@@ -111,6 +124,10 @@ for ( $i = 0; $i -lt $args.count; $i++ ) {
     }
     '-N' {
       $NINJACMAKE = 1
+    }
+    '-S' {
+      Write-Host "-S" -ForegroundColor Green
+      $STORE += " $($args[$i])"
     }
     default {
       Write-Host "File $($args[$i])" -ForegroundColor Green
@@ -161,6 +178,21 @@ if ($NINJACMAKE -eq 1) {
   $cmakelist = $listfull | Select-String $patterncmakelist -AllMatches
 }
 
+function makefunc {
+  param (
+    [string]$make_cmd
+  )
+  try {
+    Write-Host "makefunc: Run $MAKE $make_cmd $JOPTION "
+    & cmd.exe /C `"$MAKE $make_cmd $JOPTION 2`>`&1 `" # Ok verbose
+    # & cmd.exe /C `"$MAKE $make_cmd $JOPTION `>nul 2`>`&1 `"
+  }
+  catch {
+    Write-Host "ERROR: $MAKE failed $_" -ForegroundColor Red
+    $global:fail = 1
+  }
+}
+
 # Clean up after the last build
 function distclean {
   Write-Host "  Cleaning..."
@@ -170,8 +202,12 @@ function distclean {
       git -C $APPSDIR clean -xfdq
     }
     else {
+      makefunc "distclean"
       # Remove .version manually because this file is shipped with
       # the release package and then distclean has to keep it.
+      if (Test-Path -Path ".version") {
+        Remove-Item ".version" -Force
+      }
       if ($CHECKCLEAN -ne 0) {
         if ((Test-Path -Path "$nuttx\.git") -or (Test-Path -Path "$APPSDIR\.git")) {
           try {
@@ -200,6 +236,49 @@ function run_command ($command) {
   return $_
 }
 
+# Configure for the next build
+
+function configure_default {
+  try {
+    $tmpconfig = $config -replace '\\', ':'
+
+    if ($tmpconfig -match "windows") {
+      Write-Host  "Only Cmake Visual Studio 2022."
+    }
+    else {
+      Write-Host "configure.ps1 $HOPTION $STORE $tmpconfig $JOPTION"
+      & .\tools\configure.ps1 $HOPTION $STORE "-j 4" $tmpconfig
+    }
+    Write-Host "Configuration completed successfully."
+  }
+  catch {
+    Write-Host "Configuration failed: $_"
+    $global:fail = 1
+  }
+   
+  if ($toolchain) {
+    # Write-Host "CMake toolchain: $toolchain" -ForegroundColor Green
+    $patternallitem = '_TOOLCHAIN_'
+    $contentconfig = Get-Content "$nuttx\.config"
+
+    $listtoolchain = $contentconfig | Select-String $patternallitem -AllMatches
+    # Write-Host "CMake toolchain: $listtoolchain" -ForegroundColor Green
+    $listtoolchain = $listtoolchain | Select-String 'CONFIG_TOOLCHAIN_WINDOWS', 'CONFIG_ARCH_TOOLCHAIN_*' -NotMatch | Select-String '=y' -AllMatches
+    $toolchainarr = $listtoolchain -split '='
+    # Write-Host "toolchainarr: $toolchainarr"
+    $original_toolchain = $($toolchainarr[0])
+    # Write-Host "original_toolchain: $original_toolchain"
+    if ($original_toolchain) {
+      Write-Host "  Disabling $original_toolchain"
+      kconfig-tweak.ps1 --file "$nuttx\.config" -d $original_toolchain
+    }
+
+    Write-Host "  Enabling $toolchain"
+    kconfig-tweak.ps1 --file "$nuttx\.config" -e $toolchain
+    makefunc "olddefconfig"
+  }
+  Write-Host "configure_default fail: $global:fail"
+}
 function configure_cmake {
   # Run CMake with specified configurations
 
@@ -254,8 +333,7 @@ function configure {
     configure_cmake
   }
   else {
-    # configure_default to-do
-    Write-Host "  configure_default" -ForegroundColor Green
+    configure_default
   }
 
 }
@@ -263,7 +341,34 @@ function configure {
 # Perform the next build
 
 function build_default {
-  # make build_default to-do
+  makefunc
+
+  if ($SAVEARTIFACTS -eq 1) {
+    $artifactconfigdir = "$ARTIFACTDIR\$config"
+    Write-Host "Copy in artifactconfigdir: $artifactconfigdir"
+    New-Item -Force -ItemType directory -Path $artifactconfigdir > $null
+    $contentmanifest = $null
+    if (Test-Path -Path "$nuttx\nuttx.manifest") {
+      $contentmanifest = Get-Content "$nuttx\nuttx.manifest"
+      # Write-Host "Manifest contentmanifest: $contentmanifest"
+      # Copy files with error handling
+      try {
+        foreach ($ma in $contentmanifest) {
+          # Write-Host "find manifest: $ma" -ForegroundColor Green
+          if (Test-Path -Path "$nuttx\$ma") {
+            Copy-Item -Path "$nuttx\$ma" -Destination $artifactconfigdir -Force -ErrorAction Stop
+          }
+          else {
+            Write-Host "build_default: missing file $nuttx\$ma"
+          }
+        }
+        Write-Host "  Files copied successfully from $nuttx to $artifactconfigdir."
+      }
+      catch {
+        Write-Host "An error occurred while copying files: $_" -ForegroundColor Red
+      }
+    }
+  }
 }
 
 function build_cmake {
@@ -319,8 +424,8 @@ function build {
     build_cmake
   }
   else {
-    # make build_default to-do
-    Write-Host "  build_default to-do" -ForegroundColor Green
+    # Write-Host "  build_default to-do" -ForegroundColor Green
+    build_default
   }
 }
 
@@ -423,6 +528,7 @@ function dotest {
   if ($NINJACMAKE -eq 1) {
     foreach ($l in $cmakelist) {
       if ("Cmake," + $config -replace '\\', ':' -eq "$l") {
+        Write-Host "Cmake in present: $config" -ForegroundColor Yellow
         $cmake = 1
       }
     }
