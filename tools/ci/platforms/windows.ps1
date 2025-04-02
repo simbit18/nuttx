@@ -381,7 +381,6 @@ function install_build_tools {
   if (-not (Test-Path -Path "$NUTTXTOOLS\env.ps1")) {
     add_envpath "$NUTTXTOOLS\env.ps1"
   }
-
   $install = "arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain pico_sdk pico_tool cmake_tool esp_tool kconfig_frontends ninja_tool"
 
   $splitArray = $install.Split(" ")
