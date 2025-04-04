@@ -29,7 +29,12 @@
 ifeq ($(CONFIG_APPS_DIR),)
 CONFIG_APPS_DIR = $(TOPDIR)/../apps
 endif
+
+ifeq ($(CONFIG_WINDOWS_NATIVE),y)
+APPDIR := $(subst /,\,$(realpath ${shell if exist "$(CONFIG_APPS_DIR)\Makefile" echo $(CONFIG_APPS_DIR)}))
+else
 APPDIR := $(realpath ${shell if [ -r $(CONFIG_APPS_DIR)/Makefile ]; then echo "$(CONFIG_APPS_DIR)"; fi})
+endif
 
 ifeq ($(APPDIR),)
 include $(TOPDIR)/Make.defs
