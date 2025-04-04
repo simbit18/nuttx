@@ -52,10 +52,9 @@ COBJS = $(CSRCS:.c=$(OBJEXT))
 SRCS = $(ASRCS) $(CSRCS)
 OBJS = $(AOBJS) $(COBJS)
 
-PROXYDEPPATH = --dep-path proxies
-STUBDEPPATH = --dep-path stubs
-WRAPDEPPATH = --dep-path wraps
-VPATH = proxies:stubs:wraps
+VPATH += proxies
+VPATH += stubs
+VPATH += wraps
 
 BIN1 = libproxies$(LIBEXT)
 BIN2 = libstubs$(LIBEXT)
@@ -87,13 +86,24 @@ makedepfile: $(CSRCS:.c=.ddc) $(ASRCS:.S=.dds)
 	$(call DELFILE, $^)
 
 .depend: Makefile $(SRCS) $(TOPDIR)$(DELIM).config
-	$(Q) $(MAKE) makedepfile DEPPATH="$(PROXYDEPPATH) $(STUBDEPPATH) $(WRAPDEPPATH)"
+	$(Q) $(MAKE) makedepfile DEPPATH="$(patsubst %,--dep-path %,$(subst :, ,$(VPATH)))"
 	$(Q) touch $@
 
 depend: .depend
 
 .context: syscall.csv
-	$(Q) $(MAKE) -C $(TOPDIR)$(DELIM)tools -f Makefile.host mksyscall
+	$(Q) $(MAKE) -C $(TOPDIR)$(DELIM)tools -f Makefile.host mksyscall$(HOSTEXEEXT)
+ifeq ($(CONFIG_WINDOWS_NATIVE),y)
+ifeq ($(CONFIG_LIB_SYSCALL),y)
+	$(Q) (cd proxies & $(MKSYSCALL) -p $(CSVFILE);)
+	$(Q) (cd stubs & $(MKSYSCALL) -s $(CSVFILE);)
+endif
+ifeq ($(CONFIG_SCHED_INSTRUMENTATION_SYSCALL),y)
+	$(Q) (cd wraps & $(MKSYSCALL) -w $(CSVFILE))
+	$(Q) $(CPP) $(CPPFLAGS) $(SYSCALLWRAPS:.ldcmd=.h) | \
+	  sed -e "1,/WRAPOPTSTARTS/d" -e "/^#/d" > $(SYSCALLWRAPS)
+endif
+else
 ifeq ($(CONFIG_LIB_SYSCALL),y)
 	$(Q) (cd proxies; $(MKSYSCALL) -p $(CSVFILE);)
 	$(Q) (cd stubs; $(MKSYSCALL) -s $(CSVFILE);)
@@ -102,6 +112,7 @@ ifeq ($(CONFIG_SCHED_INSTRUMENTATION_SYSCALL),y)
 	$(Q) (cd wraps; $(MKSYSCALL) -w $(CSVFILE);)
 	$(Q) $(CPP) $(CPPFLAGS) $(SYSCALLWRAPS:.ldcmd=.h) | \
 	  sed -e '1,/WRAPOPTSTARTS/d' -e '/^#/d' > $(SYSCALLWRAPS)
+endif
 endif
 	$(Q) touch $@
 

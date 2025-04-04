@@ -20,4 +20,4 @@
 #
 ############################################################################
 
-STUB_SRCS := ${shell cd stubs; ls *.c 2>/dev/null }
+STUB_SRCS := $(notdir $(wildcard stubs/*.c))
