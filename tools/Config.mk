@@ -83,7 +83,8 @@ ifeq ($(CONFIG_WINDOWS_NATIVE),y)
 
 # In the Windows native environment, the MinGW GCC compiler is used
 
-HOSTCC ?= mingw32-gcc.exe
+# HOSTCC ?= mingw32-gcc.exe
+HOSTCC ?= gcc.exe
 HOSTCFLAGS ?= -O2 -Wall -Wstrict-prototypes -Wshadow -DCONFIG_WINDOWS_NATIVE=y
 
 else
@@ -586,6 +587,26 @@ define CATFILE
 endef
 endif
 
+# MKDIRECTORY -  Create one directory
+#
+# USAGE: $(call MKDIRECTORY,dest)
+
+ifeq ($(CONFIG_WINDOWS_NATIVE),y)
+define MKDIRECTORY
+	$(Q) if not exist $1 (mkdir $1)
+endef
+else
+define MKDIRECTORY
+	$(Q) mkdir -p $1
+endef
+endif
+
+ifeq ($(CONFIG_WINDOWS_NATIVE),y)
+define ADDLISTFILE
+	$(Q) echo "ADDLISTFILE: $(1)"
+	$(foreach FILE, $(1), $(NEWLINE) $(Q) if exist $(FILE) (echo $(FILE) >> $(2)))
+endef
+endif
 # RWILDCARD - Recursive wildcard used to get lists of files from directories
 #
 # USAGE:  FILELIST = $(call RWILDCARD,<dir>,<wildcard-filename)
