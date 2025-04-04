@@ -95,7 +95,7 @@ AFLAGS += ${INCDIR_PREFIX}$(TOPDIR)$(DELIM)libs$(DELIM)libc
 MKSYMTAB = $(TOPDIR)$(DELIM)tools$(DELIM)mksymtab$(HOSTEXEEXT)
 
 $(MKSYMTAB):
-	$(Q) $(MAKE) -C $(TOPDIR)$(DELIM)tools -f Makefile.host mksymtab
+	$(Q) $(MAKE) -C $(TOPDIR)$(DELIM)tools -f Makefile.host mksymtab$(HOSTEXEEXT)
 
 # C library and math library symbols should be available in the FLAT
 # and PROTECTED builds.  KERNEL builds are separately linked and so should
