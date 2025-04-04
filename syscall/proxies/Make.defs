@@ -20,4 +20,4 @@
 #
 ############################################################################
 
-PROXY_SRCS := ${shell cd proxies; ls *.c 2>/dev/null }
+PROXY_SRCS := $(notdir $(wildcard proxies/*.c))
