@@ -24,7 +24,7 @@
 
 # Boards build by CMake
 
-CMake,nucleo-l152re:nsh
+-CMake,nucleo-l152re:nsh
 CMake,nucleo-f411re:nsh
 CMake,raspberrypi-pico:nsh
 CMake,rv-virt:nsh
