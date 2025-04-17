@@ -1,5 +1,5 @@
 # ##############################################################################
-# arch/arm/src/armv6-m/CMakeLists.txt
+# boards/arm/rp2040/raspberrypi-pico/src/CMakeLists.txt
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -20,28 +20,30 @@
 #
 # ##############################################################################
 
-set(SRCS
-    arm_exception.S
-    arm_saveusercontext.S
-    arm_cpuinfo.c
-    arm_doirq.c
-    arm_hardfault.c
-    arm_initialstate.c
-    arm_schedulesigaction.c
-    arm_sigdeliver.c
-    arm_svcall.c
-    arm_systemreset.c
-    arm_tcbinfo.c
-    arm_trigger_irq.c
-    arm_vectors.c)
+set(SRCS rp2040_boardinitialize.c rp2040_bringup.c)
 
-if((DEFINED CONFIG_DEBUG_FEATURES AND CONFIG_DEBUG_FEATURES)
-   OR (DEFINED CONFIG_ARM_COREDUMP_REGION AND CONFIG_ARM_COREDUMP_REGION))
-  list(APPEND SRCS arm_dumpnvic.c)
+if(CONFIG_DEV_GPIO)
+  list(APPEND SRCS rp2040_gpio.c)
 endif()
 
-if(CONFIG_ARCH_RAMVECTORS)
-  list(APPEND SRCS arm_ramvec_initialize.c arm_ramvec_attach.c)
+if(CONFIG_ARCH_LEDS)
+  list(APPEND SRCS rp2040_autoleds.c)
+else()
+  list(APPEND SRCS rp2040_userleds.c)
 endif()
 
-target_sources(arch PRIVATE ${SRCS})
+if(CONFIG_ARCH_BUTTONS)
+  list(APPEND SRCS rp2040_buttons.c)
+endif()
+
+if(CONFIG_BOARDCTL)
+  list(APPEND SRCS rp2040_appinit.c)
+endif()
+
+target_sources(board PRIVATE ${SRCS})
+
+if(CONFIG_RP2040_FLASH_BOOT)
+  set_property(GLOBAL PROPERTY LD_SCRIPT "${NUTTX_BOARD_DIR}/scripts/raspberrypi-pico-flash.ld")
+else()
+  set_property(GLOBAL PROPERTY LD_SCRIPT "${NUTTX_BOARD_DIR}/scripts/raspberrypi-pico-sram.ld")
+endif()
