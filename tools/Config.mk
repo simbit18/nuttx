@@ -620,6 +620,30 @@ define DOWNLOAD
 	$(ECHO_END)
 endef
 
+# CURL - Download file.
+#        The fourth argument is an storage path. The third argument is used
+#        if it is not provided or is empty.
+# Example: $(call CURL,$(URL_BASE),$(FOO_ARCHIVE),foo.out,foo_store.out)
+
+define CURL
+	$(ECHO_BEGIN)"Downloading: $(if $4,$4,$3) "
+	$(Q) $(if $4, \
+       $(call CURLSTORE,$1/$2,$4/$2,$3/$2), \
+       curl -L -Ss $1/$2 -o $3/$2)
+	$(ECHO_END)
+endef
+
+# CURLSTORE - Download file is an storage path.
+#             Internal a CURL
+
+define CURLSTORE
+	$(ECHO_BEGIN)"STORE -> $2"
+	$(Q) $(if $(wildcard $2),, \
+       curl -L -Ss $1 -o $2)
+	$(Q) cp -f  $2 $3
+	$(ECHO_END)
+endef
+
 # CLONE - Git clone repository. Initializes a new Git repository in the
 #         folder on your local machine and populates it with the contents
 #         of the central repository.
