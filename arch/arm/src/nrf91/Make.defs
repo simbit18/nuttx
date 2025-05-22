@@ -89,8 +89,16 @@ NRFXLIB_REF     := v$(NRFXLIB_VER)
 NRFXLIB_TGZ     := $(NRFXLIB_REF).tar.gz
 NRFXLIB_URL     := https://github.com/nrfconnect/sdk-nrfxlib/archive
 
+# $(NRFXLIB_TGZ):
+# $(call DOWNLOAD,$(NRFXLIB_URL),$(NRFXLIB_TGZ),chip/$(NRFXLIB_TGZ))
+
 $(NRFXLIB_TGZ):
-	$(call DOWNLOAD,$(NRFXLIB_URL),$(NRFXLIB_TGZ),chip/$(NRFXLIB_TGZ))
+ifneq ($(wildcard $(NXTMPDIR)/.*),)
+	$(call CURL,$(NRFXLIB_URL),$(NRFXLIB_TGZ),chip,$(NXTMPDIR))
+else
+	$(call CURL,$(NRFXLIB_URL),$(NRFXLIB_TGZ),chip)
+endif
+
 
 chip/$(NRFXLIB_UNPACK): $(NRFXLIB_TGZ)
 	$(Q) echo "Unpacking: NRXFLIB"
