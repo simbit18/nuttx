@@ -59,10 +59,19 @@ ifeq ($(CONFIG_FS_LITTLEFS_MULTI_VERSION),y)
 CFLAGS += -DLFS_MULTIVERSION
 endif
 
+LITTLEFS_URL     := https://github.com/ARMmbed/littlefs/archive
+
 LITTLEFS_TARBALL = $(shell echo $(CONFIG_FS_LITTLEFS_VERSION).tar.gz)
 
+# $(LITTLEFS_TARBALL):
+# $(call DOWNLOAD,https://github.com/ARMmbed/littlefs/archive,$(LITTLEFS_TARBALL),littlefs/$(LITTLEFS_TARBALL))
+
 $(LITTLEFS_TARBALL):
-	$(call DOWNLOAD,https://github.com/ARMmbed/littlefs/archive,$(LITTLEFS_TARBALL),littlefs/$(LITTLEFS_TARBALL))
+ifneq ($(wildcard $(NXTMPDIR)/.*),)
+	$(call CURL,$(LITTLEFS_URL),$(LITTLEFS_TARBALL),littlefs,$(NXTMPDIR))
+else
+	$(call CURL,$(LITTLEFS_URL),$(LITTLEFS_TARBALL),littlefs)
+endif
 
 .littlefsunpack: $(LITTLEFS_TARBALL)
 	$(Q) tar zxf littlefs/$(LITTLEFS_TARBALL) -C littlefs
