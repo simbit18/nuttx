@@ -628,8 +628,8 @@ endef
 define CURL
 	$(ECHO_BEGIN)"Downloading: $(if $4,$4,$3) "
 	$(Q) $(if $4, \
-       $(call CURLSTORE,$1/$2,$4/$2,$3/$2), \
-       curl -L -Ss $1/$2 -o $3/$2)
+       $(call CURLSTORE,$1/$2,$4/$2,$(if $3,$3/$2,$2), \
+       curl -L $(if $(V),,-Ss) $(1)/$(2) -o $(if $(3),$(3)/$(2),$(2)))
 	$(ECHO_END)
 endef
 
@@ -639,8 +639,8 @@ endef
 define CURLSTORE
 	$(ECHO_BEGIN)"STORE -> $2"
 	$(Q) $(if $(wildcard $2),, \
-       curl -L -Ss $1 -o $2)
-	$(Q) cp -f  $2 $3
+       curl -L $(if $(V),,-Ss) $(1) -o $(2))
+	$(Q) cp -f $2 $3
 	$(ECHO_END)
 endef
 
