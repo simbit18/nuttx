@@ -626,7 +626,7 @@ endef
 # Example: $(call CURL,$(URL_BASE),$(FOO_ARCHIVE),foo.out,foo_store.out)
 
 define CURL
-	$(ECHO_BEGIN)"Downloading: $(if $4,$4,$3) "
+	$(ECHO_BEGIN)"Downloading: $2"
 	$(Q) $(if $4, \
        $(call CURLSTORE,$1/$2,$4/$2,$(if $(3),$(3)/$(2),$(2))), \
        curl -L $(if $(V),,-Ss) $(1)/$(2) -o $(if $(3),$(3)/$(2),$(2)))
