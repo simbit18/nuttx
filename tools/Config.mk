@@ -620,7 +620,8 @@ define DOWNLOAD
 	$(ECHO_END)
 endef
 
-# CURL - Download file.
+# CURL - Download file. cURL command to download a file in the
+#        folder on your local machine.
 #        The fourth argument is an storage path. The third argument is used
 #        if it is not provided or is empty.
 # Example: $(call CURL,$(URL_BASE),$(FOO_ARCHIVE),foo.out,foo_store.out)
@@ -637,7 +638,7 @@ endef
 #             Internal a CURL
 
 define CURLSTORE
-	$(ECHO_BEGIN)"STORE -> $2"
+	$(ECHO_BEGIN)"Search in the storage path -> $2"
 	$(Q) $(if $(wildcard $2),, \
        curl -L $(if $(V),,-Ss) $(1) -o $(2))
 	$(Q) cp -f $2 $3
@@ -651,6 +652,26 @@ endef
 #         if it is not provided or is empty.
 # Example: $(call CLONE,$(URL_BASE),$(PATH),$(STORAGE_FOLDER))
 
+ifeq ($(CONFIG_WINDOWS_NATIVE),y)
+define CLONE
+	$(ECHO_BEGIN)"Clone: $(if $3,$3,$2) "
+	$(Q) $(if $3, \
+       $(call CLONESTORE,$1,$3,$2), \
+       git clone --quiet $1 $2)
+	$(ECHO_END)
+endef
+
+# CLONESTORE - Download file is an storage path.
+#              Internal a CLONE
+
+define CLONESTORE
+	$(ECHO_BEGIN)"Clone store: $1"
+	$(Q) $(if $(wildcard $2), \
+       cp -Rf $2 $3, \
+       git clone --quiet $1 $2)
+	$(ECHO_END)
+endef
+else
 define CLONE
 	$(ECHO_BEGIN)"Clone: $(if $3,$3,$2) "
 	if [ -z $3 ]; then \
@@ -663,6 +684,8 @@ define CLONE
 	fi
 	$(ECHO_END)
 endef
+endif
+
 
 # CHECK_COMMITSHA - Check if the branch contains the commit SHA-1.
 #         Remove the folder if the commit is not present in the branch.
@@ -670,6 +693,17 @@ endef
 #         The second argument is a unique SHA-1 hash value.
 # Example: $(call CHECK_COMMITSHA,$(GIT_FOLDER),$(COMMIT_SHA-1))
 
+ifeq ($(CONFIG_WINDOWS_NATIVE),y)
+define CHECK_COMMITSHA
+	$(ECHO_BEGIN)"COMMIT SHA-1: $2 "
+	$(Q) $(if $(wildcard $1), \
+            $(eval num_commits = $(shell git -C $1 branch --contains $2 2>&1)),)
+    $(Q) $(if $(num_commits), \
+             echo "Commit is not present removed folder $1 " \
+             && rm -Rf $1,)
+	$(ECHO_END)
+endef
+else
 define CHECK_COMMITSHA
 	$(ECHO_BEGIN)"COMMIT SHA-1: $2 "
 	if [ -d $1 ]; then \
@@ -680,6 +714,7 @@ define CHECK_COMMITSHA
 	fi
 	$(ECHO_END)
 endef
+endif
 
 # CLEAN - Default clean target
 
