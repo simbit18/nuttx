@@ -58,7 +58,7 @@ arm_gcc_toolchain() {
     unzip -qo ${basefile}.zip
     mv ${basefile} gcc-arm-none-eabi
     rm ${basefile}.zip
-    chmod +x gcc-arm-none-eabi
+    chmod +x gcc-arm-none-eabi/bin/arm-none-eabi-gcc
   fi
 
   command arm-none-eabi-gcc --version
