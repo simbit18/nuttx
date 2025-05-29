@@ -294,7 +294,7 @@ setup_links() {
 install_build_tools() {
   mkdir -p "${NUTTXTOOLS}"
   echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
-  install="arm_gcc_toolchain kconfig_frontends"
+  install="kconfig_frontends arm_gcc_toolchain"
   # install="arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain kconfig_frontends riscv_gcc_toolchain rust python_tools"
 
   oldpath=$(cd . && pwd -P)
