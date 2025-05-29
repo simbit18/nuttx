@@ -58,7 +58,7 @@ function install_tools {
       to_do "arch"
       ;;
     CYGWIN*)
-      to_do "CYGWIN"
+      "${CIPLAT}"/cygwin.sh
       ;;
     debian)
       to_do "debian"
