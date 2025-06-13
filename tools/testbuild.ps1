@@ -270,16 +270,17 @@ function build_cmake {
 
   # Build the project
   try {
-    if (cmake --build build 2> $null) {
+<#     if (cmake --build build 2> $null) {
       cmake --build build
       $global:fail = 1
-    }
-    $foo = (cmake --build build 2> $null)
+    } #>
+    $foo = (cmake --build build 1> $null)
     if ($null -eq $foo) {
       Write-Host "  Build completed successfully."
     }
     else {
       Write-Host "Build failed: $foo"
+      $global:fail = 1
     }
     # Write-Host "  Build completed successfully."
   }
