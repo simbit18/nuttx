@@ -274,14 +274,24 @@ function build_cmake {
       cmake --build build
       $global:fail = 1
     } #>
-    $foo = (cmake --build build 1> $null)
-    if ($null -eq $foo) {
-      Write-Host "  Build completed successfully."
-    }
-    else {
+    $foo = (cmake --build build 2> $null)
+    $err = $foo | ?{$_.gettype().Name -eq "Error"}
+    #if ($null -eq $foo) {
+    if($err) {
+      #Write-Host "  Build completed successfully."
       Write-Host "Build failed: $foo"
       $global:fail = 1
     }
+    else {
+      Write-Host "  Build completed successfully."
+      # Write-Host "Build failed: $foo"
+      # $global:fail = 1
+    }
+<# 	$test = dcdiag 2>&1
+$err = $test | ?{$_.gettype().Name -eq "ErrorRecord"}
+if($err){
+    # Error has occurred
+} #>
     # Write-Host "  Build completed successfully."
   }
   catch {
