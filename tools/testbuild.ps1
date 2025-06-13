@@ -270,12 +270,11 @@ function build_cmake {
 
   # Build the project
   try {
-    <# if (cmake --build build 2> $null) {
+    if (cmake --build build 1> $null) {
       cmake --build build
       $global:fail = 1
-    } #>
-    cmake --build build 2> $null
-    Write-Host "  Build completed successfully."
+    }
+    # Write-Host "  Build completed successfully."
   }
   catch {
     Write-Error "Build failed: $_"
@@ -301,6 +300,7 @@ function build_cmake {
     }
     catch {
       Write-Host "  An error occurred while copying files: $_" -ForegroundColor Red
+      $global:fail = 1
     }
   }
 }
