@@ -270,7 +270,7 @@ function build_cmake {
 
   # Build the project
   try {
-    if (cmake --build build >$null 2>&1) {
+    if (cmake --build build 2>&1) {
       cmake --build build
       $global:fail = 1
     }
