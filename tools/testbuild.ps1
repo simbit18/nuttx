@@ -281,7 +281,7 @@ function build_cmake {
      if (!$null -eq $foo) {
      Write-Host "Build failed: $foo" #>
 
-    cmake --build build 2>$null
+    cmake --build build 2>&1
      if ($lastExitCode -ne 0) { Write-Host "Executing 'cmake ..' failed with exit code $_" }
  
    # }
