@@ -276,6 +276,7 @@ function build_cmake {
     } #>
     #$foo = (cmake --build build 2> $null)
     $foo = (cmake --build build >$null 2>&1)
+    Write-Host "Build failed: $foo"
     $err = $foo | ?{$_.gettype().Name -eq "error"}
     #if ($null -eq $foo) {
     if($err) {
