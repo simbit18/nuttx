@@ -274,7 +274,8 @@ function build_cmake {
       cmake --build build
       $global:fail = 1
     } #>
-    $foo = (cmake --build build 2> $null)
+    #$foo = (cmake --build build 2> $null)
+    $foo = (cmake --build build >$null2>&1)
     $err = $foo | ?{$_.gettype().Name -eq "Error"}
     #if ($null -eq $foo) {
     if($err) {
