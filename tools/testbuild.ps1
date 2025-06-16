@@ -275,8 +275,8 @@ function build_cmake {
       $global:fail = 1
     } #>
        cmake --build build 2>&1 |
-  foreach ( ($_ -match 'error') -or
-    ($_ -match 'Error')) {$_ }
+  foreach { (($_ -match 'error') -or
+    ($_ -match 'Error')) $_ }
 <#     #$foo = (cmake --build build 2> $null)
     $foo = (cmake --build build 2>&1)
     Write-Host "Build failed: $foo"
