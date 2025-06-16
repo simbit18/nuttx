@@ -284,8 +284,7 @@ function build_cmake {
     cmake --build build 2>$null
      if ($lastExitCode -ne 0) { Write-Host "Executing 'cmake ..' failed with exit code $_" }
  
-
-    }
+   # }
    <#  cmake --build build >$null 2>&1 |
   foreach { (($_ -match 'error') -or
     ($_ -match 'Error')); $_ } #>
