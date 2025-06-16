@@ -274,9 +274,21 @@ function build_cmake {
       cmake --build build
       $global:fail = 1
     } #>
-    cmake --build build >$null 2>&1 |
+
+<#     $foo = (cmake --build build 2>$null) |
+      foreach { (($_ -match 'FAILED:') -or
+    ($_ -match 'Error')); $_ } 
+     if (!$null -eq $foo) {
+     Write-Host "Build failed: $foo" #>
+
+    cmake --build build 2>$null
+     if ($lastExitCode -ne 0) { Write-Host "Executing 'cmake ..' failed with exit code $_" }
+ 
+
+    }
+   <#  cmake --build build >$null 2>&1 |
   foreach { (($_ -match 'error') -or
-    ($_ -match 'Error')); $_ }
+    ($_ -match 'Error')); $_ } #>
 <#     #$foo = (cmake --build build 2> $null)
     $foo = (cmake --build build 2>&1)
     Write-Host "Build failed: $foo"
