@@ -281,8 +281,20 @@ function build_cmake {
      if (!$null -eq $foo) {
      Write-Host "Build failed: $foo" #>
 
-    cmake --build build 2>&1
-     if ($lastExitCode -ne 0) { Write-Host "Executing 'cmake ..' failed with exit code $_" }
+    # cmake --build build 2>&1
+    # if ($lastExitCode -ne 0) { Write-Host "Executing 'cmake ..' failed with exit code $_" }
+ 
+ 
+    $foo = @()
+    # $ErrorActionPreference = 'Stop'
+    $ErrorActionPreference = "Continue"
+    $foo = (cmake --build build 2>$null)
+    if ($lastExitCode -ne 0) { 
+      foreach($linea in $foo) {
+         Write-Host "$linea"
+       }
+    }
+ 
  
    # }
    <#  cmake --build build >$null 2>&1 |
