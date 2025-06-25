@@ -236,28 +236,34 @@ config SEGGER_SYSVIEW
 if SEGGER_SYSVIEW
 
 config SEGGER_SYSVIEW_RTT_CHANNEL
-	int "Segger System View RTT channel"
+	int "Segger SystemView RTT channel"
 	default 0
 	---help---
 		The RTT channel number for SystemView, zero find the unused one.
 
 config SEGGER_SYSVIEW_RTT_BUFFER_SIZE
-	int "Segger System View buffer size"
+	int "Segger SystemView buffer size"
 	default SEGGER_RTT_BUFFER_SIZE_UP
 	---help---
 		Number of bytes that SystemView uses for the RTT buffer.
 
 config SEGGER_SYSVIEW_RAM_BASE
-	int "Segger System View Ram Base"
+	int "Segger SystemView Ram Base"
 	default 0
 	---help---
 		The lowest RAM address used for IDs
 
 config SEGGER_SYSVIEW_POST_MORTEM
-	bool "Segger System View post-mortem mode"
+	bool "Segger SystemView  post-mortem mode"
 	default n
 	---help---
-		Configures the System View to record continuously in circular buffer
+		Configures the SystemView  to record continuously in circular buffer
+
+config SEGGER_SYSVIEW_VERSION
+	string "Segger SystemView version to use"
+	default "356"
+	---help---
+		The Segger SystemView version to use.
 
 endif # SEGGER_SYSVIEW
 
