@@ -7,6 +7,7 @@ menu "Segger RTT drivers"
 
 config SEGGER_RTT
 	bool
+	select SEGGER_SYSVIEW_VERSION
 	---help---
 		Enable Segger J-Link RTT libraries for platforms that support it.
 		Selection of this option enables use of RTT for various subsystems.
@@ -225,6 +226,7 @@ endif # NOTE_RTT
 config SEGGER_SYSVIEW
 	bool "Note SEGGER SystemView driver"
 	select SEGGER_RTT
+	select SEGGER_SYSVIEW_VERSION
 	---help---
 		SystemView is a real-time recording and visualization tool for embedded
 		systems that reveals the true runtime behavior of an application,
