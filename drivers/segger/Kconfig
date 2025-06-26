@@ -235,6 +235,7 @@ config SEGGER_SYSVIEW
 
 config SEGGER_SYSVIEW_VERSION
 	string "Segger SystemView version to use"
+	depends on SERIAL_RTT || SEGGER_SYSVIEW
 	default "356"
 	---help---
 		The Segger SystemView version to use.
