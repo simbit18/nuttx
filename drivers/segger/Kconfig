@@ -233,6 +233,12 @@ config SEGGER_SYSVIEW
 		systems comprising multiple threads and interrupts. SystemView can ensure
 		unintended interactions and resource conflicts.
 
+config SEGGER_SYSVIEW_VERSION
+	string "Segger SystemView version to use"
+	default "356"
+	---help---
+		The Segger SystemView version to use.
+
 if SEGGER_SYSVIEW
 
 config SEGGER_SYSVIEW_RTT_CHANNEL
@@ -258,12 +264,6 @@ config SEGGER_SYSVIEW_POST_MORTEM
 	default n
 	---help---
 		Configures the SystemView  to record continuously in circular buffer
-
-config SEGGER_SYSVIEW_VERSION
-	string "Segger SystemView version to use"
-	default "356"
-	---help---
-		The Segger SystemView version to use.
 
 endif # SEGGER_SYSVIEW
 
