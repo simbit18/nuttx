@@ -15,6 +15,7 @@ name: Build
 on:
   pull_request:
     paths-ignore:
+      - 'AUTHORS'
       - 'Documentation/**'
       - 'tools/ci/docker/linux/**'
   push:
