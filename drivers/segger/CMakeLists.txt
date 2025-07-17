@@ -22,13 +22,13 @@
 
 if(CONFIG_SEGGER_RTT OR CONFIG_SEGGER_SYSVIEW)
   if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/SystemView)
-
+    message(STATUS "No installed version of SystemView was found. Attempting to fetch [SystemView_Src_V${CONFIG_SEGGER_SYSVIEW_TARGET_SOURCE}.zip] from segger.com")
     #set(SYSVIEW_VERSION 356)
     FetchContent_Declare(
       systemview
       DOWNLOAD_NAME "SystemView.zip"
       DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}
-      URL "https://www.segger.com/downloads/systemview/SystemView_Src_V${CONFIG_SEGGER_SYSVIEW_VERSION}.zip"
+      URL "https://www.segger.com/downloads/systemview/SystemView_Src_V${CONFIG_SEGGER_SYSVIEW_TARGET_SOURCE}.zip"
           SOURCE_DIR
           ${CMAKE_CURRENT_LIST_DIR}/SystemView
           BINARY_DIR
