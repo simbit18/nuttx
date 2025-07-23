@@ -292,6 +292,7 @@ setup_links() {
 }
 
 install_build_tools() {
+  add_path "/usr/bin:$(cygpath "${SYSTEMROOT}")/System32"
   mkdir -p "${NUTTXTOOLS}"
   echo "#!/usr/bin/env sh" > "${NUTTXTOOLS}"/env.sh
   install="kconfig_frontends arm_gcc_toolchain"
