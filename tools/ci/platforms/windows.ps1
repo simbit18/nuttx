@@ -223,6 +223,26 @@ function ninja_tool {
   Write-Host ""
 }
 
+function pico_tool {
+  Write-Host "Check picotool ..." -ForegroundColor Green
+  if (run_command("picotool") -ne 0) {
+    add_path "$NUTTXTOOLS\picotool"
+    if ($null -eq (Get-Command picotool -ErrorAction SilentlyContinue)) {
+      Write-Host "Download: picotool package" -ForegroundColor Green
+      # Download the file
+      $basefile = "picotool-2.2.0-x64-win"
+      Set-Location "$NUTTXTOOLS"
+      # Download tool picotool
+      Invoke-WebRequest -Uri "https://github.com/raspberrypi/pico-sdk-tools/releases/download/v2.2.0-0/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
+      Expand-Archive "$NUTTXTOOLS\$basefile.zip" # -DestinationPath  "$basefile"
+      Move-Item -Path "$basefile\picotool" -Destination "picotool"
+      Remove-Item "$basefile*" -Force -Recurse
+    }
+  }
+  picotool version
+  Write-Host ""
+}
+
 function riscv_gcc_toolchain() {
   Write-Host "Check RISCV GCC toolchain ..." -ForegroundColor Green
   add_path "$NUTTXTOOLS\riscv-none-elf-gcc\bin"
@@ -292,7 +312,7 @@ function install_build_tools {
   if (-not (Test-Path -Path "$NUTTXTOOLS\env.ps1")) {
     add_envpath "$NUTTXTOOLS\env.ps1"
   }
-  $install = "arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain cmake_tool kconfig_frontends ninja_tool"
+  $install = "arm_clang_toolchain arm_gcc_toolchain arm64_gcc_toolchain riscv_gcc_toolchain cmake_tool kconfig_frontends ninja_tool pico_tool"
 
   $splitArray = $install.Split(" ")
   $oldpath = Get-Location
