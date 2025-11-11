@@ -213,7 +213,7 @@ function ninja_tool {
       $basefile = "ninja-win"
       Set-Location "$NUTTXTOOLS"
       # Download tool ninja
-      Invoke-WebRequest -Uri "https://github.com/ninja-build/ninja/releases/download/v1.12.1/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
+      Invoke-WebRequest -Uri "https://github.com/ninja-build/ninja/releases/download/v1.13.1/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
       Expand-Archive "$NUTTXTOOLS\$basefile.zip" # -DestinationPath  "$basefile"
       Move-Item -Path "$basefile" -Destination "ninja"
       Remove-Item "$basefile*" -Force
@@ -332,10 +332,10 @@ function win_tools() {
     if (-not (Test-Path -Path "$NUTTXTOOLS\win-tools\busybox.exe")) {
       # Download the file
       Write-Host "Download: win-tools package" -ForegroundColor Green
-      $basefile = "win-tools-v1.38.0"
+      $basefile = "win-tools-v1.38.1"
       Set-Location "$NUTTXTOOLS"
       # Download the win_tools
-      Invoke-WebRequest -Uri "https://github.com/simbit18/win-tools/releases/download/win-tools-v1.38.0/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
+      Invoke-WebRequest -Uri "https://github.com/simbit18/win-tools/releases/download/win-tools-v1.38.1/$basefile.zip" -OutFile "$NUTTXTOOLS\$basefile.zip" -ErrorAction Stop
       Expand-Archive "$NUTTXTOOLS\$basefile.zip"
       Move-Item -Path "$basefile\win-tools" -Destination "win-tools"
       Remove-Item "$basefile*" -Force
