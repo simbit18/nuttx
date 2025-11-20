@@ -48,7 +48,7 @@
 #  include "espressif/esp_wdt.h"
 #endif
 
-#ifdef CONFIG_ESP32_SPIFLASH
+#ifdef CONFIG_ESPRESSIF_SPIFLASH
 #  include "esp32_board_spiflash.h"
 #endif
 
@@ -80,7 +80,7 @@
 #  include "esp_board_rmt.h"
 #endif
 
-#ifdef CONFIG_ESP32_I2C
+#ifdef CONFIG_ESPRESSIF_I2C
 #  include "esp32_board_i2c.h"
 #endif
 
@@ -380,7 +380,9 @@ int esp_bringup(void)
     }
 #endif
 
-#if defined(CONFIG_I2C)
+/* #if defined(CONFIG_I2C) */
+
+#if defined(CONFIG_ESPRESSIF_I2C)
   /* Configure I2C peripheral interfaces */
 
   ret = board_i2c_init();
