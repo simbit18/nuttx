@@ -29,8 +29,14 @@
 
 /* GPIO pins used by the GPIO Subsystem */
 
-#define BOARD_NGPIOOUT    1 /* Amount of GPIO Output pins */
+#define BOARD_NGPIOOUT    2 /* Amount of GPIO Output pins */
 #define BOARD_NGPIOINT    1 /* Amount of GPIO Input w/ Interruption pins */
+
+/* ESP32C3-Generic GPIOs ****************************************************/
+
+/* BOOT Button */
+
+#define BUTTON_BOOT  9
 
 #endif /* __BOARDS_RISCV_ESP32C3_ESP32_C3_ZERO_INCLUDE_BOARD_H */
 

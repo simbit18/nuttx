@@ -37,12 +37,19 @@
 #include <nuttx/fs/fs.h>
 
 #include "esp_board_ledc.h"
-#include "esp_board_spiflash.h"
-#include "esp_board_i2c.h"
-#include "esp_board_bmp280.h"
+/* #include "esp_board_spiflash.h" */
+/* #include "esp_board_i2c.h" */
+
+#ifdef CONFIG_ESPRESSIF_ADC
+#  include "esp_board_adc.h"
+#endif
 
 #ifdef CONFIG_WATCHDOG
 #  include "espressif/esp_wdt.h"
+#endif
+
+#ifdef CONFIG_ESP32_SPIFLASH
+#  include "esp32_board_spiflash.h"
 #endif
 
 #ifdef CONFIG_TIMER
@@ -61,12 +68,20 @@
 #  include "espressif/esp_gpio.h"
 #endif
 
+#ifdef CONFIG_INPUT_BUTTONS
+#  include <nuttx/input/buttons.h>
+#endif
+
 #ifdef CONFIG_ESPRESSIF_EFUSE
 #  include "espressif/esp_efuse.h"
 #endif
 
 #ifdef CONFIG_ESP_RMT
 #  include "esp_board_rmt.h"
+#endif
+
+#ifdef CONFIG_ESP32_I2C
+#  include "esp32_board_i2c.h"
 #endif
 
 #ifdef CONFIG_ESPRESSIF_I2S
@@ -104,6 +119,26 @@
 
 #ifdef CONFIG_SYSTEM_NXDIAG_ESPRESSIF_CHIP_WO_TOOL
 #  include "espressif/esp_nxdiag.h"
+#endif
+
+#ifdef CONFIG_ESP_SDM
+#  include "espressif/esp_sdm.h"
+#endif
+
+#ifdef CONFIG_ESPRESSIF_SHA_ACCELERATOR
+#  include "espressif/esp_sha.h"
+#endif
+
+#ifdef CONFIG_MMCSD_SPI
+#  include "esp_board_mmcsd.h"
+#endif
+
+#ifdef CONFIG_SENSORS_BMP180
+#  include "esp_board_bmp180.h"
+#endif
+
+#ifdef CONFIG_SENSORS_BMP280
+#  include "esp_board_bmp280.h"
 #endif
 
 #include "esp32-c3-zero.h"
@@ -166,6 +201,16 @@ int esp_bringup(void)
   if (ret < 0)
     {
       syslog(LOG_ERR, "ERROR: Failed to init EFUSE: %d\n", ret);
+    }
+#endif
+
+#if defined(CONFIG_ESPRESSIF_SHA_ACCELERATOR) && \
+    !defined(CONFIG_CRYPTO_CRYPTODEV_HARDWARE)
+  ret = esp_sha_init();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR,
+             "ERROR: Failed to initialize SHA: %d\n", ret);
     }
 #endif
 
@@ -234,6 +279,14 @@ int esp_bringup(void)
     }
 #  endif /* CONFIG_ESPRESSIF_SPI_BITBANG */
 #endif /* CONFIG_ESPRESSIF_SPI */
+
+#if defined(CONFIG_ESPRESSIF_SPI) && defined(CONFIG_MMCSD_SPI)
+  ret = esp_mmcsd_spi_initialize();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "ERROR: failed to init MMCSD SPI\n");
+    }
+#endif
 
 #ifdef CONFIG_ESPRESSIF_SPIFLASH
   ret = board_spiflash_init();
@@ -350,6 +403,23 @@ int esp_bringup(void)
     }
 #endif
 
+#ifdef CONFIG_ESP_SDM
+  struct esp_sdm_chan_config_s config =
+  {
+    .gpio_num = 5,
+    .sample_rate_hz = 1000 * 1000,
+    .flags = 0,
+  };
+
+  struct dac_dev_s *dev = esp_sdminitialize(config);
+  ret = dac_register("/dev/dac0", dev);
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "Failed to initialize DAC driver: %d\n",
+             ret);
+    }
+#endif
+
 #ifdef CONFIG_ESPRESSIF_TWAI
 
   /* Initialize TWAI and register the TWAI driver. */
@@ -369,6 +439,16 @@ int esp_bringup(void)
     }
 #endif
 
+#if defined(CONFIG_INPUT_BUTTONS) && defined(CONFIG_INPUT_BUTTONS_LOWER)
+  /* Register the BUTTON driver */
+
+  ret = btn_lower_initialize("/dev/buttons");
+  if (ret < 0)
+    {
+      ierr("ERROR: btn_lower_initialize() failed: %d\n", ret);
+    }
+#endif
+
 #ifdef CONFIG_ESPRESSIF_LEDC
   ret = board_ledc_setup();
   if (ret < 0)
@@ -382,6 +462,14 @@ int esp_bringup(void)
   if (ret < 0)
     {
       syslog(LOG_ERR, "ERROR: esp_nxdiag_initialize failed: %d\n", ret);
+    }
+#endif
+
+#ifdef CONFIG_ESPRESSIF_ADC
+  ret = board_adc_init();
+  if (ret < 0)
+    {
+      syslog(LOG_ERR, "Failed to initialize ADC driver: %d\n", ret);
     }
 #endif
 
