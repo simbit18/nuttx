@@ -4803,6 +4803,9 @@ endif
 if ARCH_BOARD_ESP32C3_XIAO
 source "boards/risc-v/esp32c3/esp32c3-xiao/Kconfig"
 endif
+if ARCH_BOARD_ESP32_C3_ZERO
+source "boards/risc-v/esp32c3/esp32-c3-zero/Kconfig"
+endif
 if ARCH_BOARD_ESP32S2_KALUGA_1
 source "boards/xtensa/esp32s2/esp32s2-kaluga-1/Kconfig"
 endif
