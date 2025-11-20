@@ -49,7 +49,7 @@
 #endif
 
 #ifdef CONFIG_ESPRESSIF_SPIFLASH
-#  include "esp32_board_spiflash.h"
+#  include "esp_board_spiflash.h"
 #endif
 
 #ifdef CONFIG_TIMER
@@ -81,7 +81,7 @@
 #endif
 
 #ifdef CONFIG_ESPRESSIF_I2C
-#  include "esp32_board_i2c.h"
+#  include "esp_board_i2c.h"
 #endif
 
 #ifdef CONFIG_ESPRESSIF_I2S
