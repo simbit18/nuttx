@@ -49,9 +49,8 @@ RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -q
 RUN mkdir -p /tools
 WORKDIR /tools
 
-RUN mkdir -p /tools/nuttx-tools
-RUN curl -s -L https://bitbucket.org/nuttx/tools/get/9ad3e1ee75c7.tar.gz \
-  | tar -C nuttx-tools --strip-components=1 -xz
+RUN mkdir -p /tools/nuttx-tools \
+  && git clone --depth 1 https://github.com/patacongo/tools nuttx-tools
 
 RUN mkdir -p /tools/bloaty \
   && git clone --depth 1 --branch v1.1 https://github.com/google/bloaty bloaty-src \
