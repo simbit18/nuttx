@@ -102,8 +102,8 @@ function(nuttx_add_romfs)
     ARGN
     ${ARGN})
 
-  if(NOT PATH AND NOT FILES)
-    message(FATAL_ERROR "Either PATH or FILES must be specified")
+  if(NOT PATH)
+    message(FATAL_ERROR "PATH must be specified")
   endif()
 
   if(TARGET board)
@@ -181,16 +181,47 @@ function(nuttx_add_romfs)
     set(IMGNAME romfs.img)
   endif()
 
-  add_custom_command(
+  # create romfs.img
+  find_program(GENROMFS genromfs)
+  if(NOT GENROMFS)
+    message(FATAL_ERROR "genromfs not found")
+  endif()
+
+  # create nsh_romfsimg.c
+  find_program(XXD xxd)
+  if(NOT XXD)
+    message(FATAL_ERROR "xxd not found")
+  endif()
+
+  find_program(SED sed)
+  if(NOT SED)
+    message(FATAL_ERROR "sed not found")
+  endif()
+  
+  if(EXISTS ${PATH})
+    add_custom_command(
+        OUTPUT romfs_${NAME}
+        COMMAND ${CMAKE_COMMAND} -E make_directory romfs_${NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH} romfs_${NAME}
+        DEPENDS ${DEPENDS})
+  endif()
+  
+  if(NOT NONCONST)
+    add_custom_command(
     OUTPUT romfs_${NAME}.${EXTENSION}
     COMMAND ${CMAKE_COMMAND} -E make_directory romfs_${NAME}
-    COMMAND if \[ \"${PATH}\" != \"\" \]; then ${CMAKE_COMMAND} -E
-            copy_directory ${PATH} romfs_${NAME} \; fi
     COMMAND genromfs -f ${IMGNAME} -d romfs_${NAME} -V ${NAME}
     COMMAND xxd -i ${IMGNAME} romfs_${NAME}.${EXTENSION}
-    COMMAND if ! [ -z "${NONCONST}" ]\; then sed -E -i'' -e
-            "s/^unsigned/const unsigned/g" romfs_${NAME}.${EXTENSION} \; fi
+    COMMAND sed -E -i'' -e "s/^unsigned/const unsigned/g" romfs_${NAME}.${EXTENSION}
     DEPENDS ${DEPENDS})
+  else()
+    add_custom_command(
+    OUTPUT romfs_${NAME}.${EXTENSION}
+    COMMAND ${CMAKE_COMMAND} -E make_directory romfs_${NAME}
+    COMMAND genromfs -f ${IMGNAME} -d romfs_${NAME} -V ${NAME}
+    COMMAND xxd -i ${IMGNAME} romfs_${NAME}.${EXTENSION}
+    DEPENDS ${DEPENDS})
+  endif()
 
   if(NOT HEADER)
     add_custom_target(target-romfs DEPENDS ${DEPENDS})
@@ -200,12 +231,18 @@ function(nuttx_add_romfs)
   endif()
 endfunction()
 
-# nuttx_add_cromfs Generates a CROMFS image in a C array, which is built to an
-# OBJECT library.
+# ~~~
+# nuttx_add_cromfs
 #
-# Parameters: - NAME: determines the name of target (cromfs_${NAME}) - PATH: the
-# directory that will be used to create the CROMFS - FILES: paths to files to
-# copy into CROMFS - DEPENDS: list of targets that should be depended on
+# Description:
+#   Generates a CROMFS image in a C array, which is built to an OBJECT library.
+#
+# Parameters:
+#   NAME   : determines the name of target (cromfs_${NAME})
+#   PATH   : the directory that will be used to create the CROMFS
+#   FILES  : paths to files to copy into CROMFS
+#   DEPENDS: list of targets that should be depended on
+# ~~~
 
 function(nuttx_add_cromfs)
   nuttx_parse_function_args(
