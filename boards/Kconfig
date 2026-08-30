@@ -705,6 +705,14 @@ config ARCH_BOARD_ESP32H2_DEVKIT
 	---help---
 		The ESP32-H2 DevKit features the ESP32-H2 CPU with a RISC-V core.
 
+config ARCH_BOARD_ESP32_H2_DEV_KIT_N4
+	bool "Waveshare ESP32-H2-DEV-KIT-N4"
+	depends on ARCH_CHIP_ESP32H2
+	select ARCH_HAVE_BUTTONS
+	select ARCH_HAVE_IRQBUTTONS
+	---help---
+		The ESP32-H2-DEV-KIT-N4 from Waveshare features the ESP32-H2 CPU with a RISC-V core.
+
 config ARCH_BOARD_ESP32P4_FUNCTION_EV_BOARD
 	bool "Espressif ESP32-P4 Function EV Board"
 	depends on ARCH_CHIP_ESP32P4
@@ -3931,6 +3939,7 @@ config ARCH_BOARD
 	default "esp32c6-devkitm"              if ARCH_BOARD_ESP32C6_DEVKITM
 	default "esp32c6-xiao"                 if ARCH_BOARD_ESP32C6_XIAO
 	default "esp32h2-devkit"               if ARCH_BOARD_ESP32H2_DEVKIT
+	default "esp32-h2-dev-kit-n4"          if ARCH_BOARD_ESP32_H2_DEV_KIT_N4
 	default "esp32p4-function-ev-board"    if ARCH_BOARD_ESP32P4_FUNCTION_EV_BOARD
 	default "esp32p4-pico-wifi-wareshare"  if ARCH_BOARD_ESP32P4_PICO_WIFI_WARESHARE
 	default "esp32p4-tab5"                 if ARCH_BOARD_ESP32P4_TAB5
@@ -5332,6 +5341,9 @@ endif
 #endif
 if ARCH_BOARD_ESP32H2_DEVKIT
 source "boards/risc-v/esp32h2/esp32h2-devkit/Kconfig"
+endif
+if ARCH_BOARD_ESP32_H2_DEV_KIT_N4
+source "boards/risc-v/esp32h2/esp32-h2-dev-kit-n4/Kconfig"
 endif
 if ARCH_BOARD_ESP32P4_FUNCTION_EV_BOARD
 source "boards/risc-v/esp32p4/esp32p4-function-ev-board/Kconfig"
