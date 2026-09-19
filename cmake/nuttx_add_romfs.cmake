@@ -197,32 +197,30 @@ function(nuttx_add_romfs)
   if(NOT SED)
     message(FATAL_ERROR "sed not found")
   endif()
-  
-  if(EXISTS ${PATH})
-    add_custom_command(
-        OUTPUT romfs_${NAME}
-        COMMAND ${CMAKE_COMMAND} -E make_directory romfs_${NAME}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH} romfs_${NAME}
-        DEPENDS ${DEPENDS})
-  endif()
-  
+
   if(NOT NONCONST)
     add_custom_command(
-    OUTPUT romfs_${NAME}.${EXTENSION}
-    COMMAND ${CMAKE_COMMAND} -E make_directory romfs_${NAME}
-    COMMAND genromfs -f ${IMGNAME} -d romfs_${NAME} -V ${NAME}
-    COMMAND ${CMAKE_COMMAND} -E echo "#include <nuttx/compiler.h>" >
-          ${CMAKE_CURRENT_BINARY_DIR}/romfs_${NAME}.${EXTENSION}
-    COMMAND xxd -i ${IMGNAME} >> romfs_${NAME}.${EXTENSION}
-    COMMAND sed -E -i'' -e "s/^unsigned char/const unsigned char aligned_data(4)/g" romfs_${NAME}.${EXTENSION}
-    DEPENDS ${DEPENDS})
+      OUTPUT romfs_${NAME}.${EXTENSION}
+      COMMAND ${CMAKE_COMMAND} -E make_directory romfs_${NAME}
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH}
+              "${CMAKE_CURRENT_BINARY_DIR}/romfs_${NAME}"
+      COMMAND genromfs -f ${IMGNAME} -d romfs_${NAME} -V "${NAME}"
+      COMMAND ${CMAKE_COMMAND} -E echo "#include <nuttx/compiler.h>" >
+              ${CMAKE_CURRENT_BINARY_DIR}/romfs_${NAME}.${EXTENSION}
+      COMMAND xxd -i ${IMGNAME} >> romfs_${NAME}.${EXTENSION}
+      COMMAND
+        sed -E -i'' -e "s/^unsigned char/const unsigned char aligned_data(4)/g"
+        romfs_${NAME}.${EXTENSION}
+      DEPENDS ${DEPENDS})
   else()
     add_custom_command(
-    OUTPUT romfs_${NAME}.${EXTENSION}
-    COMMAND ${CMAKE_COMMAND} -E make_directory romfs_${NAME}
-    COMMAND genromfs -f ${IMGNAME} -d romfs_${NAME} -V ${NAME}
-    COMMAND xxd -i ${IMGNAME} romfs_${NAME}.${EXTENSION}
-    DEPENDS ${DEPENDS})
+      OUTPUT romfs_${NAME}.${EXTENSION}
+      COMMAND ${CMAKE_COMMAND} -E make_directory romfs_${NAME}
+      COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH}
+              "${CMAKE_CURRENT_BINARY_DIR}/romfs_${NAME}"
+      COMMAND genromfs -f ${IMGNAME} -d romfs_${NAME} -V "${NAME}"
+      COMMAND xxd -i ${IMGNAME} romfs_${NAME}.${EXTENSION}
+      DEPENDS ${DEPENDS})
   endif()
 
   if(NOT HEADER)
