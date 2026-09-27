@@ -193,25 +193,23 @@ function(nuttx_add_romfs)
     message(FATAL_ERROR "xxd not found")
   endif()
 
-  find_program(SED sed)
-  if(NOT SED)
-    message(FATAL_ERROR "sed not found")
-  endif()
-
   if(NOT NONCONST)
+
     add_custom_command(
       OUTPUT romfs_${NAME}.${EXTENSION}
       COMMAND ${CMAKE_COMMAND} -E make_directory romfs_${NAME}
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH}
               "${CMAKE_CURRENT_BINARY_DIR}/romfs_${NAME}"
       COMMAND genromfs -f ${IMGNAME} -d romfs_${NAME} -V "${NAME}"
-      COMMAND ${CMAKE_COMMAND} -E echo "#include <nuttx/compiler.h>" >
-              ${CMAKE_CURRENT_BINARY_DIR}/romfs_${NAME}.${EXTENSION}
-      COMMAND xxd -i ${IMGNAME} >> romfs_${NAME}.${EXTENSION}
+      COMMAND xxd -i ${IMGNAME} romfs_${NAME}.tmp
       COMMAND
-        sed -E -i'' -e "s/^unsigned char/const unsigned char aligned_data(4)/g"
-        romfs_${NAME}.${EXTENSION}
-      DEPENDS ${DEPENDS})
+        ${CMAKE_COMMAND}
+        -DROMFS_SRC=${CMAKE_CURRENT_BINARY_DIR}/romfs_${NAME}.${EXTENSION}
+        -DROMFS_SRC_TMP=${CMAKE_CURRENT_BINARY_DIR}/romfs_${NAME}.tmp -P
+        ${NUTTX_DIR}/cmake/nuttx_generate_romfsimg.cmake
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      DEPENDS ${DEPENDS}
+      COMMENT "Generating nsh_romfsimg.c")
   else()
     add_custom_command(
       OUTPUT romfs_${NAME}.${EXTENSION}
@@ -220,9 +218,10 @@ function(nuttx_add_romfs)
               "${CMAKE_CURRENT_BINARY_DIR}/romfs_${NAME}"
       COMMAND genromfs -f ${IMGNAME} -d romfs_${NAME} -V "${NAME}"
       COMMAND xxd -i ${IMGNAME} romfs_${NAME}.${EXTENSION}
-      DEPENDS ${DEPENDS})
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      DEPENDS ${DEPENDS}
+      COMMENT "Generating nsh_romfsimg.c")
   endif()
-
   if(NOT HEADER)
     add_custom_target(target-romfs DEPENDS ${DEPENDS})
     nuttx_add_aux_library(romfs_${NAME})
